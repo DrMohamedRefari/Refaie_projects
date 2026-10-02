@@ -250,6 +250,125 @@ textarea.cv-in{resize:vertical;min-height:84px}
 .cv-foot{display:flex;flex-wrap:wrap;gap:8px;padding:12px 16px;border-top:1px solid var(--line);background:var(--surface)}
 .cv-foot .cv-btn{flex:1 1 120px}
 @media(prefers-reduced-motion:reduce){.cv-modal,.cv-card{transition:none}}
+
+/* ===== Editor redesign v2 + usage guide ===== */
+.nav-btn .lbl-short{display:none}
+.nav-btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;white-space:nowrap}
+.nav-btn.help{background:var(--accent-soft);color:var(--strong);border-color:color-mix(in srgb,var(--accent) 35%,var(--line))}
+.nav-btn.help svg{width:18px;height:18px;flex:none}
+.nav-btn.help.pulse{animation:helpPulse 2.2s ease-in-out infinite}
+@keyframes helpPulse{0%,100%{box-shadow:0 0 0 0 color-mix(in srgb,var(--accent) 45%,transparent)}60%{box-shadow:0 0 0 9px transparent}}
+
+#editorScreen{padding-top:22px}
+.editor-head{display:block;padding:22px 24px 16px;background:linear-gradient(180deg,var(--surface-2),var(--surface));border-bottom:0}
+.editor-title{font-size:24px;line-height:1.45}
+.editor-sub{margin:7px 0 0;font-size:13.5px;line-height:1.85;max-width:60ch}
+.ed-bar{display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:9px 14px;border-block:1px solid var(--line);background:var(--surface-2)}
+.ed-chip{display:inline-flex;align-items:center;gap:7px;min-height:38px;padding:6px 13px;border-radius:11px;border:1px solid var(--line);background:var(--surface);color:var(--text);font-weight:800;font-size:13.5px;transition:background .15s,border-color .15s,transform .12s}
+.ed-chip:hover{border-color:var(--accent);background:var(--accent-soft)}.ed-chip:active{transform:scale(.97)}
+.ed-chip svg{width:17px;height:17px;flex:none}
+.ed-bar .clear-btn{min-height:38px;padding:6px 13px;font-size:13.5px;border-radius:11px}
+.ed-count{margin-inline-start:auto;font-size:12.5px;font-weight:700;color:var(--muted);font-variant-numeric:tabular-nums}
+#markdownInput{min-height:max(300px,calc(100vh - 430px))}
+.ed-go{padding:16px 16px 6px;background:var(--surface)}
+.ed-go-btn{width:100%;display:flex;align-items:center;justify-content:center;gap:10px;min-height:56px;padding:10px 18px;border:0;border-radius:16px;background:var(--accent);color:var(--on-c);font-weight:900;font-size:18px;box-shadow:0 8px 20px color-mix(in srgb,var(--accent) 34%,transparent);transition:transform .15s,box-shadow .15s}
+.ed-go-btn:hover{transform:translateY(-1px)}.ed-go-btn:active{transform:scale(.985)}
+.ed-go-btn svg{width:20px;height:20px}
+.ed-go-hint{margin:9px 0 0;text-align:center;font-size:12.5px;color:var(--muted)}
+.editor-footer{border-top:0;background:transparent;padding:14px 14px 20px}
+
+/* help modal */
+.hp-intro{margin:0 0 14px;font-size:14.5px;line-height:1.9;color:var(--muted)}
+.hp-steps{list-style:none;margin:0;padding:0;display:grid;gap:10px;counter-reset:hp}
+.hp-steps li{counter-increment:hp;position:relative;padding:12px 14px;padding-inline-start:58px;border:1px solid var(--line);border-radius:16px;background:var(--surface-2);font-size:15px;line-height:1.85}
+.hp-steps li::before{content:counter(hp);position:absolute;inset-inline-start:12px;top:12px;width:34px;height:34px;border-radius:50%;display:grid;place-items:center;background:var(--accent);color:var(--on-c);font:900 16px/1 var(--font-head)}
+.hp-steps b{color:var(--heading)}
+.hp-steps small{display:block;color:var(--muted);font-size:12.5px;margin-top:2px}
+.hp-acc{width:100%;display:flex;align-items:center;gap:10px;margin-top:16px;min-height:56px;padding:10px 14px;border:1.5px solid var(--accent);border-radius:16px;background:var(--accent-soft);color:var(--strong);font-weight:900;font-size:15.5px;text-align:start}
+.hp-acc .hp-acc-t{flex:1;display:flex;flex-direction:column;line-height:1.5}
+.hp-acc .hp-acc-t small{font-weight:600;font-size:12px;color:var(--muted)}
+.hp-acc .chev{width:22px;height:22px;flex:none;transition:transform .2s}
+.hp-acc[aria-expanded=true] .chev{transform:rotate(180deg)}
+.hp-prompt{display:none;margin-top:10px;padding:12px;border:1px solid var(--line);border-radius:16px;background:var(--surface)}
+.hp-prompt.open{display:block}
+.hp-pbox{position:relative;margin:12px 0 0;border-radius:14px;background:var(--code-bg);color:var(--code-text);border:1px solid var(--line);overflow:hidden}
+.hp-pbox pre{margin:0;padding:14px 14px;max-height:260px;overflow:auto;overscroll-behavior:contain;white-space:pre-wrap;word-break:break-word;font-family:ui-monospace,"Cascadia Code",Consolas,"Noto Sans Arabic",monospace;font-size:12.5px;line-height:1.8;text-align:start;-webkit-user-select:all;user-select:all}
+.hp-copy{width:100%;margin-top:10px}
+.hp-note{margin:10px 2px 0;font-size:12.5px;line-height:1.8;color:var(--muted)}
+.hp-tip{margin-top:14px;padding:11px 14px;border-radius:14px;border:1px dashed var(--line);font-size:13.5px;line-height:1.85;color:var(--muted)}
+.hp-tip b{color:var(--heading)}
+
+@media(max-width:560px){
+  .topbar{flex-wrap:wrap;row-gap:8px;padding-bottom:10px}
+  .top-actions{margin-inline-start:0;width:100%;gap:6px}
+  .top-actions>.nav-btn,.top-actions>.theme-wrap{flex:1 1 0;min-width:0}
+  .top-actions>.zoom-box{flex:none}
+  .theme-btn{width:100%;justify-content:center}
+  .nav-btn,.theme-btn{padding-inline:6px;font-size:13px}
+  .nav-btn .lbl-full{display:none}.nav-btn .lbl-short{display:inline}
+  .brand .bt small{display:block}
+}
+@media(max-width:700px){
+  #markdownInput{min-height:max(280px,calc(100vh - 420px))}
+  .editor-head{padding:18px 16px 12px}.editor-title{font-size:21px}
+  .ed-count{flex-basis:100%;margin-inline-start:0;text-align:center;order:5}
+  .ed-chip,.ed-bar .clear-btn{flex:1 1 0;justify-content:center}
+}
+@media(prefers-reduced-motion:reduce){.nav-btn.help.pulse{animation:none}}
+
+/* ===== Soft CSS-art dividers (hr + h1 underline) — theme-aware ===== */
+:root{--orn-rgb:176,141,60}
+body.theme-authentic{--orn-rgb:176,141,60}
+body.theme-royal{--orn-rgb:184,146,58}
+body.theme-emerald{--orn-rgb:4,120,87}
+body.theme-sunset{--orn-rgb:194,65,12}
+body.theme-rose{--orn-rgb:190,24,93}
+body.theme-ocean{--orn-rgb:3,105,161}
+body.theme-ink{--orn-rgb:17,24,39}
+body.theme-night{--orn-rgb:224,180,90}
+.pdf-light{--orn-rgb:176,141,60}
+
+.md hr,.md h1{
+  --o0:rgba(var(--orn-rgb),0);--o1:rgba(var(--orn-rgb),.55);--o2:rgba(var(--orn-rgb),.85);
+}
+/* strip = two tapered hairlines + graduated dots, drawn as one layered background */
+.md hr{
+  border:0;height:22px;margin:1.7em 0;opacity:1;background-color:transparent;
+  background-repeat:no-repeat;background-size:38% 1.5px,38% 1.5px,7px 7px,7px 7px,5px 5px,5px 5px;
+  background-position:left 50%,right 50%,44% 50%,56% 50%,39.5% 50%,60.5% 50%;
+  background-image:
+    linear-gradient(90deg,var(--o0),var(--o1)),
+    linear-gradient(90deg,var(--o1),var(--o0)),
+    radial-gradient(circle,var(--o2) 1.9px,var(--o0) 2.6px),
+    radial-gradient(circle,var(--o2) 1.9px,var(--o0) 2.6px),
+    radial-gradient(circle,var(--o1) 1.2px,var(--o0) 1.9px),
+    radial-gradient(circle,var(--o1) 1.2px,var(--o0) 1.9px);
+}
+.md hr::after{display:none}
+.md hr::before,.md h1::after{
+  content:"";position:absolute;left:50%;top:50%;width:7px;height:7px;margin:-3.5px 0 0 -3.5px;
+  height:7px;right:auto;bottom:auto;background-image:none;
+  background-color:rgb(var(--orn-rgb));transform:rotate(45deg);border-radius:1.5px;
+  box-shadow:0 0 0 2.5px var(--surface),0 0 0 4px rgba(var(--orn-rgb),.9),0 0 10px 3px rgba(var(--orn-rgb),.22);
+}
+/* h1: same ornament pinned under the title */
+.md h1{
+  background-image:none;
+  padding-bottom:.95em;
+}
+.md h1::before{
+  content:"";position:absolute;left:0;right:0;top:auto;bottom:0;width:auto;height:22px;
+  background-repeat:no-repeat;background-size:38% 1.5px,38% 1.5px,7px 7px,7px 7px,5px 5px,5px 5px;
+  background-position:left 50%,right 50%,44% 50%,56% 50%,39.5% 50%,60.5% 50%;
+  background-image:
+    linear-gradient(90deg,var(--o0),var(--o1)),
+    linear-gradient(90deg,var(--o1),var(--o0)),
+    radial-gradient(circle,var(--o2) 1.9px,var(--o0) 2.6px),
+    radial-gradient(circle,var(--o2) 1.9px,var(--o0) 2.6px),
+    radial-gradient(circle,var(--o1) 1.2px,var(--o0) 1.9px),
+    radial-gradient(circle,var(--o1) 1.2px,var(--o0) 1.9px);
+}
+.md h1::after{top:auto;bottom:11px;margin:0 0 -3.5px -3.5px}
 </style>
 </head>
 <body class="theme-authentic">
@@ -257,8 +376,9 @@ textarea.cv-in{resize:vertical;min-height:84px}
   <header class="topbar">
     <div class="brand"><svg viewBox="0 0 40 40" aria-hidden="true"><rect width="40" height="40" rx="11" fill="var(--accent)"/><path d="M7.5 12.5c4.2-1.7 8.4-1.3 12.5 1.4 4.1-2.7 8.3-3.1 12.5-1.4v17.2c-4.2-1.5-8.4-1.1-12.5 1.6-4.100-2.7-8.300-3.100-12.500-1.600z" fill="#fff" opacity=".96"/><path d="M20 13.9v17.4" stroke="var(--accent)" stroke-width="1.6"/><rect x="10.5" y="17" width="7" height="2.8" rx="1.4" fill="var(--c4)"/><rect x="10.5" y="22" width="7" height="2.8" rx="1.4" fill="var(--c2)"/><rect x="10.5" y="27" width="4.5" height="2.2" rx="1.1" fill="var(--c6)"/><rect x="22.5" y="17.4" width="7" height="2" rx="1" fill="var(--accent)" opacity=".3"/><rect x="22.5" y="22.4" width="7" height="2" rx="1" fill="var(--accent)" opacity=".3"/><rect x="22.5" y="27.2" width="5" height="2" rx="1" fill="var(--accent)" opacity=".3"/></svg><span class="bt"><b>مذاكرتي</b><small>Markdown Study</small></span></div>
     <div class="top-actions">
-      <button id="editorBtn" class="nav-btn primary" type="button" aria-label="التحرير"><span class="nav-label">✎ التحرير</span><span aria-hidden="true" class="mobile-icon">✎</span></button>
-      <button id="studyBtn" class="nav-btn" type="button" aria-label="المذاكرة"><span class="nav-label">↙ المذاكرة</span><span aria-hidden="true" class="mobile-icon">↙</span></button>
+      <button id="helpBtn" class="nav-btn help" type="button" aria-label="شرح طريقة الاستخدام" aria-haspopup="dialog"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9.5"/><path d="M9.2 9.3a2.9 2.9 0 0 1 5.6 1c0 1.9-2.8 2.4-2.8 4.2"/><path d="M12 17.6h.01"/></svg><span class="lbl-full">شرح طريقة الاستخدام</span><span class="lbl-short">الشرح</span></button>
+      <button id="editorBtn" class="nav-btn primary" type="button" aria-label="التحرير"><span>التحرير</span></button>
+      <button id="studyBtn" class="nav-btn" type="button" aria-label="المذاكرة"><span>المذاكرة</span></button>
       <div id="zoomBox" class="zoom-box hidden" role="group" aria-label="حجم النص">
         <button id="zoomOut" type="button" aria-label="تصغير النص">−</button>
         <button id="zoomIn" type="button" aria-label="تكبير النص">+</button>
@@ -284,12 +404,13 @@ textarea.cv-in{resize:vertical;min-height:84px}
     <div class="editor-shell">
       <section class="editor-card">
         <div class="editor-head">
-          <span class="eh-ic" aria-hidden="true"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h4L19 9a2.1 2.1 0 0 0-3-3L5 17z"/><path d="M14 7l3 3"/></svg></span>
-          <div class="eh-text">
-            <h1 class="editor-title">الصق نص Markdown هنا</h1>
-            <p class="editor-sub">يدعم Markdown الكامل: عناوين، جداول، قوائم مهام، تنبيهات ملوّنة، هوامش، روابط وتمييز. ثم اضغط «المذاكرة».</p>
-          </div>
-          <button id="clearBtn" class="clear-btn" type="button" aria-label="مسح محتوى الصفحة"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6h18M8 6V4h8v2M6 6l1 14h10l1-14"/></svg><span>مسح محتوى الصفحة</span></button>
+          <h1 class="editor-title">الصق نص Markdown هنا</h1>
+          <p class="editor-sub">يدعم Markdown الكامل: عناوين، جداول، قوائم مهام، تنبيهات ملوّنة، هوامش، روابط وتمييز. ثم اضغط «ابدأ المذاكرة».</p>
+        </div>
+        <div class="ed-bar">
+          <button id="pasteBtn" class="ed-chip" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="8" y="3" width="8" height="4" rx="1"/><path d="M16 5h2a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2h2"/></svg><span>لصق من الحافظة</span></button>
+          <button id="clearBtn" class="clear-btn" type="button" aria-label="مسح محتوى الصفحة"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6h18M8 6V4h8v2M6 6l1 14h10l1-14"/></svg><span>مسح</span></button>
+          <span id="edCount" class="ed-count" aria-live="off">0 كلمة · 0 حرف</span>
         </div>
         <div id="confirmBox" class="confirm-box hidden" role="alertdialog" aria-modal="true" aria-labelledby="confirmTxt">
           <div class="confirm-card">
@@ -303,6 +424,10 @@ textarea.cv-in{resize:vertical;min-height:84px}
           </div>
         </div>
         <textarea id="markdownInput" aria-label="نص Markdown" dir="auto" spellcheck="false" autocomplete="off" placeholder="# عنوان الدرس&#10;&#10;اكتب أو الصق المحتوى هنا...&#10;&#10;**معلومة مهمة**&#10;&#10;- نقطة أولى&#10;- نقطة ثانية"></textarea>
+        <div class="ed-go">
+          <button id="goStudyBtn" class="ed-go-btn" type="button"><span>ابدأ المذاكرة</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5M11 6l-6 6 6 6"/></svg></button>
+          <p class="ed-go-hint">بعد المذاكرة يمكنك تحميل المذكرة PDF من الزر العلوي</p>
+        </div>
         <div class="editor-footer">
           <a class="tg-btn" href="https://t.me/Refaei_1" target="_blank" rel="noopener noreferrer" aria-label="تواصل معي على تيليجرام">
             <span class="tg-ic"><svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true" focusable="false"><path fill="currentColor" d="M9.78 18.65l.28-4.23 7.68-6.92c.34-.31-.07-.46-.52-.19L7.74 13.3 3.64 12c-.88-.25-.89-.86.2-1.3l15.97-6.16c.73-.33 1.43.18 1.15 1.3l-2.72 12.81c-.19.91-.74 1.13-1.5.71L12.6 16.3l-1.99 1.93c-.23.23-.42.42-.83.42z"/></svg></span>
@@ -325,6 +450,44 @@ textarea.cv-in{resize:vertical;min-height:84px}
     </article>
     <div id="scrollHint" aria-hidden="true">مرّر للقراءة</div>
   </main>
+</div>
+
+<div id="helpModal" class="cv-modal hidden" role="dialog" aria-modal="true" aria-labelledby="helpTitle">
+  <div class="cv-card">
+    <div class="cv-head">
+      <b id="helpTitle">شرح طريقة الاستخدام</b>
+      <button id="helpClose" class="cv-x" type="button" aria-label="إغلاق">✕</button>
+    </div>
+    <div class="cv-scroll">
+      <p class="hp-intro">حوّل أي نص Markdown إلى مذكرة ملوّنة منظمة للمذاكرة، ثم احفظها كملف PDF. الخطوات:</p>
+      <ol class="hp-steps">
+        <li><b>الصق النص المكتوب بـ Markdown</b> في المربع الكبير في صفحة التحرير.<small>أو اضغط «لصق من الحافظة». يُحفظ نصك تلقائياً في متصفحك.</small></li>
+        <li>اضغط <b>«ابدأ المذاكرة»</b> (أو «المذاكرة» من الشريط العلوي) لتظهر المذكرة بتنسيق وألوان جاهزة.<small>يمكنك تغيير الثيم من زر «الثيمات» وتكبير الخط أو تصغيره.</small></li>
+        <li>اضغط <b>«PDF»</b> من الشريط العلوي، واختر شكل الغلاف إن أردت، ثم <b>حمّل الملف</b> على جهازك.</li>
+        <li>لا تملك نصاً بصيغة Markdown؟ استخدم <b>البرومبت الجاهز</b> بالأسفل مع أي أداة ذكاء اصطناعي.</li>
+      </ol>
+
+      <button id="promptToggle" class="hp-acc" type="button" aria-expanded="false" aria-controls="promptPanel">
+        <span class="hp-acc-t">برومبت جاهز للذكاء الاصطناعي<small>انسخه بلمسة واحدة وأرسله لـ ChatGPT أو أي أداة</small></span>
+        <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>
+      </button>
+      <div id="promptPanel" class="hp-prompt">
+        <div class="cv-seg" role="group" aria-label="لغة المذكرة">
+          <button type="button" data-pl="ar" aria-pressed="true">عربي</button>
+          <button type="button" data-pl="en" aria-pressed="false">English</button>
+          <button type="button" data-pl="both" aria-pressed="false">الاثنان</button>
+        </div>
+        <div class="hp-pbox"><pre id="promptText" dir="auto" tabindex="0" aria-label="نص البرومبت"></pre></div>
+        <button id="promptCopy" class="cv-btn pri hp-copy" type="button">نسخ البرومبت</button>
+        <p class="hp-note">بعد النسخ: الصقه في أداة الذكاء الاصطناعي، واستبدل السطر الأخير بموضوعك أو ملاحظاتك. سيرد عليك بنص Markdown داخل مربع كود، انسخه ثم عُد إلى هنا والصقه في صفحة التحرير.</p>
+      </div>
+
+      <div class="hp-tip"><b>تلميح:</b> التنبيهات الملوّنة تُكتب هكذا: <code>&gt; [!TIP] عنوان</code> ثم سطر جديد يبدأ بـ <code>&gt;</code> ويحتوي النص.</div>
+    </div>
+    <div class="cv-foot">
+      <button id="helpOk" class="cv-btn pri" type="button">فهمت، لنبدأ</button>
+    </div>
+  </div>
 </div>
 
 <div id="toast" class="hidden" role="status" aria-live="polite"></div>
@@ -805,7 +968,7 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
   }
   const $=s=>document.querySelector(s);
   const input=$('#markdownInput'), content=$('#content'), editorScreen=$('#editorScreen'), readerScreen=$('#readerScreen');
-  const pdfBtn=$('#pdfBtn'), toast=$('#toast'); const editorBtn=$('#editorBtn'), studyBtn=$('#studyBtn'), themeToggle=$('#themeToggle'), themeMenu=$('#themeMenu');
+  const pdfBtn=$('#pdfBtn'), toast=$('#toast'); const helpBtn=$('#helpBtn'), editorBtn=$('#editorBtn'), studyBtn=$('#studyBtn'), themeToggle=$('#themeToggle'), themeMenu=$('#themeMenu');
   const STORAGE='refaie-minimal-study-v1';
   const themes=['authentic','royal','emerald','sunset','rose','ocean','ink','night'];
   const EMPTY='<div class="empty">لا يوجد محتوى بعد.</div>';
@@ -1039,7 +1202,7 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
   }
   function showScreen(which){
     const editor=which==='editor'; editorScreen.classList.toggle('active',editor); readerScreen.classList.toggle('active',!editor);
-    editorBtn.classList.toggle('primary',editor); studyBtn.classList.toggle('primary',!editor); pdfBtn.classList.toggle('hidden',editor);zoomBox.classList.toggle('hidden',editor);
+    editorBtn.classList.toggle('primary',editor); studyBtn.classList.toggle('primary',!editor); pdfBtn.classList.toggle('hidden',editor);helpBtn.classList.toggle('hidden',!editor);zoomBox.classList.toggle('hidden',editor);
     if(!editor){persist(); render(); try{window.scrollTo({top:0,behavior:'instant'})}catch(_){window.scrollTo(0,0)}}
     else input.focus();
   }
@@ -1551,6 +1714,147 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
   document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!confirmBox.classList.contains('hidden'))closeConfirm()});
 
   load();
+
+  /* ---------- Usage guide + AI prompt, paste, counter, go-study ---------- */
+  const HELP_SEEN=STORAGE+'-help-seen';
+  const FENCE='````markdown';
+  const CALLOUT_LINES=['> [!TIP] عنوان اختياري','> نص التنبيه هنا'];
+  const HELP_PROMPTS={
+    ar:[
+      'أنت مساعد متخصص في إعداد المذكرات الدراسية. حوّل المحتوى الذي سأرسله في آخر هذه الرسالة إلى مذكرة منظمة بصيغة Markdown، واكتبها كاملة باللغة العربية.',
+      '',
+      'قواعد التنسيق:',
+      '- عنوان رئيسي واحد فقط في أول المذكرة: # العنوان',
+      '- استخدم ## للأقسام الرئيسية و ### للأقسام الفرعية',
+      '- **عريض** لأهم المصطلحات فقط، و ==تمييز== للأرقام والتعريفات التي يجب حفظها',
+      '- قوائم نقطية (- ) أو مرقمة (1. ) لتقسيم المعلومات',
+      '- جداول Markdown للمقارنات والتصنيفات',
+      '- تنبيهات ملوّنة بهذه الصيغة (كل سطر يبدأ بـ >):',
+      ...CALLOUT_LINES,
+      '  الأنواع المتاحة: NOTE, INFO, TIP, IMPORTANT, WARNING, CAUTION, DANGER, SUCCESS, QUESTION, EXAMPLE, ABSTRACT',
+      '- قائمة مهام للمراجعة السريعة في آخر المذكرة: - [ ] نقطة',
+      '- هوامش عند الحاجة: [^1] داخل النص ثم [^1]: الشرح في سطر مستقل',
+      '- ممنوع استخدام HTML أو الصور',
+      '',
+      'شكل الإخراج: ضع المذكرة كاملة داخل كتلة كود واحدة من نوع markdown (استخدم أربع علامات ` للسياج الخارجي، أي ' + FENCE + ') ولا تكتب أي شيء خارجها، حتى أنسخها بضغطة واحدة.',
+      '',
+      'المحتوى:',
+      '[اكتب هنا موضوعك أو ملاحظاتك، أو الصق النص المراد تنظيمه]'
+    ],
+    en:[
+      'You are an expert study-notes writer. Turn the content I give you at the end of this message into well-structured study notes in Markdown, written entirely in English.',
+      '',
+      'Formatting rules:',
+      '- Exactly one top-level title at the start: # Title',
+      '- Use ## for main sections and ### for subsections',
+      '- Use **bold** for key terms only, and ==highlight== for numbers and definitions that must be memorized',
+      '- Bullet lists (- ) or numbered lists (1. ) to break information down',
+      '- Markdown tables for comparisons and classifications',
+      '- Colored callouts in this format (every line starts with >):',
+      ...CALLOUT_LINES.map(l=>l.replace('عنوان اختياري','optional title').replace('نص التنبيه هنا','callout text here')),
+      '  Available types: NOTE, INFO, TIP, IMPORTANT, WARNING, CAUTION, DANGER, SUCCESS, QUESTION, EXAMPLE, ABSTRACT',
+      '- A task list for quick review at the end: - [ ] item',
+      '- Footnotes when needed: [^1] in the text, then [^1]: explanation on its own line',
+      '- Do not use HTML or images',
+      '',
+      'Output format: put the entire notes inside ONE markdown code block (use four backticks for the outer fence, i.e. ' + FENCE + ') and write nothing outside it, so I can copy it with one tap.',
+      '',
+      'Content:',
+      '[write your topic or notes here, or paste the text to organize]'
+    ],
+    both:[
+      'أنت مساعد متخصص في إعداد المذكرات الدراسية. حوّل المحتوى الذي سأرسله في آخر هذه الرسالة إلى مذكرة منظمة بصيغة Markdown بلغتين: الشرح بالعربية، والمصطلحات العلمية بالإنجليزية بين قوسين عند أول ذكر لها.',
+      '',
+      'قواعد التنسيق:',
+      '- عنوان رئيسي واحد فقط في أول المذكرة بالصيغتين: # العنوان بالعربية | English Title',
+      '- استخدم ## للأقسام الرئيسية و ### للأقسام الفرعية (عنوان القسم بالعربية ثم الإنجليزية)',
+      '- **عريض** لأهم المصطلحات فقط، و ==تمييز== للأرقام والتعريفات التي يجب حفظها',
+      '- قوائم نقطية (- ) أو مرقمة (1. ) لتقسيم المعلومات',
+      '- جداول Markdown للمقارنات والتصنيفات',
+      '- تنبيهات ملوّنة بهذه الصيغة (كل سطر يبدأ بـ >):',
+      ...CALLOUT_LINES,
+      '  الأنواع المتاحة: NOTE, INFO, TIP, IMPORTANT, WARNING, CAUTION, DANGER, SUCCESS, QUESTION, EXAMPLE, ABSTRACT',
+      '- في آخر المذكرة: جدول مصطلحات بثلاثة أعمدة (العربية | English | المعنى المختصر)، ثم قائمة مهام للمراجعة: - [ ] نقطة',
+      '- هوامش عند الحاجة: [^1] داخل النص ثم [^1]: الشرح في سطر مستقل',
+      '- ممنوع استخدام HTML أو الصور',
+      '',
+      'شكل الإخراج: ضع المذكرة كاملة داخل كتلة كود واحدة من نوع markdown (استخدم أربع علامات ` للسياج الخارجي، أي ' + FENCE + ') ولا تكتب أي شيء خارجها، حتى أنسخها بضغطة واحدة.',
+      '',
+      'المحتوى:',
+      '[اكتب هنا موضوعك أو ملاحظاتك، أو الصق النص المراد تنظيمه]'
+    ]
+  };
+  const helpBtn_=helpBtn, helpModal=$('#helpModal'), helpClose=$('#helpClose'), helpOk=$('#helpOk');
+  const promptToggle=$('#promptToggle'), promptPanel=$('#promptPanel'), promptText=$('#promptText'), promptCopy=$('#promptCopy');
+  let promptLang='ar', helpOpen=false, helpTimer=0;
+  function setPromptLang(l){
+    promptLang=l;
+    promptText.textContent=HELP_PROMPTS[l].join('\n');
+    promptText.scrollTop=0;
+    helpModal.querySelectorAll('[data-pl]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.pl===l)));
+  }
+  function openHelp(){
+    if(helpOpen)return; helpOpen=true; clearTimeout(helpTimer);
+    helpModal.classList.remove('hidden'); document.body.style.overflow='hidden';
+    requestAnimationFrame(()=>helpModal.classList.add('show'));
+    helpBtn_.classList.remove('pulse'); lsSet(HELP_SEEN,'1');
+    setTimeout(()=>helpClose.focus(),60);
+  }
+  function closeHelp(){
+    if(!helpOpen)return; helpOpen=false;
+    helpModal.classList.remove('show'); document.body.style.overflow='';
+    helpTimer=setTimeout(()=>helpModal.classList.add('hidden'),200);
+    try{helpBtn_.focus()}catch(_){}
+  }
+  async function copyText(txt){
+    try{ if(navigator.clipboard&&window.isSecureContext){await navigator.clipboard.writeText(txt);return true} }catch(_){}
+    try{
+      const ta=document.createElement('textarea'); ta.value=txt; ta.setAttribute('readonly',''); ta.style.cssText='position:fixed;left:-9999px;top:0;opacity:0';
+      document.body.appendChild(ta); ta.select(); ta.setSelectionRange(0,ta.value.length);
+      const ok=document.execCommand('copy'); ta.remove(); return ok;
+    }catch(_){return false}
+  }
+  helpBtn_.addEventListener('click',openHelp);
+  helpClose.addEventListener('click',closeHelp);
+  helpOk.addEventListener('click',closeHelp);
+  helpModal.addEventListener('click',e=>{if(e.target===helpModal)closeHelp()});
+  document.addEventListener('keydown',e=>{if(e.key==='Escape'&&helpOpen)closeHelp()});
+  promptToggle.addEventListener('click',()=>{
+    const open=promptPanel.classList.toggle('open'); promptToggle.setAttribute('aria-expanded',String(open));
+    if(open) setTimeout(()=>{try{promptToggle.scrollIntoView({block:'start',behavior:'smooth'})}catch(_){}},30);
+  });
+  helpModal.querySelectorAll('[data-pl]').forEach(b=>b.addEventListener('click',()=>setPromptLang(b.dataset.pl)));
+  promptCopy.addEventListener('click',async()=>{
+    const ok=await copyText(HELP_PROMPTS[promptLang].join('\n'));
+    if(ok){say('✓ تم نسخ البرومبت، الصقه في أداة الذكاء الاصطناعي',2600);promptCopy.textContent='✓ تم النسخ';setTimeout(()=>{promptCopy.textContent='نسخ البرومبت'},1800)}
+    else{say('تعذّر النسخ تلقائياً، اضغط على النص لتحديده ثم انسخه',3200);try{const r=document.createRange();r.selectNodeContents(promptText);const s=getSelection();s.removeAllRanges();s.addRange(r)}catch(_){}}
+  });
+  setPromptLang('ar');
+  if(!lsGet(HELP_SEEN)) helpBtn_.classList.add('pulse');
+
+  /* paste / counter / go */
+  const pasteBtn=$('#pasteBtn'), edCount=$('#edCount'), goStudyBtn=$('#goStudyBtn');
+  const nf=new Intl.NumberFormat('ar-EG');
+  function updateCount(){
+    const v=input.value, w=v.trim()?v.trim().split(/\s+/).length:0;
+    edCount.textContent=nf.format(w)+' كلمة · '+nf.format(v.length)+' حرف';
+  }
+  pasteBtn.addEventListener('click',async()=>{
+    try{
+      if(!navigator.clipboard||!navigator.clipboard.readText) throw 0;
+      const t=await navigator.clipboard.readText();
+      if(!t){say('الحافظة فارغة',1800);return}
+      input.value=t; input.dispatchEvent(new Event('input',{bubbles:true})); updateCount(); say('✓ تم لصق النص',1600);
+    }catch(_){ input.focus(); say('اضغط مطولاً داخل المربع ثم اختر «لصق»',3200) }
+  });
+  goStudyBtn.addEventListener('click',()=>{
+    if(!input.value.trim()){say('الصق نص Markdown أولاً',2000);input.focus();return}
+    showScreen('study');
+  });
+  input.addEventListener('input',updateCount);
+  confirmYes.addEventListener('click',updateCount);
+  updateCount();
+
   loadFonts().then(()=>{if(readerActive())fitTables(content,0,fontPx())});
 })();
 </script>
