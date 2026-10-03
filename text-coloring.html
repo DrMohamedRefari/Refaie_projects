@@ -3,6 +3,56 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<!-- CR:START (auto-refresh when a newer version is deployed; fail-safe) -->
+<meta http-equiv="Cache-Control" content="no-cache, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
+<script id="cr-script">
+(function(){try{
+var L=location;
+if(L.protocol!=='http:'&&L.protocol!=='https:')return;
+if(!window.fetch||!window.URL||!window.Promise)return;
+var u=new URL(L.href),now=Date.now();
+/* clean the address bar after a forced refresh */
+if(u.searchParams.has('_v')){try{var c=new URL(L.href);c.searchParams.delete('_v');history.replaceState(null,'',c.pathname+c.search+c.hash)}catch(e){}}
+function safe(){
+  try{
+    var e=document.getElementById('editorScreen');
+    if(!e||!e.classList.contains('active'))return false;
+    if(document.querySelector('.cv-modal:not(.hidden),.pe-modal:not(.hidden),.confirm-box:not(.hidden),#tc-ad-root'))return false;
+    return true;
+  }catch(e){return false}
+}
+var busy=false;
+function check(){
+  try{
+    if(busy)return;busy=true;
+    var f=new URL(L.href);f.searchParams.delete('_v');f.searchParams.set('_cb',String(Date.now()));f.hash='';
+    fetch(f.href,{cache:'no-store',credentials:'same-origin'}).then(function(r){
+      busy=false;
+      var lm=r&&r.headers&&r.headers.get('Last-Modified');if(!lm)return;
+      var fresh=Date.parse(lm),cur=Date.parse(document.lastModified);
+      if(isNaN(fresh)||isNaN(cur)||fresh-cur<1500)return;   /* only when the server copy is newer */
+      if(document.readyState==='loading'){document.addEventListener('DOMContentLoaded',function(){act(fresh)});return}
+      act(fresh);
+    },function(){busy=false});
+  }catch(e){busy=false}
+}
+function act(fresh){
+  try{
+      if(!safe())return;
+      var n=0,t=0;try{var o=JSON.parse(sessionStorage.getItem('cr-n')||'{}');n=o.n||0;t=o.t||0}catch(e){}
+      if(Date.now()-t>60000)n=0;
+      if(n>=2)return;                                         /* loop guard */
+      try{sessionStorage.setItem('cr-n',JSON.stringify({n:n+1,t:Date.now()}))}catch(e){}
+      var g=new URL(L.href);g.searchParams.set('_v',String(fresh));L.replace(g.href);
+  }catch(e){}
+}
+check();
+document.addEventListener('visibilitychange',function(){try{if(!document.hidden)check()}catch(e){}});
+}catch(e){}})();
+</script>
+<!-- CR:END -->
 <title>مذاكرتي — Markdown</title>
 <style>
 /* MK Head AR — thmanyah serif display Bold */
