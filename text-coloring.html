@@ -2157,6 +2157,7 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
         say('جاري إنشاء PDF… '+(i+1)+' / '+pages.length);
         await frame();
         pages[i].querySelector('.pg-l').textContent=brand[0];pages[i].querySelector('.pg-link').textContent=brand[1];
+        try{if(window.__pdfHlFix)window.__pdfHlFix(pages[i])}catch(e){console.error(e)} // wrapped highlights: one box per word (html2canvas paints one union box otherwise)
         const lk=pages[i].querySelector('.pg-link').getBoundingClientRect(),pr=pages[i].getBoundingClientRect();
         const lks=plLinkRects(pages[i],i,pr);
         const imgInfo=await pdfImgPrep(pages[i]);
@@ -3401,6 +3402,63 @@ document.addEventListener('keydown',function(e){if(!pop.hidden&&e.key==='Escape'
     last.set(t,hit);show(t,hit!==null&&+t.value===hit)},true);
   P.addEventListener('dblclick',e=>{const t=e.target,c=t.matches&&t.matches('input[type=range]')&&CFG[t.dataset.k];if(!c||c.def===null)return;t.value=c.def;t.dispatchEvent(new Event('input',{bubbles:true}));t.dispatchEvent(new Event('change',{bubbles:true}))});
   setInterval(()=>{if(P.classList.contains('hidden'))return;P.querySelectorAll('input[type=range]').forEach(i=>{if(CFG[i.dataset.k])show(i,false)})},250);
+})();
+</script>
+<script id="pdf-hl-fix">
+/* PDF only: html2canvas paints an inline element's background as ONE rectangle covering all its lines, which hides the text of the
+   previous line when a bold / highlighted phrase wraps. Before capture, every wrapped inline with a background (or border) is
+   re-drawn as one small box per word, each sitting on a single line, so nothing is painted over neighbouring text. */
+(function(){
+  window.__pdfHlFix=function(root){
+    var doc=root.ownerDocument,win=doc.defaultView;
+    var els=Array.prototype.slice.call(root.querySelectorAll('.md strong,.md mark,.md code,.md em,.md del,.md a'));
+    els.forEach(function(el){
+      if(el.closest('pre'))return;
+      var cs=win.getComputedStyle(el);
+      var bgi=cs.backgroundImage,bgc=cs.backgroundColor;
+      var hasBg=(bgi&&bgi!=='none')||(bgc&&bgc!=='transparent'&&!/,\s*0\)$/.test(bgc));
+      var bw=parseFloat(cs.borderTopWidth)||0;
+      if(!hasBg&&!bw)return;
+      /* only wrapped elements are affected: count distinct lines */
+      var lines=[];
+      Array.prototype.forEach.call(el.getClientRects(),function(r){
+        if(r.height<1)return;var m=r.top+r.height/2;
+        if(!lines.some(function(x){return Math.abs(x-m)<r.height*.5}))lines.push(m)});
+      if(lines.length<2)return;
+      var tw=doc.createTreeWalker(el,4),nodes=[],n;
+      while(n=tw.nextNode()){if(n.nodeValue.length)nodes.push(n)}
+      if(!nodes.length)return;
+      var all=[];
+      nodes.forEach(function(tn){
+        var parts=tn.nodeValue.match(/\S+\s*|\s+/g)||[];
+        if(!parts.length)return;
+        var frag=doc.createDocumentFragment();
+        parts.forEach(function(w){var sp=doc.createElement('span');sp.className='hlw';sp.textContent=w;frag.appendChild(sp);all.push(sp)});
+        tn.parentNode.replaceChild(frag,tn);
+      });
+      if(!all.length)return;
+      var first=all[0],last=all[all.length-1];
+      var padS=cs.paddingInlineStart,padE=cs.paddingInlineEnd,rad=cs.borderTopLeftRadius;
+      all.forEach(function(sp){
+        var st=sp.style;
+        if(bgi&&bgi!=='none'){st.backgroundImage=bgi;st.backgroundSize=cs.backgroundSize;st.backgroundRepeat='no-repeat'}
+        if(bgc)st.backgroundColor=bgc;
+        st.paddingTop=cs.paddingTop;st.paddingBottom=cs.paddingBottom;
+        if(bw){st.borderTop=cs.borderTopWidth+' '+cs.borderTopStyle+' '+cs.borderTopColor;st.borderBottom=cs.borderBottomWidth+' '+cs.borderBottomStyle+' '+cs.borderBottomColor}
+      });
+      /* neighbouring boxes overlap by 1px (width unchanged) so no hairline seam shows between words */
+      all.forEach(function(sp,k){if(k<all.length-1){sp.style.paddingInlineEnd='1px';sp.style.marginInlineEnd='-1px'}});
+      first.style.paddingInlineStart=padS;last.style.paddingInlineEnd=padE;
+      first.style.borderStartStartRadius=rad;first.style.borderEndStartRadius=rad;
+      last.style.borderStartEndRadius=rad;last.style.borderEndEndRadius=rad;
+      if(bw){
+        first.style.borderInlineStart=cs.borderInlineStartWidth+' '+cs.borderInlineStartStyle+' '+cs.borderInlineStartColor;
+        last.style.borderInlineEnd=cs.borderInlineEndWidth+' '+cs.borderInlineEndStyle+' '+cs.borderInlineEndColor;
+      }
+      /* the element itself stops drawing its own (single, union) box */
+      var es=el.style;es.backgroundImage='none';es.backgroundColor='transparent';es.padding='0';es.border='0';es.borderRadius='0';es.boxShadow='none';
+    });
+  };
 })();
 </script>
 </body>
