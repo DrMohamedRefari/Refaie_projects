@@ -20,7 +20,7 @@ function safe(){
   try{
     var e=document.getElementById('editorScreen');
     if(!e||!e.classList.contains('active'))return false;
-    if(document.querySelector('.cv-modal:not(.hidden),.pe-modal:not(.hidden),.confirm-box:not(.hidden),#tc-ad-root'))return false;
+    if(document.querySelector('.cv-modal:not(.hidden),.pe-modal:not(.hidden),.confirm-box:not(.hidden),#goPop:not([hidden]),#tc-ad-root'))return false;
     return true;
   }catch(e){return false}
 }
@@ -173,14 +173,14 @@ body{transition:background-color .25s ease,color .25s ease}
 .empty{color:var(--muted);text-align:center;padding:40px 10px}
 #scrollHint{position:fixed;left:50%;bottom:12px;transform:translateX(-50%);font-size:11px;color:var(--muted);background:color-mix(in srgb,var(--surface) 92%,transparent);border:1px solid var(--line);padding:6px 10px;border-radius:999px;opacity:.8;pointer-events:none}
 .hidden{display:none!important}.mobile-icon{display:none}
-body.theme-authentic{--c1:#0f6b5a;--c2:#a63a2b;--c3:#5b7f2b;--c4:#b8860b;--c5:#5b3f8c;--c6:#1b6a8a;--on-c:#fff;--bg:#efe6d2;--surface:#fffaf0;--surface-2:#f7eedb;--text:#1f1a12;--muted:#5e5239;--line:#dccba5;--accent:#0f6b5a;--accent-soft:#e2efe9;--strong:#0b4a3e;--strong-bg:#cfe6dc;--heading:#0b4a3e;--quote:#0f6b5a;--code-bg:#10231f;--mark:#f3d36b;--frame:#b08d3c;--code-text:#eef3ff}
-body.theme-royal{--c1:#1e3a8a;--c2:#b91c1c;--c3:#15803d;--c4:#b45309;--c5:#6d28d9;--c6:#0e7490;--on-c:#fff;--bg:#e4e9f5;--surface:#fbfcff;--surface-2:#eef2fb;--text:#0a1230;--muted:#404a6b;--line:#bcc7e6;--accent:#1e3a8a;--accent-soft:#dfe6f8;--strong:#14296b;--strong-bg:#d3ddf7;--heading:#14296b;--quote:#1e3a8a;--code-bg:#0c1431;--mark:#f6d860;--frame:#b8923a;--code-text:#eef3ff}
-body.theme-emerald{--c1:#047857;--c2:#be123c;--c3:#4d7c0f;--c4:#b45309;--c5:#7e22ce;--c6:#0369a1;--on-c:#fff;--bg:#dcf0e5;--surface:#fbfffc;--surface-2:#ebf8f0;--text:#06190f;--muted:#345a46;--line:#a9d8bd;--accent:#047857;--accent-soft:#d6f1e1;--strong:#065f46;--strong-bg:#c3ebd4;--heading:#065f46;--quote:#047857;--code-bg:#08241a;--mark:#f5e06a;--frame:#047857;--code-text:#eef3ff}
-body.theme-sunset{--c1:#c2410c;--c2:#be123c;--c3:#4d7c0f;--c4:#a16207;--c5:#86198f;--c6:#0f766e;--on-c:#fff;--bg:#f7e3d0;--surface:#fffbf6;--surface-2:#fdeedd;--text:#2a1005;--muted:#6b4429;--line:#ebc7a3;--accent:#c2410c;--accent-soft:#fde4cc;--strong:#9a3412;--strong-bg:#fbd5b0;--heading:#9a3412;--quote:#c2410c;--code-bg:#2b1407;--mark:#fbd44d;--frame:#c2410c;--code-text:#eef3ff}
-body.theme-rose{--c1:#be185d;--c2:#b91c1c;--c3:#047857;--c4:#b45309;--c5:#6d28d9;--c6:#0e7490;--on-c:#fff;--bg:#fbe0ec;--surface:#fffafc;--surface-2:#fdeaf3;--text:#2a0615;--muted:#703553;--line:#f1b8d3;--accent:#be185d;--accent-soft:#fbd9e8;--strong:#9d174d;--strong-bg:#f9c9de;--heading:#9d174d;--quote:#be185d;--code-bg:#2e0a1a;--mark:#fcdc5c;--frame:#be185d;--code-text:#eef3ff}
-body.theme-ocean{--c1:#0369a1;--c2:#be123c;--c3:#047857;--c4:#b45309;--c5:#6d28d9;--c6:#0f766e;--on-c:#fff;--bg:#d9ecf6;--surface:#fbfeff;--surface-2:#e9f5fb;--text:#04162a;--muted:#35566f;--line:#a8d0e6;--accent:#0369a1;--accent-soft:#d4eaf6;--strong:#075985;--strong-bg:#bfe0f1;--heading:#075985;--quote:#0369a1;--code-bg:#08202f;--mark:#f7de62;--frame:#0369a1;--code-text:#eef3ff}
-body.theme-ink{--c1:#1e293b;--c2:#b91c1c;--c3:#15803d;--c4:#a16207;--c5:#6d28d9;--c6:#0e7490;--on-c:#fff;--bg:#e5e7eb;--surface:#ffffff;--surface-2:#f3f4f6;--text:#0b0f19;--muted:#3f4756;--line:#c4c9d4;--accent:#111827;--accent-soft:#e5e7eb;--strong:#111827;--strong-bg:#dfe3ea;--heading:#111827;--quote:#111827;--code-bg:#0b0f19;--mark:#fde047;--frame:#111827;--code-text:#eef3ff}
-body.theme-night{--c1:#60a5fa;--c2:#fb7185;--c3:#4ade80;--c4:#fbbf24;--c5:#c4b5fd;--c6:#22d3ee;--on-c:#07090f;--bg:#06080d;--surface:#0e121b;--surface-2:#151b28;--text:#f2f4fa;--muted:#a3aec6;--line:#28324a;--accent:#e0b45a;--accent-soft:#1b2132;--strong:#f3d995;--strong-bg:#2b2733;--heading:#f3d995;--quote:#e0b45a;--code-bg:#04060a;--mark:#7a6414;--frame:#e0b45a;--code-text:#e8f0fa;--shadow:0 18px 50px rgba(0,0,0,.7);--danger:#fb7185}
+body.theme-authentic{--c1:#01665e;--c2:#b21304;--c3:#94974d;--c4:#e5c767;--c5:#4c276e;--c6:#6eacd7;--on-c:#fff;--bg:#e9dcbc;--surface:#fffaec;--surface-2:#f7ecd0;--text:#1a150c;--muted:#554829;--line:#d4bd84;--accent:#01665e;--accent-soft:#d9ece6;--strong:#014a44;--strong-bg:#c5e2da;--heading:#014a44;--quote:#01665e;--code-bg:#0c2420;--mark:#f0c94f;--frame:#b8903a;--code-text:#eef3ff;--sh-x:-4px;--sh-y:4px;--sh-b:0px;--sh-s:0px;--sh-mix:.2;--sh-a:.34;--grid-k:.9;--grid-size:22px;--glass-min:.74}
+body.theme-royal{--c1:#193990;--c2:#bc250c;--c3:#056f4c;--c4:#e8ab3e;--c5:#8c48b7;--c6:#43afc1;--on-c:#fff;--bg:#dde5f5;--surface:#f8faff;--surface-2:#eaf0fc;--text:#08102e;--muted:#3d4768;--line:#b3c2e8;--accent:#193990;--accent-soft:#dbe4fa;--strong:#12276b;--strong-bg:#cdd9f6;--heading:#12276b;--quote:#193990;--code-bg:#0a1330;--mark:#f5d65a;--frame:#193990;--code-text:#eef3ff;--sh-x:-3px;--sh-y:3px;--sh-b:0px;--sh-s:0px;--sh-mix:.1;--sh-a:.30;--grid-k:1;--grid-size:16px;--glass-min:.74}
+body.theme-emerald{--c1:#017048;--c2:#b82972;--c3:#90a018;--c4:#e3af58;--c5:#672675;--c6:#5ea7d5;--on-c:#fff;--bg:#d6eadf;--surface:#f9fffb;--surface-2:#e8f6ee;--text:#04170e;--muted:#2f5442;--line:#a4d3b8;--accent:#017048;--accent-soft:#d3eddd;--strong:#05563a;--strong-bg:#bfe6d0;--heading:#05563a;--quote:#017048;--code-bg:#07241a;--mark:#f2dc62;--frame:#2f8f6a;--code-text:#eef3ff;--sh-x:-2px;--sh-y:5px;--sh-b:12px;--sh-s:0px;--sh-mix:.15;--sh-a:.26;--grid-k:.7;--grid-size:24px;--glass-min:.74}
+body.theme-sunset{--c1:#ab4c04;--c2:#7c0515;--c3:#8aa354;--c4:#e0cd37;--c5:#4b0256;--c6:#86cccb;--on-c:#fff;--bg:#f5dfca;--surface:#fffaf3;--surface-2:#fcebd8;--text:#2a1206;--muted:#6a4326;--line:#e8c4a0;--accent:#ab4c04;--accent-soft:#fbe3c8;--strong:#8a3a02;--strong-bg:#f8d2ac;--heading:#8a3a02;--quote:#ab4c04;--code-bg:#2b1508;--mark:#f8d04a;--frame:#ab4c04;--code-text:#eef3ff;--sh-x:0px;--sh-y:8px;--sh-b:20px;--sh-s:0px;--sh-mix:.25;--sh-a:.28;--grid-k:.6;--grid-size:24px;--glass-min:.76}
+body.theme-rose{--c1:#a72a68;--c2:#4a1f10;--c3:#105d00;--c4:#e0af3b;--c5:#9b89da;--c6:#81c9d3;--on-c:#fff;--bg:#f8dde9;--surface:#fffafc;--surface-2:#fcebf3;--text:#2a0716;--muted:#6e3555;--line:#eeb6d0;--accent:#a72a68;--accent-soft:#f9d8e7;--strong:#8c1f55;--strong-bg:#f6c6dc;--heading:#8c1f55;--quote:#a72a68;--code-bg:#2c0b19;--mark:#fbd75a;--frame:#a72a68;--code-text:#eef3ff;--sh-x:0px;--sh-y:6px;--sh-b:18px;--sh-s:0px;--sh-mix:.2;--sh-a:.24;--grid-k:.65;--grid-size:24px;--glass-min:.76}
+body.theme-ocean{--c1:#006d8f;--c2:#e07374;--c3:#04541b;--c4:#f9ba41;--c5:#340f6f;--c6:#74d1d5;--on-c:#fff;--bg:#d3eaf0;--surface:#f7fdff;--surface-2:#e4f4f8;--text:#04202a;--muted:#325c6a;--line:#a2d1dc;--accent:#006d8f;--accent-soft:#d2ecf4;--strong:#065672;--strong-bg:#bde3ee;--heading:#065672;--quote:#006d8f;--code-bg:#07222c;--mark:#f6dc5e;--frame:#2d95b3;--code-text:#eef3ff;--sh-x:0px;--sh-y:6px;--sh-b:22px;--sh-s:0px;--sh-mix:.1;--sh-a:.22;--grid-k:.8;--grid-size:22px;--glass-min:.66}
+body.theme-ink{--c1:#1c2f46;--c2:#ba200d;--c3:#086c4b;--c4:#eab532;--c5:#552f86;--c6:#5ab3c8;--on-c:#fff;--bg:#e6e7ea;--surface:#ffffff;--surface-2:#f2f3f5;--text:#0a0d14;--muted:#3b4352;--line:#b9bec9;--accent:#111827;--accent-soft:#e5e7eb;--strong:#111827;--strong-bg:#dfe3ea;--heading:#111827;--quote:#111827;--code-bg:#0a0d14;--mark:#fde047;--frame:#111827;--code-text:#eef3ff;--sh-x:-5px;--sh-y:5px;--sh-b:0px;--sh-s:0px;--sh-mix:.92;--sh-a:1;--grid-k:.75;--grid-size:20px;--glass-min:.8}
+body.theme-night{--c1:#6da9e7;--c2:#e07084;--c3:#94e199;--c4:#f7cc4b;--c5:#7444b4;--c6:#3ecbdd;--on-c:#fff;--bg:#05070c;--surface:#0d111a;--surface-2:#141a27;--text:#eef1f8;--muted:#a6b1c9;--line:#27324b;--accent:#e6bd62;--accent-soft:#1b2132;--strong:#f3d995;--strong-bg:#2b2733;--heading:#f3d995;--quote:#e6bd62;--code-bg:#04060a;--mark:#6b5a12;--frame:#e6bd62;--code-text:#eef3ff;--sh-x:0px;--sh-y:0px;--sh-b:16px;--sh-s:0px;--sh-mix:0;--sh-a:.34;--grid-k:1;--grid-size:22px;--glass-min:.7;--shadow:0 18px 50px rgba(0,0,0,.7);--danger:#fb7185}
 @media(max-width:700px){
   .topbar{padding-inline:9px}.brand{font-size:14px}.nav-btn,.theme-btn{padding-inline:10px}.nav-label{display:none}.mobile-icon{display:inline}.theme-menu{inset-inline-end:-4px}
   #editorScreen{padding:9px 8px 18px}.editor-card{border-radius:14px}#markdownInput{min-height:calc(100vh - 200px);padding:16px;font-size:15px}
@@ -190,7 +190,7 @@ body.theme-night{--c1:#60a5fa;--c2:#fb7185;--c3:#4ade80;--c4:#fbbf24;--c5:#c4b5f
 }
 @media(max-width:480px){.topbar{gap:6px}.top-actions{gap:5px}.nav-btn,.theme-btn{padding-inline:8px;white-space:nowrap}.zoom-box button{width:29px}.brand{font-size:13px}}
 
-.pdf-light{--c1:#0f6b5a;--c2:#a63a2b;--c3:#5b7f2b;--c4:#b8860b;--c5:#5b3f8c;--c6:#1b6a8a;--on-c:#fff;--bg:#efe6d2;--surface:#fffaf0;--surface-2:#f7eedb;--text:#1f1a12;--muted:#5e5239;--line:#dccba5;--accent:#0f6b5a;--accent-soft:#e2efe9;--strong:#0b4a3e;--strong-bg:#cfe6dc;--heading:#0b4a3e;--quote:#0f6b5a;--code-bg:#10231f;--mark:#f3d36b;--frame:#b08d3c;--code-text:#eef3ff}
+.pdf-light{--c1:#01665e;--c2:#b21304;--c3:#94974d;--c4:#e5c767;--c5:#4c276e;--c6:#6eacd7;--on-c:#fff;--bg:#e9dcbc;--surface:#fffaec;--surface-2:#f7ecd0;--text:#1a150c;--muted:#554829;--line:#d4bd84;--accent:#01665e;--accent-soft:#d9ece6;--strong:#014a44;--strong-bg:#c5e2da;--heading:#014a44;--quote:#01665e;--code-bg:#0c2420;--mark:#f0c94f;--frame:#b8903a;--code-text:#eef3ff;--sh-x:-4px;--sh-y:4px;--sh-b:0px;--sh-s:0px;--sh-mix:.2;--sh-a:.34;--grid-k:.9;--grid-size:22px;--glass-min:.74}
 #pdfStage{position:fixed;left:-12000px;top:0;width:794px;pointer-events:none}
 .pdf-page{position:relative;width:794px;height:1123px;background:var(--surface);color:var(--text);overflow:hidden;margin-bottom:20px;font-family:var(--font-body);font-synthesis:none}
 .pdf-page .pg-frame{position:absolute;left:16px;right:16px;top:16px;bottom:16px;border:2px solid var(--frame);border-radius:6px}
@@ -516,14 +516,14 @@ body.theme-night{--orn-rgb:224,180,90}
       <div class="theme-wrap">
         <button id="themeToggle" class="theme-btn theme-toggle" type="button" aria-expanded="false" aria-haspopup="true" aria-controls="themeMenu" aria-label="اختيار الثيم">🎨 <span class="nav-label">الثيمات</span>⌄</button>
         <div id="themeMenu" class="theme-menu" role="menu" aria-label="الثيمات">
-          <button class="theme-choice active" role="menuitemradio" aria-checked="true" data-theme="authentic" type="button"><span class="theme-dot" style="background:conic-gradient(#0f6b5a 0deg 60deg,#a63a2b 60deg 120deg,#5b7f2b 120deg 180deg,#b8860b 180deg 240deg,#5b3f8c 240deg 300deg,#1b6a8a 300deg 360deg)"></span>أصيل ذهبي</button>
-          <button class="theme-choice" role="menuitemradio" aria-checked="false" data-theme="royal" type="button"><span class="theme-dot" style="background:conic-gradient(#1e3a8a 0deg 60deg,#b91c1c 60deg 120deg,#15803d 120deg 180deg,#b45309 180deg 240deg,#6d28d9 240deg 300deg,#0e7490 300deg 360deg)"></span>ملكي كحلي</button>
-          <button class="theme-choice" role="menuitemradio" aria-checked="false" data-theme="emerald" type="button"><span class="theme-dot" style="background:conic-gradient(#047857 0deg 60deg,#be123c 60deg 120deg,#4d7c0f 120deg 180deg,#b45309 180deg 240deg,#7e22ce 240deg 300deg,#0369a1 300deg 360deg)"></span>زمردي</button>
-          <button class="theme-choice" role="menuitemradio" aria-checked="false" data-theme="sunset" type="button"><span class="theme-dot" style="background:conic-gradient(#c2410c 0deg 60deg,#be123c 60deg 120deg,#4d7c0f 120deg 180deg,#a16207 180deg 240deg,#86198f 240deg 300deg,#0f766e 300deg 360deg)"></span>غروب دافئ</button>
-          <button class="theme-choice" role="menuitemradio" aria-checked="false" data-theme="rose" type="button"><span class="theme-dot" style="background:conic-gradient(#be185d 0deg 60deg,#b91c1c 60deg 120deg,#047857 120deg 180deg,#b45309 180deg 240deg,#6d28d9 240deg 300deg,#0e7490 300deg 360deg)"></span>وردي أنيق</button>
-          <button class="theme-choice" role="menuitemradio" aria-checked="false" data-theme="ocean" type="button"><span class="theme-dot" style="background:conic-gradient(#0369a1 0deg 60deg,#be123c 60deg 120deg,#047857 120deg 180deg,#b45309 180deg 240deg,#6d28d9 240deg 300deg,#0f766e 300deg 360deg)"></span>محيط</button>
-          <button class="theme-choice" role="menuitemradio" aria-checked="false" data-theme="ink" type="button"><span class="theme-dot" style="background:conic-gradient(#1e293b 0deg 60deg,#b91c1c 60deg 120deg,#15803d 120deg 180deg,#a16207 180deg 240deg,#6d28d9 240deg 300deg,#0e7490 300deg 360deg)"></span>حبر وورق</button>
-          <button class="theme-choice" role="menuitemradio" aria-checked="false" data-theme="night" type="button"><span class="theme-dot" style="background:conic-gradient(#60a5fa 0deg 60deg,#fb7185 60deg 120deg,#4ade80 120deg 180deg,#fbbf24 180deg 240deg,#c4b5fd 240deg 300deg,#22d3ee 300deg 360deg)"></span>ليلي ذهبي</button>
+          <button class="theme-choice active" role="menuitemradio" aria-checked="true" data-theme="authentic" type="button"><span class="theme-dot" style="background:conic-gradient(#01665e 0deg 60deg,#b21304 60deg 120deg,#94974d 120deg 180deg,#e5c767 180deg 240deg,#4c276e 240deg 300deg,#6eacd7 300deg 360deg)"></span>أصيل ذهبي</button>
+          <button class="theme-choice" role="menuitemradio" aria-checked="false" data-theme="royal" type="button"><span class="theme-dot" style="background:conic-gradient(#193990 0deg 60deg,#bc250c 60deg 120deg,#056f4c 120deg 180deg,#e8ab3e 180deg 240deg,#8c48b7 240deg 300deg,#43afc1 300deg 360deg)"></span>ملكي كحلي</button>
+          <button class="theme-choice" role="menuitemradio" aria-checked="false" data-theme="emerald" type="button"><span class="theme-dot" style="background:conic-gradient(#017048 0deg 60deg,#b82972 60deg 120deg,#90a018 120deg 180deg,#e3af58 180deg 240deg,#672675 240deg 300deg,#5ea7d5 300deg 360deg)"></span>زمردي</button>
+          <button class="theme-choice" role="menuitemradio" aria-checked="false" data-theme="sunset" type="button"><span class="theme-dot" style="background:conic-gradient(#ab4c04 0deg 60deg,#7c0515 60deg 120deg,#8aa354 120deg 180deg,#e0cd37 180deg 240deg,#4b0256 240deg 300deg,#86cccb 300deg 360deg)"></span>غروب دافئ</button>
+          <button class="theme-choice" role="menuitemradio" aria-checked="false" data-theme="rose" type="button"><span class="theme-dot" style="background:conic-gradient(#a72a68 0deg 60deg,#4a1f10 60deg 120deg,#105d00 120deg 180deg,#e0af3b 180deg 240deg,#9b89da 240deg 300deg,#81c9d3 300deg 360deg)"></span>وردي أنيق</button>
+          <button class="theme-choice" role="menuitemradio" aria-checked="false" data-theme="ocean" type="button"><span class="theme-dot" style="background:conic-gradient(#006d8f 0deg 60deg,#e07374 60deg 120deg,#04541b 120deg 180deg,#f9ba41 180deg 240deg,#340f6f 240deg 300deg,#74d1d5 300deg 360deg)"></span>محيط</button>
+          <button class="theme-choice" role="menuitemradio" aria-checked="false" data-theme="ink" type="button"><span class="theme-dot" style="background:conic-gradient(#1c2f46 0deg 60deg,#ba200d 60deg 120deg,#086c4b 120deg 180deg,#eab532 180deg 240deg,#552f86 240deg 300deg,#5ab3c8 300deg 360deg)"></span>حبر وورق</button>
+          <button class="theme-choice" role="menuitemradio" aria-checked="false" data-theme="night" type="button"><span class="theme-dot" style="background:conic-gradient(#6da9e7 0deg 60deg,#e07084 60deg 120deg,#94e199 120deg 180deg,#f7cc4b 180deg 240deg,#7444b4 240deg 300deg,#3ecbdd 300deg 360deg)"></span>ليلي ذهبي</button>
         </div>
       </div>
     </div>
@@ -552,7 +552,7 @@ body.theme-night{--orn-rgb:224,180,90}
             </div>
           </div>
         </div>
-        <textarea id="markdownInput" aria-label="نص Markdown" dir="auto" spellcheck="false" autocomplete="off" placeholder="# عنوان الدرس&#10;&#10;اكتب أو الصق المحتوى هنا...&#10;&#10;**معلومة مهمة**&#10;&#10;- نقطة أولى&#10;- نقطة ثانية"></textarea>
+        <textarea id="markdownInput" aria-label="نص Markdown" dir="auto" spellcheck="false" autocomplete="off" placeholder="ألصق هنا النص المنسّق بالماركداون…"></textarea>
         <div class="ed-go">
           <button id="goStudyBtn" class="ed-go-btn" type="button"><span>ابدأ المذاكرة</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5M11 6l-6 6 6 6"/></svg></button>
           <p class="ed-go-hint">بعد المذاكرة يمكنك تحميل المذكرة PDF من الزر العلوي</p>
@@ -1397,11 +1397,12 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
   function setTheme(theme){
     themes.forEach(t=>document.body.classList.remove('theme-'+t)); document.body.classList.add('theme-'+theme);
     document.querySelectorAll('.theme-choice').forEach(b=>{const on=b.dataset.theme===theme;b.classList.toggle('active',on);b.setAttribute('aria-checked',String(on))});
-    recolor();
+    inkApply(document.body);recolor();
     lsSet(STORAGE+'-theme',theme);
     closeMenu();
   }
   function load(){
+    inkApply(document.body);
     const saved=lsGet(STORAGE); if(saved!==null) input.value=saved;
     let theme=lsGet(STORAGE+'-theme'); theme=({blue:'royal',cream:'sunset',forest:'emerald',slate:'ink'})[theme]||theme; if(theme&&themes.includes(theme)) setTheme(theme);
     render();
@@ -1424,6 +1425,87 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
   function rl(h){const [r,g,b]=hexToRgb(h).map(v=>{v/=255;return v<=.03928?v/12.92:Math.pow((v+.055)/1.055,2.4)});return .2126*r+.7152*g+.0722*b}
   function cr(a,b){const x=rl(a),y=rl(b);return (Math.max(x,y)+.05)/(Math.min(x,y)+.05)}
   function ensure(c,bg,toward,min){let o=c;for(let t=0;t<=1.0001&&cr(o,bg)<min;t+=.05)o=mixHex(toward,c,t);return o}
+  /* ================= v4 ADAPTIVE INK ENGINE =================
+     Pure functions, no dependencies. Decisions are made per theme (inkApply) and per element (colorize/set).
+     Thresholds live in INK. Rules:
+     R1 FILLS    on-colour = better of white / near-black by WCAG ratio; must reach AA 4.5:1 (large text 3:1 is never relied on).
+                 If neither does, the fill moves in OKLab lightness (hue + chroma kept) until it does.
+     R2 TEXT     coloured text on the page (heading, strong, link, muted, text) is deepened on light surfaces and lightened on
+                 dark ones until AA is met against every surface it can sit on. A 1px solid halo ring is added per element
+                 ONLY if the text is still under HALO_BELOW (5.5:1) on the tint/page under it (halo = 4 offset text-shadows,
+                 solid rgba, no blur, html2canvas-safe).
+     R3 SHADOWS  light themes: offset "neo-brutalist" shadow tinted with the element's own --hc (theme art vars --sh-*);
+                 dark themes: the same slot becomes a soft glow (offset 0, blur 16px) in the element colour.
+     R4 MARK     marker colour is moved away from the text colour until text-on-marker >= 4.5:1.
+     R5 GRID     line colour from the accent (light) or white (dark); alpha capped at 8% (light) / 4% (dark) times the theme
+                 factor --grid-k; alpha is reduced until body, heading and muted text keep AA over a grid intersection
+                 (two crossing lines) on every surface.
+     R6 GLASS    surface colour at the lowest alpha (>= theme --glass-min) that keeps text AA over both a black and a white
+                 backdrop; solid surface colour is the fallback (@supports in CSS). */
+  const INK={AA:4.5,HALO_BELOW:5.5,GRID_CAP_LIGHT:.08,GRID_CAP_DARK:.04,GRID_CODE:.04,DARKTXT:'#10151b',LIGHTTXT:'#ffffff'};
+  const INK_VARS=['--c1','--c2','--c3','--c4','--c5','--c6','--on-1','--on-2','--on-3','--on-4','--on-5','--on-6','--on-c','--accent','--text','--muted','--heading','--strong','--link','--mark','--code-text','--danger',
+    '--ink-halo','--ink-shadow','--ink-glow','--ink-tglow','--ink-stroke','--ink-stroke-w','--grid-line','--grid-alpha','--grid-code','--zebra','--glass-bg','--glass-solid','--glass-blur','--sh-x','--sh-y','--sh-b','--sh-s','--ink-dark'];
+  function parseCol(v){v=(v||'').trim();if(/^#(?:[0-9a-f]{3}|[0-9a-f]{6})$/i.test(v))return rgbToHex(hexToRgb(v));
+    const m=v.match(/rgba?\(\s*([\d.]+)[\s,]+([\d.]+)[\s,]+([\d.]+)/i);return m?rgbToHex([+m[1],+m[2],+m[3]]):null}
+  const rgba=(h,a)=>{const [r,g,b]=hexToRgb(h);return `rgba(${r},${g},${b},${+a.toFixed(3)})`};
+  const lin=v=>{v/=255;return v<=.04045?v/12.92:Math.pow((v+.055)/1.055,2.4)}, unlin=x=>255*(x<=.0031308?12.92*x:1.055*Math.pow(x,1/2.4)-.055);
+  function toOk(h){const [r,g,b]=hexToRgb(h).map(lin),l=Math.cbrt(.4122214708*r+.5363325363*g+.0514459929*b),m=Math.cbrt(.2119034982*r+.6806995451*g+.1073969566*b),s=Math.cbrt(.0883024619*r+.2817188376*g+.6299787005*b);
+    return [.2104542553*l+.793617785*m-.0040720468*s,1.9779984951*l-2.428592205*m+.4505937099*s,.0259040371*l+.7827717662*m-.808675766*s]}
+  function fromOk(L,a,b){const l=Math.pow(L+.3963377774*a+.2158037573*b,3),m=Math.pow(L-.1055613458*a-.0638541728*b,3),s=Math.pow(L-.0894841775*a-1.291485548*b,3);
+    return [4.0767416621*l-3.3077115913*m+.2309699292*s,-1.2684380046*l+2.6097574011*m-.3413193965*s,-.0041960863*l-.7034186147*m+1.707614701*s]}
+  /* perceptual lighten/darken: new OKLab lightness L2, same hue, chroma reduced only if the colour leaves the sRGB gamut */
+  function okShift(h,L2){const [,a,b]=toOk(h);let k=1;const cl=c=>rgbToHex(c.map(x=>unlin(Math.min(1,Math.max(0,x)))));
+    for(let i=0;i<26;i++){const c=fromOk(L2,a*k,b*k);if(c.every(x=>x>=-.0005&&x<=1.0005))return cl(c);k*=.92}
+    return cl(fromOk(L2,0,0))}
+  const crAll=(c,bgs)=>Math.min.apply(null,bgs.map(b=>cr(c,b)));
+  /* R2: move colour c in direction dir (-1 deeper, +1 lighter) until it reaches min against all bgs */
+  function inkTone(c,bgs,min,dir){let o=c,L=toOk(c)[0];for(let i=0;i<80&&crAll(o,bgs)<min;i++){L+=dir*.012;if(L<0||L>1)break;o=okShift(c,L)}return o}
+  const inkOn=c=>cr(c,INK.LIGHTTXT)>=cr(c,INK.DARKTXT)?INK.LIGHTTXT:INK.DARKTXT;
+  /* R1 */
+  function inkFill(c){let on=inkOn(c);if(cr(c,on)>=INK.AA)return {fill:c,on};
+    const dir=on===INK.LIGHTTXT?-1:1;let o=c,L=toOk(c)[0];for(let i=0;i<80&&cr(o,on)<INK.AA;i++){L+=dir*.01;o=okShift(c,L)}return {fill:o,on}}
+  const over=(fg,a,bg)=>mixHex(fg,bg,a);              // colour fg at alpha a composited over bg (mixHex(a,b,t) = t*a+(1-t)*b)
+  const num=(v,d)=>{const n=parseFloat(v);return isNaN(n)?d:n};
+  function inkApply(scope){
+    INK_VARS.forEach(v=>scope.style.removeProperty(v));
+    const cs=getComputedStyle(scope),P=(n,d)=>parseCol(cs.getPropertyValue(n))||d,N=(n,d)=>num(cs.getPropertyValue(n),d);
+    const surface=P('--surface','#ffffff'),bg=P('--bg',surface),s2=P('--surface-2',surface),soft=P('--accent-soft',s2),sbg=P('--strong-bg',soft);
+    const dark=lum(surface)<.5,dir=dark?1:-1,out={},pages=[surface,bg,s2,soft];
+    const fb=['#3157d6','#e0483f','#1f9d62','#b88400','#8a4fd0','#0e93a8'];
+    for(let i=1;i<=6;i++){const f=inkFill(P('--c'+i,fb[i-1]));out['--c'+i]=f.fill;out['--on-'+i]=f.on}
+    const af=inkFill(P('--accent',out['--c1']));out['--accent']=af.fill;out['--on-c']=af.on;
+    const text=inkTone(P('--text',dark?'#fff':'#111'),pages,7,dir);out['--text']=text;
+    out['--muted']=inkTone(P('--muted',text),pages,INK.AA,dir);
+    out['--heading']=inkTone(P('--heading',af.fill),[surface,bg],7,dir);
+    out['--strong']=inkTone(P('--strong',af.fill),[surface,sbg,soft],INK.AA,dir);
+    out['--link']=inkTone(af.fill,[surface,s2,soft],INK.AA,dir);
+    const codeBg=P('--code-bg','#0b0f19');out['--code-text']=inkTone(P('--code-text','#eef3ff'),[codeBg],7,1);
+    out['--danger']=inkTone(P('--danger','#b42318'),[surface,s2,bg],INK.AA,dir);
+    out['--mark']=inkTone(P('--mark','#f3d36b'),[text],INK.AA,dark?-1:1);       // R4
+    // R3 shadow colours (shape comes from the theme's --sh-* art vars; dark themes switch to glow)
+    const mix=N('--sh-mix',.2),sa=N('--sh-a',.3);
+    out['--ink-shadow']=dark?rgba(af.fill,.3):rgba(mixHex(text,af.fill,mix),sa);
+    out['--ink-glow']=rgba(dark?out['--link']:af.fill,dark?.38:.0);
+    out['--ink-tglow']=dark?'0 0 .55em '+rgba(out['--heading'],.34):'0 0 0 transparent';
+    if(dark){out['--sh-x']='0px';out['--sh-y']='0px';out['--sh-b']='16px';out['--sh-s']='0px'}
+    out['--ink-stroke-w']=dark?'0px':'.12px';out['--ink-stroke']=rgba(text,.4);
+    out['--ink-halo']=rgba(surface,.6);
+    // R5 grid
+    const cap=dark?INK.GRID_CAP_DARK:INK.GRID_CAP_LIGHT,k=Math.min(1,Math.max(0,N('--grid-k',1)));
+    const gc=dark?'#ffffff':mixHex(af.fill,text,.6);let ga=+(cap*k).toFixed(3);
+    const gridOK=a=>{const x=1-(1-a)*(1-a);return [surface,s2,soft,sbg].every(b=>{const bb=over(gc,x,b);return [text,out['--heading'],out['--muted']].every(t=>cr(t,bb)>=INK.AA)})};
+    while(ga>.005&&!gridOK(ga))ga=+(ga*.8).toFixed(3);
+    out['--grid-line']=rgba(gc,ga);out['--grid-alpha']=String(ga);out['--grid-code']=rgba('#ffffff',INK.GRID_CODE);
+    out['--zebra']=rgba(s2,.72);
+    // R6 glass
+    const gmin=N('--glass-min',.74);let a=gmin;
+    for(;a<.94;a+=.02){const t=out['--text'];if(cr(t,over(surface,a,'#000000'))>=INK.AA&&cr(t,over(surface,a,'#ffffff'))>=INK.AA)break}
+    a=Math.min(a,.94);out['--glass-bg']=rgba(surface,a);out['--glass-solid']=surface;out['--glass-blur']=(dark?10:12)+'px';
+    out['--ink-dark']=dark?'1':'0';
+    for(const n in out)scope.style.setProperty(n,out[n]);
+    return out;
+  }
+  const inkSet=(el,map)=>{for(const n in map)el.style.setProperty(n,map[n])};
   function readPalette(scope){
     const cs=getComputedStyle(scope), g=n=>cs.getPropertyValue(n).trim(), isHex=v=>/^#(?:[0-9a-f]{3}|[0-9a-f]{6})$/i.test(v);
     const fallback=['#3157d6','#e0483f','#1f9d62','#b88400','#8a4fd0','#0e93a8'];
@@ -1431,13 +1513,18 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
     const surface=isHex(g('--surface'))?g('--surface'):'#ffffff', text=isHex(g('--text'))?g('--text'):'#18202a', muted=isHex(g('--muted'))?g('--muted'):'#697586';
     const dark=lum(surface)<.5;
     const tints=colors.map(c=>mixHex(c,surface,dark?.34:.22));
-    return {colors,tints,text,muted,surface,frame:isHex(g('--frame'))?g('--frame'):mixHex(muted,surface,.5),
-      heads:colors.map((c,k)=>ensure(c,tints[k],dark?'#ffffff':text,6.5)),
-      ons:colors.map(c=>cr(c,'#ffffff')>=cr(c,'#10151b')?'#ffffff':'#10151b')};
+    const heads=colors.map((c,k)=>ensure(c,tints[k],dark?'#ffffff':text,6.5));
+    const sm=num(g('--sh-mix'),.2),sa=num(g('--sh-a'),.3);
+    // per-colour shadow/glow colour (R3) and halo ring colour (R2), pre-computed so colorize() stays cheap
+    const shadows=colors.map(c=>dark?rgba(c,.42):rgba(mixHex(text,c,sm),sa));
+    return {colors,tints,text,muted,surface,dark,frame:isHex(g('--frame'))?g('--frame'):mixHex(muted,surface,.5),heads,shadows,
+      ons:colors.map((c,k)=>isHex(g('--on-'+(k+1)))?g('--on-'+(k+1)):inkOn(c))};
   }
+  const inkHalo=(txt,under,dark)=>cr(txt,under)<INK.HALO_BELOW?rgba(dark?mixHex(under,'#000000',.6):mixHex(under,'#ffffff',.55),.6):'transparent';
   function colorize(root,pal){
     const n=pal.colors.length;
-    const set=(el,i)=>{const k=((i%n)+n)%n;el.style.setProperty('--hc',pal.colors[k]);el.style.setProperty('--hb',pal.tints[k]);el.style.setProperty('--hd',pal.heads[k]);el.style.setProperty('--hon',pal.ons[k])};
+    const set=(el,i)=>{const k=((i%n)+n)%n;el.style.setProperty('--hc',pal.colors[k]);el.style.setProperty('--hb',pal.tints[k]);el.style.setProperty('--hd',pal.heads[k]);el.style.setProperty('--hon',pal.ons[k]);el.style.setProperty('--hs',pal.shadows[k]);
+      el.style.setProperty('--hh',inkHalo(pal.heads[k],el.tagName==='STRONG'?pal.tints[k]:pal.surface,pal.dark))};
     root.querySelectorAll('h2').forEach((e,i)=>set(e,i));
     root.querySelectorAll('h3').forEach((e,i)=>set(e,i+2));
     root.querySelectorAll('h4,h5,h6').forEach((e,i)=>set(e,i+4));
@@ -1447,7 +1534,46 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
     root.querySelectorAll('ul,ol').forEach(l=>Array.from(l.children).forEach((li,i)=>set(li,i)));
     root.querySelectorAll('tr').forEach(tr=>Array.from(tr.children).forEach((c,i)=>{if(c.tagName==='TH')set(c,i)}));
   }
-  function recolor(){colorize(content,readPalette(document.body))}
+  function recolor(){if(!document.body.style.getPropertyValue('--ink-dark'))inkApply(document.body);colorize(content,readPalette(document.body))}
+  /* self-check: contrast ratios per theme, no UI. Usage: __inkAudit() -> {rows,failures,table}. Restores the active theme. */
+  window.__inkAudit=function(){
+    const body=document.body,prev=themes.find(t=>body.classList.contains('theme-'+t)),rows=[],fails=[];
+    const sim={deut:[[.367322,.860646,-.228041],[.280085,.672501,.047413],[-.01182,.04294,.968881]],prot:[[.152286,1.052583,-.204868],[.114503,.786281,.099216],[-.003882,-.048116,1.051998]],trit:[[1.255528,-.076749,-.178779],[-.078411,.930809,.147602],[.004733,.691367,.3039]]};
+    const labOf=(h,kind)=>{let v=hexToRgb(h).map(lin);if(kind!=='norm'){const M=sim[kind];v=M.map(r=>Math.min(1,Math.max(0,r[0]*v[0]+r[1]*v[1]+r[2]*v[2])))}
+      const l=Math.cbrt(.4122214708*v[0]+.5363325363*v[1]+.0514459929*v[2]),m=Math.cbrt(.2119034982*v[0]+.6806995451*v[1]+.1073969566*v[2]),s=Math.cbrt(.0883024619*v[0]+.2817188376*v[1]+.6299787005*v[2]);
+      return [.2104542553*l+.793617785*m-.0040720468*s,1.9779984951*l-2.428592205*m+.4505937099*s,.0259040371*l+.7827717662*m-.808675766*s]};
+    const f2=x=>Math.round(x*100)/100;
+    themes.forEach(t=>{
+      themes.forEach(x=>body.classList.remove('theme-'+x));body.classList.add('theme-'+t);const o=inkApply(body),pal=readPalette(body),cs=getComputedStyle(body);
+      const P=n=>parseCol(cs.getPropertyValue(n)),surface=P('--surface'),bg=P('--bg'),s2=P('--surface-2'),soft=P('--accent-soft'),sbg=P('--strong-bg'),text=P('--text');
+      const ga=num(cs.getPropertyValue('--grid-alpha'),0),gl=parseCol(cs.getPropertyValue('--grid-line')),cross=1-(1-ga)*(1-ga),dark=pal.dark;
+      const gridWorst=Math.min.apply(null,[surface,s2,soft,sbg].map(b=>{const bb=over(gl,cross,b);return Math.min(cr(text,bb),cr(P('--heading'),bb),cr(P('--muted'),bb))}));
+      const tintGrid=Math.min.apply(null,pal.tints.map((tn,k)=>cr(pal.heads[k],over(gl,cross,tn))));
+      const gm=parseCol(cs.getPropertyValue('--glass-bg'))||surface,galpha=num((cs.getPropertyValue('--glass-bg').match(/,\s*([\d.]+)\)$/)||[])[1],1);
+      const glassWorst=Math.min(cr(text,over(surface,galpha,'#000000')),cr(text,over(surface,galpha,'#ffffff')));
+      const r={theme:t,dark,
+        text_page:f2(cr(text,surface)),text_bg:f2(cr(text,bg)),heading_page:f2(cr(P('--heading'),surface)),strong_on_hl:f2(cr(P('--strong'),sbg)),link_page:f2(cr(P('--link'),surface)),
+        muted_min:f2(Math.min(cr(P('--muted'),surface),cr(P('--muted'),s2),cr(P('--muted'),soft),cr(P('--muted'),bg))),
+        on_fill:pal.colors.map((c,k)=>f2(cr(pal.ons[k],c))),head_on_tint:pal.heads.map((h,k)=>f2(cr(h,pal.tints[k]))),head_on_page:pal.heads.map(h=>f2(cr(h,surface))),
+        mark_text:f2(cr(text,P('--mark'))),mark_vs_page:f2(cr(P('--mark'),surface)),code:f2(cr(P('--code-text'),P('--code-bg'))),
+        accent_btn:f2(cr(P('--on-c'),P('--accent'))),grid_alpha:ga,grid_text_worst:f2(gridWorst),grid_tint_head:f2(tintGrid),glass_alpha:galpha,glass_worst:f2(glassWorst),
+        halos:pal.heads.filter((h,k)=>inkHalo(h,pal.tints[k],dark)!=='transparent').length};
+      // colour-blind separation of the six accents: min pairwise OKLab distance under each simulation
+      ['norm','deut','prot','trit'].forEach(kind=>{let mn=9;for(let i=0;i<6;i++)for(let j=i+1;j<6;j++){const a=labOf(pal.colors[i],kind),b=labOf(pal.colors[j],kind);mn=Math.min(mn,Math.hypot(a[0]-b[0],a[1]-b[1],a[2]-b[2]))}r['dE_'+kind]=f2(mn)});
+      r.lightness_span=f2(Math.max.apply(null,pal.colors.map(c=>toOk(c)[0]))-Math.min.apply(null,pal.colors.map(c=>toOk(c)[0])));
+      const bad=[];const chk=(n,v,min)=>{if(v<min)bad.push(n+'='+v+'<'+min)};
+      chk('text_page',r.text_page,7);chk('heading_page',r.heading_page,7);chk('strong_on_hl',r.strong_on_hl,4.5);chk('link_page',r.link_page,4.5);chk('muted_min',r.muted_min,4.5);
+      r.on_fill.forEach((v,k)=>chk('on_fill'+(k+1),v,4.5));r.head_on_tint.forEach((v,k)=>chk('head_on_tint'+(k+1),v,4.5));r.head_on_page.forEach((v,k)=>chk('head_on_page'+(k+1),v,4.5));
+      chk('mark_text',r.mark_text,4.5);chk('code',r.code,7);chk('accent_btn',r.accent_btn,4.5);chk('grid_text_worst',r.grid_text_worst,4.5);chk('grid_tint_head',r.grid_tint_head,4.5);chk('glass_worst',r.glass_worst,4.5);
+      chk('dE_deut',r.dE_deut,.05);chk('dE_prot',r.dE_prot,.05);chk('dE_trit',r.dE_trit,.04);
+      if(ga>(dark?.04:.08)+1e-9)bad.push('grid_alpha too high');
+      r.ok=!bad.length;r.bad=bad;rows.push(r);if(bad.length)fails.push(t+': '+bad.join(', '));
+    });
+    themes.forEach(x=>body.classList.remove('theme-'+x));body.classList.add('theme-'+(prev||themes[0]));inkApply(body);
+    const hdr='| theme | text/page | heading | strong | link | muted | on-fill (6) | head/tint (6) | mark | code | btn | grid a | grid-text | glass | dE deut/prot/trit | ok |\n|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|\n';
+    const table=hdr+rows.map(r=>`| ${r.theme} | ${r.text_page} | ${r.heading_page} | ${r.strong_on_hl} | ${r.link_page} | ${r.muted_min} | ${r.on_fill.join(' ')} | ${r.head_on_tint.join(' ')} | ${r.mark_text} | ${r.code} | ${r.accent_btn} | ${r.grid_alpha} | ${r.grid_text_worst} | ${r.glass_worst} | ${r.dE_deut}/${r.dE_prot}/${r.dE_trit} | ${r.ok?'PASS':'FAIL'} |`).join('\n');
+    return {rows,failures:fails,table};
+  };
 
   /* ---------- PDF export (A4 pages, saved to Downloads) ---------- */
   let busy=false, toastTimer=0;
@@ -1841,10 +1967,23 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
     im.src=u;
   }
 
+  /* v5: freeze markdown images before html2canvas (no auto sizing / object-fit => no stretching in the PDF) */
+  async function pdfImgPrep(pg){
+    const imgs=Array.from(pg.querySelectorAll('.pg-body .md img'));
+    await Promise.all(imgs.map(i=>i.decode?i.decode().catch(()=>{}):0));
+    return imgs.map(i=>{const r=i.getBoundingClientRect(),c=getComputedStyle(i);
+      return{w:Math.round(r.width*100)/100,h:Math.round(r.height*100)/100,nw:i.naturalWidth,nh:i.naturalHeight,rad:c.borderTopLeftRadius,m:c.margin,src:i.currentSrc||i.src}});
+  }
+  function pdfImgApply(doc,pg,info){
+    Array.from(pg.querySelectorAll('.pg-body .md img')).forEach((i,k)=>{const f=info[k];if(!f||!f.nw||!f.nh)return;
+      const d=doc.createElement('div'),box=f.w/f.h,nat=f.nw/f.nh,same=Math.abs(box/nat-1)<.02;
+      d.style.cssText='display:block;box-sizing:border-box;width:'+f.w+'px;height:'+f.h+'px;margin:'+f.m+';border-radius:'+f.rad+';background-repeat:no-repeat;background-position:center;background-size:'+(same?'100% 100%':'contain')+';background-image:url("'+f.src.replace(/"/g,'%22')+'")';
+      i.replaceWith(d)});
+  }
   function paginateDoc(stage,brand){
       const light=document.body.classList.contains('theme-night')?' pdf-light':'';
       const probe=document.createElement('div');probe.className='pdf-page'+light;stage.appendChild(probe);
-      const pal=readPalette(probe);stage.removeChild(probe);
+      const inkMap=inkApply(probe);const pal=readPalette(probe);stage.removeChild(probe);
       const src=document.createElement('div');
       src.innerHTML=renderMarkdown(input.value);
       applyDir(src);colorize(src,pal);prepPdfLists(src);
@@ -1860,7 +1999,7 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
       const newPage=()=>{
         if(pages.length>=MAX_PAGES)throw userErr('المستند طويل جدًا للتصدير (أكثر من '+MAX_PAGES+' صفحة)');
         const pg=document.createElement('div');pg.className='pdf-page'+light;pg.dataset.pg=String(pages.length);
-        pg.style.setProperty('--frame',pal.frame);
+        pg.style.setProperty('--frame',pal.frame);inkSet(pg,inkMap);
         pg.innerHTML='<div class="pg-frame"></div><div class="pg-strip"></div><div class="pg-body md"></div><div class="pg-foot"><span class="pg-l"></span><span class="pg-num"></span><span class="pg-link"></span></div>';
         stage.appendChild(pg);pg.bodyEl=pg.querySelector('.pg-body');pg.i=pages.length;if(pdfZoom!==1)pg.bodyEl.style.fontSize=fs(1);
         pg.lim=pg.bodyEl.getBoundingClientRect().top+pg.bodyEl.clientHeight+3;
@@ -2020,13 +2159,14 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
         pages[i].querySelector('.pg-l').textContent=brand[0];pages[i].querySelector('.pg-link').textContent=brand[1];
         const lk=pages[i].querySelector('.pg-link').getBoundingClientRect(),pr=pages[i].getBoundingClientRect();
         const lks=plLinkRects(pages[i],i,pr);
+        const imgInfo=await pdfImgPrep(pages[i]);
         try{
           canvas=await html2canvas(pages[i],{
             scale:scale,backgroundColor:'#ffffff',useCORS:true,logging:false,
             width:794,height:1123,windowWidth:794,windowHeight:1123,scrollX:0,scrollY:0,x:0,y:0,
             onclone:doc=>{
               const pg=doc.querySelector('[data-pg="'+i+'"]');
-              doc.body.replaceChildren(pg);
+              doc.body.replaceChildren(pg);pdfImgApply(doc,pg,imgInfo);
               doc.body.style.cssText='margin:0;padding:0;overflow:visible';
               doc.documentElement.style.cssText='margin:0;padding:0;overflow:visible';
               pg.style.cssText+=';position:relative;left:0;top:0;margin:0';
@@ -2577,47 +2717,83 @@ var AIP_PROMPT=[
   "",
   "1. Your ENTIRE reply must be ONE single code block and nothing else. No greeting, no intro, no closing remarks, no explanations, no text before or after the block.",
   "2. Open the block with FOUR backticks followed by the word markdown, and close it with four backticks. This lets any triple-backtick code fence you need inside stay intact. Never close the block early and never split the reply into several blocks.",
-  "3. Inside the block, write standard CommonMark / GitHub-Flavored Markdown only. No HTML (the only allowed tag is <br> inside table cells), no LaTeX, no Mermaid, no images, no inline CSS, no color codes, and no emojis (they break the PDF fonts).",
-  "4. Write in the language I ask for. If it is Arabic, use clear Modern Standard Arabic and keep technical terms in English inside parentheses on first use, for example: دوالي المريء (Esophageal varices).",
+  "3. Inside the block, write standard CommonMark / GitHub-Flavored Markdown only, restricted to the syntax listed below. Do NOT use: HTML (the only allowed tag is <br>, and any other tag is shown as plain text), LaTeX or math syntax, Mermaid, images, inline CSS, color codes, or emojis (they break the PDF fonts).",
+  "4. Write in the language I ask for. If it is Arabic, use clear Modern Standard Arabic and keep technical terms in English inside parentheses on first use, for example: دوالي المريء (Esophageal varices). If the document is not in Arabic, give EVERY callout a custom title in the document language, because the default callout titles are Arabic.",
   "",
   "=== HOW MY RENDERER WORKS (write to fit it) ===",
   "",
-  "My app converts Markdown into a colorful, paginated A4 study PDF and applies colors AUTOMATICALLY by order and structure. You never specify colors. Your job is to use the right structure so the result looks beautiful:",
+  "My app converts Markdown into a colorful, paginated A4 study PDF (and a matching on-screen study view) and applies colors AUTOMATICALLY by order and structure. You never specify colors. Direction (RTL/LTR) is detected automatically per block. Your job is to use exactly the structures below so the result looks beautiful and nothing renders as stray symbols.",
   "",
-  "- # (H1): use exactly ONE, as the document title. It renders as a centered title with a gold ornament.",
-  "- ## (H2): the main sections. Each becomes a filled colored band with a different color, so use them for 4-10 major sections. Number them like \"## 1. Section name\". Keep titles short (under 8 words).",
-  "- ### (H3): subsections. Each gets a colored dot and underline. Use them to break a section into small, scannable parts. Avoid #### and deeper.",
-  "- **Bold**: each bold phrase gets its own color. Use it ONLY for key terms, definitions, drugs, names, numbers, and high-yield facts: 1-3 phrases per paragraph at most. Never bold a whole sentence.",
-  "- *Italic*: also colored. Use it for secondary emphasis, foreign terms, or short mnemonics.",
-  "- ==highlight==: a marker-pen highlight. Use sparingly for the 1-3 most critical facts in a section.",
-  "- Lists: markers are colored per item. Use short items (one line, ideally under 15 words). Nest at most 2 levels. Use numbered lists for steps, sequences, and ranked items. Use \"- [ ]\" task lists for review checklists.",
-  "- Tables: header cells are colored per column, and rows are zebra-striped. Always use tables for comparisons, classifications, differential diagnosis, drugs, and \"site / cause / feature\" style data. Rules: at most 5 columns; short cell text (1-8 words, no paragraphs); a header row and a separator row with at least three dashes per cell (|---|---|---|); the first column holds the item name; escape a literal pipe as \\|; split any table longer than 12 rows into several tables under separate H3 headings.",
-  "- Callouts (colored boxes with a title bar). Syntax: a line \"> [!TYPE] Optional custom title\" followed by lines starting with \"> \". Allowed TYPE values: NOTE, INFO, ABSTRACT, SUMMARY, TIP, HINT, IMPORTANT, WARNING, CAUTION, DANGER, SUCCESS, QUESTION, EXAMPLE. Use them with meaning:",
-  "  - ABSTRACT right after the title: a 2-4 line overview.",
-  "  - IMPORTANT for must-know rules.",
-  "  - TIP for mnemonics and memory tricks.",
-  "  - WARNING / CAUTION for pitfalls and common mistakes.",
-  "  - DANGER for emergencies or red flags.",
-  "  - EXAMPLE for clinical cases or worked examples.",
-  "  - QUESTION for self-test questions (put the answer on the next line).",
-  "  - SUCCESS for confirmed facts or the final take-home point.",
-  "  Keep each callout to 1-5 short lines. Do not put tables inside callouts. Use 3-8 callouts per document, spread out and mixing types.",
-  "- Plain blockquote (\"> text\") is also colored; use it for definitions or quotations only.",
-  "- --- (horizontal rule): an ornamental divider. Use it rarely, only between major parts.",
-  "- Code blocks: only for real code, formulas, or protocols, and keep lines short (under 60 characters) because the page is narrow.",
-  "- Footnotes [^1] with a definition line \"[^1]: text\" are supported. Use them only for side references.",
+  "--- Block elements ---",
+  "",
+  "- # (H1): exactly ONE, as the document title. Centered title with a gold ornament. Never use the underline style (=== under a line).",
+  "- ## (H2): the main sections. Each becomes a filled colored band with a different color, so use 4-10 major sections. Number them like \"## 1. Section name\". Keep titles under 8 words.",
+  "- ### (H3): subsections. Each gets a colored dot and underline. Use them to break a section into small scannable parts.",
+  "- #### (H4): allowed sparingly for a small labeled sub-part (colored side bar). Never use ##### or ######.",
+  "- Paragraphs: write each paragraph as ONE line. Every line break inside a paragraph is kept as a visible line break, so never hard-wrap sentences. Separate all blocks with one blank line. Keep paragraphs to 1-3 short sentences.",
+  "- Unordered lists: use \"- \" markers only. Each nesting level gets a different marker style automatically.",
+  "- Ordered lists: \"1. \", \"2. \", ... Use for steps, sequences, ranked items. Nested ordered lists are allowed (they appear as letters in the study view).",
+  "- Nesting: indent each child level by exactly 2 spaces. Use at most 3 levels, and prefer 2. A nested list may be a different type from its parent (a numbered list under a bullet, and the reverse).",
+  "- Do NOT put blank lines between items of the same list (a blank line splits it into two lists). Put one blank line before and after the whole list. Keep items short (one line, ideally under 15 words). Do not stack more than 7 items in a row.",
+  "- Task lists: \"- [ ] item\" for open items and \"- [x] item\" for done items. Use them only for review checklists.",
+  "- Tables (GitHub style):",
+  "  - Header row, then a separator row with at least three dashes per cell: |---|---|---|",
+  "  - Alignment is supported with colons: |:---| (start), |:---:| (center), |---:| (end). Use center only for short symbols or numbers.",
+  "  - At most 5 columns; cell text 1-8 words; first column holds the item name.",
+  "  - Inside cells you may use **bold**, *italic*, ==highlight==, `code`, ^sup^, ~sub~ and <br> for a forced line break. No lists, headings, callouts, or code blocks inside cells.",
+  "  - Escape a literal pipe as \\|",
+  "  - Put a blank line before and after every table. Split any table longer than 12 rows into several tables under separate H3 headings.",
+  "  - Header cells are colored per column and rows are zebra-striped automatically.",
+  "- Callouts (colored boxes with a title bar). Syntax: the first line is \"> [!TYPE] Optional custom title\", followed by body lines that each start with \"> \". A line containing only \">\" makes a blank line inside the box. Allowed TYPE values (case-insensitive, no other values work): NOTE, INFO, ABSTRACT, SUMMARY, TIP, HINT, IMPORTANT, WARNING, CAUTION, DANGER, SUCCESS, QUESTION, EXAMPLE.",
+  "  - Without a custom title, the box shows an Arabic default title (ملاحظة, معلومة, خلاصة, نصيحة, مهم, تنبيه, احذر, خطر, صحيح, سؤال, مثال).",
+  "  - Types that share a color family: NOTE / ABSTRACT / SUMMARY; TIP / HINT / SUCCESS; CAUTION / DANGER; INFO / EXAMPLE. IMPORTANT and QUESTION share one color; WARNING has its own color. Choose by meaning, and vary types so neighboring boxes differ in color.",
+  "  - Use them with meaning: ABSTRACT or SUMMARY right after the title (2-4 line overview); IMPORTANT for must-know rules; TIP or HINT for mnemonics and memory tricks; WARNING or CAUTION for pitfalls and common mistakes; DANGER for emergencies and red flags; EXAMPLE for cases or worked examples; QUESTION for self-test questions (put the answer on the next line inside the same box, for example \"> **Answer:** ...\"); SUCCESS for confirmed facts or the final take-home point; NOTE or INFO for side information.",
+  "  - Inside a callout you may use paragraphs, short bullet or numbered lists, bold, highlight, and short code. Do not put tables or headings inside callouts. Keep each callout to 1-5 short lines.",
+  "  - IMPORTANT: always leave one blank line (not a \">\" line) between two callouts. Without it they merge into one box and the second header shows as plain text.",
+  "  - Use 3-8 callouts per document, spread out and mixing types.",
+  "- Plain blockquote: \"> text\" (no [!TYPE]) is also colored; use it only for definitions or quotations. Blockquotes can be nested with \"> >\".",
+  "- Horizontal rule: a line containing only --- renders as an ornamental divider. Use it rarely, only between major parts, with blank lines around it. Never put --- directly under a text line.",
+  "- Code blocks: use a triple-backtick fence with an optional language label on the opening line (shown as a small caption), for example:",
+  "",
+  "```text",
+  "Dose = weight x 15 mg",
+  "```",
+  "",
+  "  Use them only for real code, formulas, or protocols. Keep lines under 60 characters because the page is narrow. Content inside is shown literally and always left-to-right, so no Markdown works inside it. Never create code by indenting lines with spaces.",
+  "- Footnotes: put a marker like [^1] in the text, and define it on its own single line anywhere (usually at the end): \"[^1]: short text\". Definitions must be one line. Numbering is automatic by first appearance, and all notes are collected at the end under a divider. Every marker needs a definition and vice versa. Use them only for side references.",
+  "",
+  "--- Inline formatting ---",
+  "",
+  "- **Bold**: each bold phrase gets its own color. Use ONLY for key terms, definitions, drugs, names, numbers, and high-yield facts, 1-3 phrases per paragraph at most. Never bold a whole sentence.",
+  "- *Italic*: also colored. Use it for secondary emphasis, foreign terms, or short mnemonics. (***bold italic*** also works; use it rarely.)",
+  "- ==highlight==: marker-pen highlight. Use sparingly for the 1-3 most critical facts in a section.",
+  "- ~~strikethrough~~: use only to show something wrong or outdated next to the correct version.",
+  "- `inline code`: use for drug doses, gene or protein symbols, commands, codes, and exact terms. It is always shown left-to-right in a small box.",
+  "- Superscript ^text^ and subscript ~text~: use for units, charges and chemistry, for example m^2^, 10^9^/L, Ca^2+^, H~2~O, CO~2~. No spaces are allowed inside the markers.",
+  "- Markers must touch the text: write **word**, never ** word **.",
+  "- Links: [label](https://example.com) and bare http(s) URLs work (http, https and mailto only). Use them rarely and only for real, well-known sources. Never invent URLs.",
+  "- Escaping: put a backslash before a literal special character, for example \\* \\_ \\~ \\^ \\= \\| \\# \\[ \\]",
+  "- Danger characters: a pair of ~ or ^ or == in the same line turns the text between them into subscript, superscript or highlight. Therefore NEVER use ~ to mean \"approximately\" (write \"about\" or use the word in the document language), and avoid stray * _ ^ = characters in normal text. Use the letter x or the symbol × for multiplication, never an asterisk.",
+  "",
+  "--- Characters and symbols (the PDF fonts are limited) ---",
+  "",
+  "- Safe: letters, digits, standard punctuation, % < > ( ) [ ] / and the symbols × ÷ ± ° ½ – —",
+  "- Avoid: arrows (→ ← ↑ ↓), ≥ ≤ ≈ ≠, µ, ✓ and ✗, Unicode superscript or subscript digits, bullets typed by hand, and all emojis. Use words instead (\"increases\", \"leads to\", \"at least\", \"about\", \"mcg\"), or the plain ASCII forms > < and -> when needed. For exponents and chemistry use the ^ and ~ markup above.",
   "",
   "=== CONTENT AND LAYOUT RULES ===",
   "",
   "- Be accurate, well organized, and exam-oriented: move from simple to complex, define each term once, then build on it.",
-  "- Keep paragraphs to 1-3 short sentences. Prefer lists and tables over long prose. Never write a wall of text.",
+  "- Prefer lists and tables over long prose. Never write a wall of text.",
   "- Mix element types so the page looks rich: after every 1-2 paragraphs or lists, add a table, a callout, or a highlighted key point. Do not stack more than 7 bullets in a row.",
-  "- Suggested lecture skeleton: H1 title, ABSTRACT callout, then numbered H2 sections each with H3 parts, a comparison table where useful, a TIP callout for mnemonics, a WARNING for pitfalls, a final \"Summary\" H2 with a recap table, a \"Self-test\" H2 with QUESTION callouts, and a short \"Review checklist\" with task items.",
-  "- Avoid very long unbroken tables and very long lists, because the PDF paginates automatically and compact blocks break across pages more cleanly.",
+  "- Suggested lecture skeleton: H1 title, ABSTRACT callout, then numbered H2 sections each with H3 parts, comparison tables where useful, a TIP callout for mnemonics, a WARNING for pitfalls, a final \"Summary\" H2 with a recap table, a \"Self-test\" H2 with QUESTION callouts, and a short \"Review checklist\" with task items.",
+  "- Always use tables for comparisons, classifications, differential diagnosis, drugs, and \"site / cause / feature\" style data.",
+  "- Avoid very long unbroken tables, very long lists, and very long code blocks, because the PDF paginates automatically and compact blocks break across pages more cleanly.",
   "- Do not repeat the same information twice. Do not add filler, apologies, or meta-commentary.",
   "- Do not use inline color words, \"[color]\" tags, or any decoration markup. The renderer handles all colors.",
   "",
-  "Remember: the whole answer is ONE ````markdown code block, with nothing outside it."
+  "=== FINAL CHECK BEFORE YOU REPLY ===",
+  "",
+  "Exactly one H1; H2 sections are numbered; no ##### headings; blank lines around every block; no blank lines between list items; blank line between consecutive callouts; every table has a separator row of at least three dashes per cell and at most 5 columns; no ~ used for \"approximately\"; no emojis, arrows or ≥ ≤ ≈ symbols; no HTML except <br> in table cells; the whole answer is ONE four-backtick markdown block with nothing outside it."
 ].join("\n");
 var ta=document.getElementById('aip-prompt-text'),btn=document.getElementById('aip-copy'),
     det=document.getElementById('aip-details'),sec=document.getElementById('aip-section'),
@@ -3022,5 +3198,210 @@ var TCAdCore=(function(){
   "ads": []
 }
 </script><!-- AD-CONFIG:END -->
+
+<style id="ux-polish">
+/* ===== UX polish: calmer home screen, grid paste box, artistic lists, start popup ===== */
+/* 1. calmer & smaller controls on the home screen */
+#editorScreen{padding:10px 10px 20px}
+.editor-head{padding:14px 16px 6px!important}
+.editor-title{font-size:18px!important}
+.editor-sub,.ed-go-hint{display:none!important}
+.ed-bar{gap:6px;padding:7px 12px;border-block:0!important;background:transparent!important}
+.ed-chip,.ed-bar .clear-btn{min-height:32px!important;padding:3px 11px!important;font-size:12.5px!important;border-radius:9px!important;font-weight:700!important}
+.ed-chip svg,.ed-bar .clear-btn svg{width:15px!important;height:15px!important}
+.ed-count{font-size:11.5px!important;opacity:.8}
+.ed-go{padding:6px 14px 4px!important;display:flex;justify-content:center}
+.ed-go-btn{width:auto!important;min-width:190px;min-height:42px!important;padding:6px 22px!important;font-size:15px!important;border-radius:12px!important;box-shadow:0 5px 14px color-mix(in srgb,var(--accent) 28%,transparent)!important}
+.ed-go-btn svg{width:17px!important;height:17px!important}
+.editor-footer{padding:10px 12px 14px!important;gap:8px!important;flex-wrap:nowrap!important}
+.tg-btn{flex:1 1 0;min-width:0;min-height:40px!important;padding:5px 12px!important;border-radius:11px!important}
+.tg-tx small,.tg-ar{display:none!important}
+.tg-tx b{font-size:12.5px!important;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tg-ic svg{width:18px!important;height:18px!important}
+.nav-btn,.theme-btn{min-height:34px!important;padding:4px 10px!important;font-size:12.5px!important}
+.zoom-box button{min-height:34px!important;width:30px!important}
+/* 2. paste box: faint grid + stroke + shadow */
+#markdownInput{
+  width:calc(100% - 28px)!important;margin:6px 14px 8px!important;padding:16px 16px!important;
+  border:2px solid color-mix(in srgb,var(--accent) 45%,var(--line))!important;border-radius:14px!important;
+  background-color:var(--surface)!important;
+  background-image:linear-gradient(color-mix(in srgb,var(--accent) 11%,transparent) 1px,transparent 1px),linear-gradient(90deg,color-mix(in srgb,var(--accent) 11%,transparent) 1px,transparent 1px)!important;
+  background-size:22px 22px!important;background-attachment:local!important;
+  box-shadow:-5px 5px 0 color-mix(in srgb,var(--accent) 22%,transparent),inset 0 0 22px color-mix(in srgb,var(--accent) 6%,transparent)!important;
+  text-shadow:1px 1px 0 color-mix(in srgb,var(--accent) 16%,transparent);
+  -webkit-text-stroke:.25px color-mix(in srgb,var(--text) 55%,transparent);
+  transition:box-shadow .2s,border-color .2s}
+#markdownInput:focus{border-color:var(--accent)!important;box-shadow:-7px 7px 0 color-mix(in srgb,var(--accent) 30%,transparent),inset 0 0 22px color-mix(in srgb,var(--accent) 8%,transparent)!important}
+#markdownInput::placeholder{color:var(--muted);opacity:.65;text-shadow:none;-webkit-text-stroke:0;font-weight:600}
+/* 3. artistic lists in the study view (PDF pages use their own markers, untouched) */
+.reader .md ul,.reader .md ol:not(.fns){list-style:none;padding-inline-start:0;margin:1em 0}
+.reader .md ol:not(.fns){counter-reset:uxli}
+.reader .md ul>li,.reader .md ol:not(.fns)>li{position:relative;padding-inline-start:2.15em;margin:.6em 0}
+.reader .md ul>li::before{content:"";position:absolute;inset-inline-start:.5em;top:.58em;width:.58em;height:.58em;border-radius:2px;transform:rotate(45deg);background:var(--hc,var(--accent));box-shadow:0 0 0 3px color-mix(in srgb,var(--hc,var(--accent)) 18%,transparent)}
+.reader .md ul ul>li::before{border-radius:50%;transform:none;background:transparent;border:2px solid var(--hc,var(--accent));box-shadow:none;width:.52em;height:.52em}
+.reader .md ul ul ul>li::before{width:.7em;height:3px;border:0;border-radius:3px;top:.85em;background:var(--hc,var(--accent));opacity:.8}
+.reader .md ol:not(.fns)>li{counter-increment:uxli}
+.reader .md ol:not(.fns)>li::before{content:counter(uxli);position:absolute;inset-inline-start:0;top:.12em;width:1.6em;height:1.6em;display:grid;place-items:center;border-radius:50%;background:var(--hc,var(--accent));color:var(--hon,var(--on-c));font:900 .8em/1 var(--font);box-shadow:-2px 2px 0 color-mix(in srgb,var(--hc,var(--accent)) 30%,transparent)}
+.reader .md ol:not(.fns)>li:not(:last-child)::after{content:"";position:absolute;inset-inline-start:calc(.8em - 1px);top:1.9em;bottom:-.7em;border-inline-start:2px dashed color-mix(in srgb,var(--hc,var(--accent)) 35%,transparent)}
+.reader .md ol ol:not(.fns)>li::before{content:counter(uxli,lower-alpha);border-radius:.4em;background:transparent;color:var(--hc,var(--accent));border:2px solid var(--hc,var(--accent));box-shadow:none}
+.reader .md li.task{padding-inline-start:0!important;margin-inline-start:0!important}
+.reader .md li.task::before,.reader .md li.task::after{display:none!important}
+/* 4. calm "start studying" popup */
+.go-pop{position:fixed;inset:0;z-index:90;display:flex;align-items:center;justify-content:center;padding:18px;background:rgba(20,24,30,.38);-webkit-backdrop-filter:blur(3px);backdrop-filter:blur(3px);opacity:0;transition:opacity .2s}
+.go-pop[hidden]{display:none}
+.go-pop.on{opacity:1}
+.go-card{width:min(320px,100%);padding:22px 20px 16px;text-align:center;border-radius:22px;background:var(--surface);color:var(--text);border:1.5px solid color-mix(in srgb,var(--accent) 40%,var(--line));box-shadow:0 18px 50px rgba(0,0,0,.22),-6px 6px 0 color-mix(in srgb,var(--accent) 20%,transparent);transform:translateY(14px) scale(.96);transition:transform .25s cubic-bezier(.2,.9,.3,1.2)}
+.go-pop.on .go-card{transform:none}
+.go-ok{width:44px;height:44px;margin:0 auto 10px;border-radius:50%;display:grid;place-items:center;background:var(--accent-soft);color:var(--accent);font-size:22px;font-weight:900}
+.go-t{margin:0 0 4px;font-family:var(--font-head);font-size:18px;font-weight:800;color:var(--heading)}
+.go-s{margin:0 0 16px;font-size:13px;color:var(--muted)}
+.go-start{width:100%;display:flex;align-items:center;justify-content:center;gap:10px;min-height:46px;border:0;border-radius:14px;background:var(--accent);color:var(--on-c);font-weight:900;font-size:16px;animation:goGlow 2s ease-in-out infinite}
+.go-start svg{width:20px;height:20px;animation:goArrow 1.1s ease-in-out infinite}
+.go-later{margin-top:8px;width:100%;min-height:38px;border:0;background:transparent;color:var(--muted);font-weight:700;font-size:13.5px;border-radius:10px}
+.go-later:active{background:var(--accent-soft)}
+@keyframes goArrow{0%,100%{transform:translateX(0)}50%{transform:translateX(-7px)}}
+@keyframes goGlow{0%,100%{box-shadow:0 0 0 0 color-mix(in srgb,var(--accent) 45%,transparent)}50%{box-shadow:0 0 0 9px color-mix(in srgb,var(--accent) 0%,transparent),0 6px 22px color-mix(in srgb,var(--accent) 45%,transparent)}}
+@media(prefers-reduced-motion:reduce){.go-start,.go-start svg{animation:none}.go-pop,.go-card{transition:none}}
+/* ---- round 3 ---- */
+.tg-tx b{white-space:normal!important;overflow:visible!important;text-overflow:clip!important;line-height:1.25;font-size:11.5px!important}
+/* ---- round 2 refinements ---- */
+#markdownInput{min-height:clamp(250px,44vh,440px)!important;-webkit-text-stroke:.12px color-mix(in srgb,var(--text) 40%,transparent)!important;text-shadow:1px 1px 0 color-mix(in srgb,var(--accent) 10%,transparent)!important;
+  background-image:linear-gradient(color-mix(in srgb,var(--accent) 8%,transparent) 1px,transparent 1px),linear-gradient(90deg,color-mix(in srgb,var(--accent) 8%,transparent) 1px,transparent 1px)!important}
+body.theme-night #markdownInput{background-image:linear-gradient(rgba(255,255,255,.035) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.035) 1px,transparent 1px)!important;-webkit-text-stroke:0!important}
+.tg-btn{gap:8px!important;padding:4px 8px!important;min-height:40px!important;border-radius:11px!important;box-shadow:0 4px 10px rgba(19,112,195,.22)!important}
+.tg-btn.tg-beige{box-shadow:0 4px 10px rgba(139,105,60,.14)!important}
+.tg-ic{width:28px!important;height:28px!important;border-radius:9px!important}.tg-ic svg{width:15px!important;height:15px!important}
+.tg-tx{min-width:0;flex:1}.tg-tx b{font-size:12px!important}
+.editor-footer{padding:6px 14px 14px!important}
+@media(max-width:700px){#helpBtn .lbl-short,#helpBtn .lbl-full{display:none!important}#helpBtn{width:34px;padding:4px!important;justify-content:center}.topbar{padding-block:8px}}
+.go-later{border:1.5px solid color-mix(in srgb,var(--accent) 35%,var(--line))!important;margin-top:10px!important;min-height:40px!important;color:var(--text)!important;background:transparent}
+.go-later:hover{background:var(--accent-soft)!important}
+.reader .md ul>li,.reader .md ol:not(.fns)>li{margin:.38em 0}
+.reader .md li>ul,.reader .md li>ol:not(.fns){margin:.3em 0 .1em}
+.reader .md li>ul,.reader .md li>ol:not(.fns){position:relative}
+.reader .md ul ul::before{content:"";position:absolute;inset-inline-start:-.95em;top:.1em;bottom:.2em;border-inline-start:1.5px dotted color-mix(in srgb,var(--accent) 30%,transparent)}
+@media(max-width:700px){#markdownInput{font-size:15px!important}}
+</style>
+<style id="ink-v4">
+/* ===== v4 adaptive ink: every colour below comes from variables set by inkApply()/colorize() (see "v4 ADAPTIVE INK ENGINE") ===== */
+/* pre-JS fallbacks (overridden by the engine's inline values on <body>) */
+:root{--ink-shadow:rgba(40,40,40,.3);--ink-glow:transparent;--ink-tglow:0 0 0 transparent;--ink-stroke:rgba(0,0,0,.4);--ink-stroke-w:.12px;--grid-line:rgba(20,60,50,.07);--grid-alpha:.07;--grid-code:rgba(255,255,255,.04);--grid-size:22px;--zebra:rgba(247,236,208,.72);--glass-bg:rgba(255,250,236,.78);--glass-solid:#fffaec;--glass-blur:12px;--sh-x:-4px;--sh-y:4px;--sh-b:0px;--sh-s:0px;--link:var(--accent)}
+.pdf-page{--ink-tglow:0 0 0 transparent}
+/* study-view helpers */
+.reader .md{--grid-img:linear-gradient(var(--grid-line) 1px,transparent 1px),linear-gradient(90deg,var(--grid-line) 1px,transparent 1px);--box-sh:var(--sh-x) var(--sh-y) var(--sh-b) var(--sh-s)}
+.zoom-box button{width:33px!important}
+.nav-btn.primary{color:var(--on-c)}.eh-ic{color:var(--on-c)}
+.md a{color:var(--link,var(--accent))}
+.md mark{-webkit-box-decoration-break:clone;box-decoration-break:clone}
+/* R3 shadows (own colour, offset or soft; glow in dark themes) */
+.reader .md h2{box-shadow:var(--box-sh) var(--hs,var(--ink-shadow))}
+.reader .md blockquote{box-shadow:var(--box-sh) var(--hs,var(--ink-shadow))}
+.reader .md .table-wrap,.reader .md pre{box-shadow:var(--box-sh) var(--ink-shadow)}
+@media(min-width:701px){.reader{box-shadow:var(--box-sh) var(--ink-shadow)}}
+/* R2 halo ring (solid, no blur) + dark-theme text glow; --hh is "transparent" unless the text is under 5.5:1 */
+.reader .md strong,.reader .md em{text-shadow:1px 0 var(--hh,transparent),-1px 0 var(--hh,transparent),0 1px var(--hh,transparent),0 -1px var(--hh,transparent)}
+.reader .md h3{text-shadow:var(--ink-tglow),1px 0 var(--hh,transparent),-1px 0 var(--hh,transparent),0 1px var(--hh,transparent),0 -1px var(--hh,transparent)}
+.reader .md h1{text-shadow:var(--ink-tglow)}
+/* Part 2: faint graph-paper grid (study view only, never .pdf-page) */
+.reader .md blockquote{background-image:var(--grid-img);background-size:var(--grid-size) var(--grid-size);background-color:var(--hb,var(--accent-soft))}
+.reader .md blockquote.callout>.co-t{background-image:none}
+.reader .md pre{background-image:linear-gradient(var(--grid-code) 1px,transparent 1px),linear-gradient(90deg,var(--grid-code) 1px,transparent 1px);background-size:var(--grid-size) var(--grid-size)}
+.reader .md pre code{background-image:none}
+.reader .md .table-wrap{background-color:var(--surface);background-image:var(--grid-img);background-size:var(--grid-size) var(--grid-size)}
+.reader .md tbody tr:nth-child(odd) td{background:transparent}
+.reader .md tbody tr:nth-child(even) td{background:var(--zebra)}
+body.theme-royal .reader{background-image:var(--grid-img,none);background-size:var(--grid-size) var(--grid-size);background-color:var(--surface)}
+/* Part 2: glass on floating UI only, solid fallback first */
+.topbar{background:var(--glass-solid,var(--surface))}
+.theme-menu{background:var(--glass-solid,var(--surface))}
+#scrollHint{background:var(--glass-solid,var(--surface))}
+@supports ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){
+  .topbar{background:var(--glass-bg);-webkit-backdrop-filter:blur(var(--glass-blur)) saturate(1.15);backdrop-filter:blur(var(--glass-blur)) saturate(1.15)}
+  .theme-menu{background:var(--glass-bg);-webkit-backdrop-filter:blur(calc(var(--glass-blur) + 4px)) saturate(1.2);backdrop-filter:blur(calc(var(--glass-blur) + 4px)) saturate(1.2)}
+  #scrollHint{background:var(--glass-bg);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px)}
+}
+/* editor box + start popup follow the same variables as the study view */
+body[class*="theme-"] #markdownInput{
+  background-image:var(--grid-img-ed)!important;background-size:var(--grid-size) var(--grid-size)!important;
+  box-shadow:var(--sh-x) var(--sh-y) var(--sh-b) var(--sh-s) var(--ink-shadow),inset 0 0 22px color-mix(in srgb,var(--accent) 5%,transparent)!important;
+  -webkit-text-stroke:var(--ink-stroke-w) var(--ink-stroke)!important}
+body[class*="theme-"] #markdownInput:focus{box-shadow:var(--sh-x) var(--sh-y) var(--sh-b) var(--sh-s) var(--ink-shadow),0 0 0 3px color-mix(in srgb,var(--accent) 22%,transparent)!important}
+body{--grid-img-ed:linear-gradient(var(--grid-line) 1px,transparent 1px),linear-gradient(90deg,var(--grid-line) 1px,transparent 1px)}
+.go-card{box-shadow:var(--sh-x) var(--sh-y) var(--sh-b) var(--sh-s) var(--ink-shadow),0 16px 40px rgba(0,0,0,.16)}
+.go-ok{color:var(--link)}
+.go-t{color:var(--heading)}.go-s{color:var(--muted)}
+/* theme art direction */
+body.theme-authentic .reader{box-shadow:var(--box-sh) var(--ink-shadow),inset 0 0 0 6px var(--surface),inset 0 0 0 7px color-mix(in srgb,var(--frame) 70%,transparent)}
+@media(max-width:700px){body.theme-authentic .reader{box-shadow:inset 0 0 0 5px var(--surface),inset 0 0 0 6px color-mix(in srgb,var(--frame) 60%,transparent)}}
+body.theme-ink .reader .md blockquote,body.theme-ink .reader .md .table-wrap{border-color:var(--text);border-width:2px}
+body.theme-ink .reader .md blockquote{border-inline-start-color:var(--hc,var(--text))}
+body.theme-ink .reader .md h2{border-inline-start-color:var(--text)}
+body.theme-rose .reader .md h2{border-radius:20px}
+body.theme-night .reader .md blockquote,body.theme-night .reader .md .table-wrap{border-color:color-mix(in srgb,var(--hc,var(--accent)) 50%,var(--line))}
+@media(prefers-reduced-motion:reduce){body,.reader{transition:none}}
+</style>
+<div id="goPop" class="go-pop" hidden role="dialog" aria-modal="true" aria-labelledby="goTitle">
+  <div class="go-card">
+    <div class="go-ok" aria-hidden="true">✓</div>
+    <p class="go-t" id="goTitle">تم لصق النص</p>
+    <p class="go-s">جاهز تبدأ المذاكرة؟</p>
+    <button id="goPopStart" class="go-start" type="button"><span>ابدأ المذاكرة</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5M11 6l-6 6 6 6"/></svg></button>
+    <button id="goPopLater" class="go-later" type="button">لا، ليس الآن</button>
+  </div>
+</div>
+<script id="go-pop-script">
+(function(){try{
+var inp=document.getElementById('markdownInput'),pop=document.getElementById('goPop'),go=document.getElementById('goStudyBtn'),pb=document.getElementById('pasteBtn');
+var st=document.getElementById('goPopStart'),lt=document.getElementById('goPopLater');
+if(!inp||!pop||!go||!st||!lt)return;
+var flag=0,tm=0;
+function editorActive(){var e=document.getElementById('editorScreen');return !!(e&&e.classList.contains('active'))}
+function open(){
+  if(inp.value.trim().length<20||!editorActive()||!pop.hidden)return;
+  pop.hidden=false;void pop.offsetWidth;pop.classList.add('on');
+  try{inp.blur()}catch(e){}
+  setTimeout(function(){try{st.focus({preventScroll:true})}catch(e){}},60);
+}
+function close(){pop.classList.remove('on');clearTimeout(tm);tm=setTimeout(function(){pop.hidden=true},200)}
+inp.addEventListener('paste',function(){setTimeout(open,160)});
+if(pb)pb.addEventListener('click',function(){flag=Date.now()});
+inp.addEventListener('input',function(){if(flag&&Date.now()-flag<15000){flag=0;setTimeout(open,180)}});
+st.addEventListener('click',function(){close();go.click()});
+lt.addEventListener('click',close);
+pop.addEventListener('click',function(e){if(e.target===pop)close()});
+document.addEventListener('keydown',function(e){if(!pop.hidden&&e.key==='Escape'){e.stopPropagation();close()}},true);
+}catch(e){}})();
+</script>
+<style id="slider-magnet-css">
+#peProps label[data-for] input[type=range]{touch-action:pan-y;accent-color:var(--accent)}
+#peProps .mg-v{min-width:3.2em;text-align:center;font-weight:800;font-size:12px;direction:ltr;padding:1px 6px;border-radius:999px;background:var(--accent-soft,rgba(0,0,0,.06));color:var(--text);transition:background .15s,color .15s,transform .15s}
+#peProps .mg-v.mg-on{background:var(--accent);color:#fff;transform:scale(1.08)}
+</style>
+<script id="slider-magnet">
+/* v5: magnetic sliders in the PDF page editor. Snaps only while dragging (keyboard arrows stay precise); double-click resets. */
+(function(){
+  const P=document.getElementById('peProps');if(!P)return;
+  const R=(a,b,st)=>{const o=[];for(let v=a;v<=b+1e-9;v+=st)o.push(+v.toFixed(3));return o};
+  const CFG={
+    rot:{pts:()=>R(-180,180,15),strong:[-180,-90,0,90,180],th:4,sth:7,def:0,unit:'\u00B0'},
+    size:{pts:(i)=>{const a=+i.min,b=+i.max,o=R(Math.ceil(a/50)*50,b,50);o.push(a,b);return o},strong:[],th:9,sth:9,def:null,unit:''},
+    radius:{pts:()=>R(0,50,10),strong:[0,50],th:2.2,sth:3,def:0,unit:'%'},
+    op:{pts:()=>[.25,.5,.75,1],strong:[1,.5],th:.035,sth:.045,def:1,unit:'%',pct:true}
+  };
+  let drag=false;const last=new WeakMap();
+  P.addEventListener('pointerdown',e=>{if(e.target.matches&&e.target.matches('input[type=range]'))drag=true},true);
+  addEventListener('pointerup',()=>{drag=false},true);addEventListener('pointercancel',()=>{drag=false},true);
+  function badge(i){const l=i.closest('label');if(!l)return null;let b=l.querySelector('.mg-v');if(!b){b=document.createElement('b');b.className='mg-v';l.insertBefore(b,i)}return b}
+  function show(i,snapped){const c=CFG[i.dataset.k],b=badge(i);if(!c||!b)return;const v=+i.value;b.textContent=(c.pct?Math.round(v*100):Math.round(v*100)/100)+c.unit;b.classList.toggle('mg-on',!!snapped)}
+  P.addEventListener('input',e=>{const t=e.target,c=t.matches&&t.matches('input[type=range]')&&CFG[t.dataset.k];if(!c)return;
+    let v=+t.value,hit=null;
+    if(drag){const st=c.strong||[];let best=1e9;
+      c.pts(t).forEach(x=>{const th=st.indexOf(x)>=0?c.sth:c.th,d=Math.abs(v-x);if(d<=th&&d<best){best=d;hit=x}});
+      if(hit!==null){t.value=hit;v=+t.value;if(last.get(t)!==hit&&navigator.vibrate)try{navigator.vibrate(8)}catch(_){}}}
+    last.set(t,hit);show(t,hit!==null&&+t.value===hit)},true);
+  P.addEventListener('dblclick',e=>{const t=e.target,c=t.matches&&t.matches('input[type=range]')&&CFG[t.dataset.k];if(!c||c.def===null)return;t.value=c.def;t.dispatchEvent(new Event('input',{bubbles:true}));t.dispatchEvent(new Event('change',{bubbles:true}))});
+  setInterval(()=>{if(P.classList.contains('hidden'))return;P.querySelectorAll('input[type=range]').forEach(i=>{if(CFG[i.dataset.k])show(i,false)})},250);
+})();
+</script>
 </body>
 </html>
