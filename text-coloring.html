@@ -1188,6 +1188,17 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
     <div class="cv-foot"><button id="cvGo" class="cv-btn pri" type="button">التالي: تصميم الصفحات</button><button id="cvNo" class="cv-btn" type="button" data-show="on=1">متابعة بدون غلاف</button><button id="cvCancel" class="cv-btn ghost" type="button">إلغاء</button></div>
   </div>
 </div>
+<style id="pgfix-css">
+.pg-fix{display:flex;flex-direction:column;gap:6px;padding-bottom:6px;border-bottom:1px dashed var(--line)}
+.pg-row{display:flex;align-items:center;gap:7px}.pg-row .cv-btn{flex:1 1 auto;min-height:44px}
+.pg-lb{flex:1;font-size:13px;font-weight:850;color:var(--heading)}
+.pg-sel{flex:1;font-size:12px;line-height:1.5;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pe-scaler .pg-body{cursor:pointer;-webkit-tap-highlight-color:transparent}
+.pdf-page .pgfix-sel{outline:3px solid #0f766e;outline-offset:1px;background-color:rgba(15,118,110,.16)}
+.pdf-page tr.pgfix-sel>td,.pdf-page tr.pgfix-sel>th{background-color:rgba(15,118,110,.28)!important}
+.pdf-page .pgfix-brk{box-shadow:0 -3px 0 #0f766e}
+.pdf-page tr.pgfix-brk{box-shadow:none}.pdf-page tr.pgfix-brk>td{box-shadow:inset 0 3px 0 #0f766e}
+</style>
 <div id="pageModal" class="pe-modal hidden" role="dialog" aria-modal="true" aria-labelledby="peTitle">
   <div class="pe-card">
     <div class="pe-head"><button id="peBack" class="pe-ib" type="button" aria-label="رجوع إلى إعدادات الغلاف">→</button><b id="peTitle">تصميم الصفحات</b><button id="peX" class="pe-ib" type="button" aria-label="إغلاق">✕</button></div>
@@ -1195,6 +1206,11 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
     <div class="pe-sr"><div class="pe-zoom" role="group" aria-label="حجم المحتوى في صفحات PDF" title="حجم المحتوى في PDF"><span class="pe-zi" aria-hidden="true">Aa</span><button id="peZm" class="pe-zb" type="button" aria-label="تصغير المحتوى (صفحات أقل)">−</button><b id="peZv" class="pe-zv" aria-live="polite">100%</b><button id="peZp" class="pe-zb" type="button" aria-label="تكبير المحتوى (صفحات أكثر)">＋</button></div><div id="peStrip" class="pe-strip" aria-label="الصفحات"></div></div>
     <div id="peStageWrap" class="pe-stagewrap"><div id="peSheet" class="pe-sheet"><div id="peScaler" class="pe-scaler"></div></div></div>
     <div class="pe-panel">
+      <div id="pePg" class="pg-fix hidden">
+        <div class="pg-row"><span class="pg-lb">حجم هذه الصفحة فقط</span><div class="pe-zoom" role="group" aria-label="حجم هذه الصفحة فقط"><button id="pgSm" class="pe-zb" type="button" aria-label="تصغير هذه الصفحة درجة">−</button><b id="pgV" class="pe-zv" aria-live="polite">100%</b><button id="pgLg" class="pe-zb" type="button" aria-label="تكبير هذه الصفحة درجة">＋</button></div></div>
+        <div class="pg-row"><span id="pgSel" class="pg-sel">المس سطرًا أو صفًّا في الصفحة لتحديده</span></div>
+        <div class="pg-row"><button id="pgPush" class="cv-btn pri" type="button" disabled>⤓ رحّل السطر للصفحة التالية</button><button id="pgUnpush" class="cv-btn hidden" type="button">إلغاء الترحيل</button><button id="pgReset" class="cv-btn hidden" type="button">إعادة ضبط</button></div>
+      </div>
       <div class="pe-r1"><button id="peAdd" class="pe-add" type="button">＋ إضافة صورة</button><button id="peAddShape" class="cv-btn" type="button">＋ شكل</button><button id="peAddEmo" class="cv-btn" type="button">＋ إيموجي</button><button id="peAddLink" class="cv-btn" type="button">＋ رابط</button><button id="peUp" class="cv-btn hidden" type="button">رفع صورة</button><button id="peDel" class="cv-btn pe-del hidden" type="button">حذف الصورة</button></div>
       <div id="peRatios" class="pe-ratios hidden" role="group" aria-label="أبعاد الصورة"></div>
       <div id="peFit" class="cv-seg hidden" role="group" aria-label="وضع الصورة"><button type="button" data-fit="contain" aria-pressed="false">احتواء</button><button type="button" data-fit="cover" aria-pressed="true">ملء الإطار</button></div>
@@ -1903,7 +1919,7 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
   /* Only http/https/mailto destinations are allowed (same policy as Markdown links); a bare "example.com" gets https://. */
   const plUrl=v=>{v=String(v||'').trim();if(!v)return '';if(/^(https?:\/\/|mailto:)\S+$/i.test(v))return v;if(/^[a-z][a-z0-9+.-]*:/i.test(v)||/\s/.test(v))return '';return /^[^\/?#]+\.[^\/?#]{2,}/.test(v)?'https://'+v:''};
   let PL=[],plSeq=0,plSaveT=0;
-  const PDEL=new Set(); // source-block indices removed from the PDF only (page delete in the page editor); reset on every editor open
+  const PDEL=new Set(),PBRK=new Set(),PSC=new Map(); // source-block indices removed from the PDF only (page delete in the page editor); reset on every editor open
   const numOr=(v,d)=>Number.isFinite(+v)?+v:d;
   function plLim(o){const ar=o.ar;return{minW:Math.ceil(Math.max(IMG_MIN,IMG_MIN*ar)),maxW:Math.floor(Math.min(PB.w,IMG_MAXH*ar))}} // real min/max width for this object's aspect ratio
   function plFit(o){ // clamp size to sane limits (aspect kept) and keep the box inside the page body
@@ -2100,6 +2116,7 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
       applyDir(src);colorize(src,pal);prepPdfLists(src);
       const BASE=15*pdfZoom,fs=s=>(BASE*s).toFixed(2)+'px'; // base font of the PDF page body (15px at 100%)
       fitTables(src,686,BASE); // page body is 794-2*54 = 686px wide
+      src.querySelectorAll('.li-text,p,pre,tbody tr,hr,img,h1,h2,h3,h4,h5,h6').forEach((e,i)=>{e.dataset.bk=String(i)}); // stable line ids for manual page breaks
       Array.from(src.children).forEach((k,i)=>{k.dataset.sb=String(i);if(PDEL.has(i))k.remove()});
       const titleEl=src.querySelector('h1,h2,h3');
       let title=(titleEl?titleEl.textContent:'').replace(/[\\\/:*?"<>|\n\r]+/g,' ').trim().slice(0,60)||'مذاكرتي';
@@ -2112,7 +2129,7 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
         const pg=document.createElement('div');pg.className='pdf-page'+light;pg.dataset.pg=String(pages.length);
         pg.style.setProperty('--frame',pal.frame);inkSet(pg,inkMap);
         pg.innerHTML='<div class="pg-frame"></div><div class="pg-strip"></div><div class="pg-body md"></div><div class="pg-foot"><span class="pg-l"></span><span class="pg-num"></span><span class="pg-link"></span></div>';
-        stage.appendChild(pg);pg.bodyEl=pg.querySelector('.pg-body');pg.i=pages.length;if(pdfZoom!==1)pg.bodyEl.style.fontSize=fs(1);
+        stage.appendChild(pg);pg.bodyEl=pg.querySelector('.pg-body');pg.i=pages.length;{const m=PSC.get(pg.i);if(m&&m<1){pg.sc=m;pg.bodyEl.style.fontSize=fs(m)}else if(pdfZoom!==1)pg.bodyEl.style.fontSize=fs(1)}
         pg.lim=pg.bodyEl.getBoundingClientRect().top+pg.bodyEl.clientHeight+3;
         pg.querySelector('.pg-l').textContent=brand[0];pg.querySelector('.pg-link').textContent=brand[1];
         pages.push(pg);cur=pg;plApplyPage(pg,plForPage(pg.i));return pg;
@@ -2195,6 +2212,15 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
         Array.from(body.children).forEach(c=>place(c,bd));
       };
       function place(k,dest){
+        if(PBRK.size){ // manual page breaks: a marked line always starts a new page
+          const fc=k.matches(CONTENT)?k:k.querySelector(CONTENT);
+          if(fc&&PBRK.has(fc.dataset.bk)&&!isEmpty(cur.bodyEl))nextPage();
+          if(!k.matches(CONTENT)&&Array.from(k.querySelectorAll('[data-bk]')).some(e=>e!==fc&&PBRK.has(e.dataset.bk))){
+            if(k.classList.contains('table-wrap'))return splitTable(k,dest);
+            if(k.tagName==='LI')return splitLI(k,dest);
+            if(/^(UL|OL|BLOCKQUOTE)$/.test(k.tagName)){const sd=shell(k,dest);return Array.from(k.children).forEach(c=>place(c,sd))}
+          }
+        }
         const d=dest();d.appendChild(k);
         if(fits())return;
         if(lastBottom()-cur.lim<70&&shrink(k,dest))return;
@@ -2361,7 +2387,7 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
   async function peOpen(opts){
     if(busy)return;
     const brand=_s();if(!brand){say('تعذّر التصدير: الملف تم تعديله',4500);return}
-    PDEL.clear();pe.cover=opts&&opts.cover||null;pe.off=pe.cover?1:0;pe.brand=brand;pe.sel=null;pe.cur=0;
+    PDEL.clear();PBRK.clear();PSC.clear();pe.bk=null;pe.cover=opts&&opts.cover||null;pe.off=pe.cover?1:0;pe.brand=brand;pe.sel=null;pe.cur=0;
     pe.prevOv=document.body.style.overflow;document.body.style.overflow='hidden';
     peM.classList.remove('hidden');pe.on=true;say('جاري تجهيز الصفحات…');
     try{await loadFonts();await plReady;await lkReady;await frame();peBuild();peLkThumbs();peZoomUi()}
@@ -2439,8 +2465,65 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
       P.querySelector('[data-for=radius]').classList.toggle('hidden',!(o.type==='img'||(o.type==='shape'&&o.shape==='rect')));
       P.querySelector('[data-for=fill]').classList.toggle('hidden',!(o.type==='shape'||lk));
     }
-    peHintSet();
+    peHintSet();try{pgfixUi()}catch(_){}
   }
+  /* ---------- pgfix: push one line to the next page + resize ONE page only (page editor) ---------- */
+  const PGF_STEP=.02,PGF_MIN=.6;
+  function pgfixRebuild(msg){clearTimeout(pe.pgt);pe.pgt=setTimeout(()=>{if(!pe.on)return;const before=pe.pages.length;
+    try{peBuild()}catch(e){console.error(e);say((e&&e.userMsg)||'تعذّر تحديث الصفحات',3500);return}
+    peRender();if(msg){const n=pe.pages.length;say(msg+' — '+n+(n===before?' صفحة':' صفحة (كانت '+before+')'),2200)}},60)}
+  function pgfixUi(){
+    const box=peQ('#pePg');if(!box)return;
+    const cv=peIsCover();box.classList.toggle('hidden',cv);if(cv){pe.bk=null;return}
+    const i=peIdx(),pg=pe.pages[i];if(!pg)return;
+    pg.querySelectorAll('.pgfix-sel,.pgfix-brk').forEach(e=>e.classList.remove('pgfix-sel','pgfix-brk'));
+    if(PBRK.size)pg.bodyEl.querySelectorAll('[data-bk]').forEach(e=>{if(PBRK.has(e.dataset.bk))e.classList.add('pgfix-brk')});
+    let el=null;
+    if(pe.bk){if(pe.bk.pg!==i)pe.bk=null;else{el=pg.bodyEl.querySelector('[data-bk="'+pe.bk.id+'"]');if(el)el.classList.add('pgfix-sel');else pe.bk=null}}
+    const sc=PSC.has(i)?PSC.get(i):(pg.sc||1);
+    peQ('#pgV').textContent=Math.round(sc*100)+'%';peQ('#pgSm').disabled=sc<=PGF_MIN+.001;peQ('#pgLg').disabled=sc>=.999;
+    const push=peQ('#pgPush'),un=peQ('#pgUnpush'),lb=peQ('#pgSel');
+    const marked=!!el&&PBRK.has(pe.bk.id),first=!!el&&pg.bodyEl.querySelector('[data-bk]')===el;
+    lb.textContent=el?('المحدد: '+(el.textContent||'').replace(/\s+/g,' ').trim().slice(0,48)):'المس سطرًا أو صفًّا في الصفحة لتحديده';
+    push.classList.toggle('hidden',marked);un.classList.toggle('hidden',!marked);
+    push.disabled=!el||first;
+    push.textContent=!el?'⤓ رحّل السطر للصفحة التالية':first?'هذا أول سطر في الصفحة':'⤓ رحّل هذا السطر للصفحة التالية';
+    peQ('#pgReset').classList.toggle('hidden',!(PBRK.size||PSC.size));
+  }
+  function pgfixSize(d){
+    const i=peIdx(),pg=pe.pages[i];if(!pg)return;
+    let v=Math.round(((PSC.has(i)?PSC.get(i):(pg.sc||1))+d)*100)/100;v=Math.min(1,Math.max(PGF_MIN,v));
+    if(v>=.999)PSC.delete(i);else PSC.set(i,v);
+    peQ('#pgV').textContent=Math.round(v*100)+'%';peQ('#pgSm').disabled=v<=PGF_MIN+.001;peQ('#pgLg').disabled=v>=.999;
+    pgfixRebuild(null);
+  }
+  peM.addEventListener('click',e=>{
+    if(!pe.on)return;
+    const b=e.target.closest('button');
+    if(b){
+      switch(b.id){
+        case 'pgSm':pgfixSize(-PGF_STEP);break;
+        case 'pgLg':pgfixSize(PGF_STEP);break;
+        case 'pgPush':if(pe.bk&&!b.disabled){PBRK.add(pe.bk.id);pe.bk=null;pgfixRebuild('تم ترحيل السطر للصفحة التالية');pgfixUi()}break;
+        case 'pgUnpush':if(pe.bk){PBRK.delete(pe.bk.id);pe.bk=null;pgfixRebuild('أُلغي الترحيل')}break;
+        case 'pgReset':PBRK.clear();PSC.clear();pe.bk=null;pgfixRebuild('أُعيد ضبط الصفحات');break;
+      }
+      return;
+    }
+    if(peIsCover()||!e.target.closest('#peStageWrap')||e.target.closest('.pe-box'))return;
+    const pg=pe.pages[peIdx()];if(!pg)return;
+    let el=null;
+    for(const x of document.elementsFromPoint(e.clientX,e.clientY)){
+      if(!pg.bodyEl.contains(x))continue;
+      const c=x.closest('tr[data-bk]')||x.closest('[data-bk]');
+      if(c&&pg.bodyEl.contains(c)){el=c;break}
+    }
+    if(!el){pe.bk=null;pgfixUi();return}
+    const id=el.dataset.bk;
+    if(pe.sel){pe.sel=null;peOverlay();peTools()}
+    pe.bk=(pe.bk&&pe.bk.id===id&&pe.bk.pg===peIdx())?null:{id,pg:peIdx()};
+    pgfixUi();
+  });
   const peLive=()=>{const p=pe.pages[peIdx()];if(p){plApplyPage(p,peImgs());peHintSet()}};
   function peCommit(){ // full re-pagination (later pages may change) — debounced
     clearTimeout(pe.t);
@@ -2472,7 +2555,7 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
   }
   function peDelPage(){ // remove this page's source blocks from the PDF, drop its objects, shift later pages' objects up, re-paginate
     const d=peIdx(),pg=pe.pages[d];if(!pg||pe.pages.length<2)return;
-    const mine=new Set(Array.from(pg.querySelectorAll('[data-sb]')).map(e=>+e.dataset.sb));mine.forEach(i=>PDEL.add(i));
+    const mine=new Set(Array.from(pg.querySelectorAll('[data-sb]')).map(e=>+e.dataset.sb));mine.forEach(i=>PDEL.add(i));{const m=new Map();PSC.forEach((v,k)=>{if(k<d)m.set(k,v);else if(k>d)m.set(k-1,v)});PSC.clear();m.forEach((v,k)=>PSC.set(k,v));pe.bk=null}
     PL.filter(o=>o.pg===d).forEach(plDrop);PL=PL.filter(o=>o.pg!==d);PL.forEach(o=>{if(o.pg>d)o.pg--});plSave();pe.sel=null;
     try{peBuild()}catch(e){console.error(e);say((e&&e.userMsg)||'تعذّر تحديث الصفحات',3500)}
     peRender();say('تم حذف الصفحة من PDF',2500);
