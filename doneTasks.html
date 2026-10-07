@@ -128,12 +128,18 @@ textarea{min-height:130px;resize:vertical}
 body.theme-night .st[data-v="0"].on,body.theme-night .sg button[data-v="0"].on{color:#07090e}
 .dg{color:var(--danger,#c62828)!important;border-color:currentColor!important;background:color-mix(in srgb,var(--danger,#c62828) 8%,var(--surface))!important}
 .ver{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:14px;padding-top:10px;border-top:1px solid var(--line);font-size:12px;color:var(--muted)}.ver button{min-height:40px;font-size:12px}
+.hp{font-size:13px;font-weight:700;padding:0 10px;color:var(--heading);border-color:color-mix(in srgb,var(--accent) 45%,var(--line));background:color-mix(in srgb,var(--accent) 8%,var(--surface));white-space:nowrap}
+@media(max-width:430px){h1{display:none}header{justify-content:space-between}}@media(max-width:370px){.hx{display:none}}
+.xg button{min-height:48px;font-weight:700}.xg .wa{background:#128c7e;color:#fff;border-color:transparent}.xg .tg{background:#1f7fb8;color:#fff;border-color:transparent}
+.hint{font-size:12.5px;color:var(--muted);margin:12px 2px 2px;line-height:1.8}
+.how li{margin-bottom:6px;font-size:14.5px}.how h4{margin:14px 0 4px;font-size:15px;color:var(--heading)}
 @media (prefers-reduced-motion:reduce){body,#sheet,#pop{transition:none;animation:none}}
 </style>
 </head>
 <body>
 <header>
 <h1>إنجازاتي اليومية</h1>
+<button class="hp" data-a="help" aria-label="شرح الاستخدام">📖 شرح<span class="hx"> الاستخدام</span></button>
 <button data-a="undo" aria-label="تراجع">↶</button><button data-a="redo" aria-label="إعادة">↷</button>
 <button data-a="themes" aria-label="الثيم">◐</button>
 <button class="primary" data-a="export">تصدير JPEG</button>
@@ -198,6 +204,7 @@ function lay(o){
 const rr=(c,x,y,w,h,r)=>c.roundRect?c.roundRect(x,y,w,h,r):c.rect(x,y,w,h);
 
 /* ---------- الرسم ---------- */
+const lum=h=>{const m=/^#([0-9a-f]{3}|[0-9a-f]{6})$/i.exec((h||'').trim());if(!m)return 0;let x=m[1];if(x.length===3)x=x.replace(/./g,'$&$&');const n=parseInt(x,16);return(.299*(n>>16)+.587*(n>>8&255)+.114*(n&255))/255};
 function dObj(c,o){
  if(o.t==='divider'){const w=o.w/2,C='rgba(176,141,62,.9)',E='rgba(176,141,62,0)';
   for(const s of[-1,1]){const g=c.createLinearGradient(s*w,0,s*24,0);g.addColorStop(0,E);g.addColorStop(1,C);c.fillStyle=g;c.fillRect(Math.min(s*w,s*24),-.75,w-24,1.5)}
@@ -207,19 +214,20 @@ function dObj(c,o){
   let sw=im.width,sh=im.height;if(sw/sh>w/h)sw=sh*w/h;else sh=sw*h/w;
   c.save();if(o.fl)c.scale(-1,1);path();c.clip();c.drawImage(im,(im.width-sw)/2,(im.height-sh)/2,sw,sh,-w/2,-h/2,w,h);c.restore();
   if(o.frame){path();c.lineWidth=Math.max(8,w*.012);c.strokeStyle=V.frame;c.stroke()}return}
- lay(o);const{w,h,fs,_pad:pad,_cb:cb,_lh:lh,_L:L}=o,al=o.al,ax=al==='r'?w/2-pad-cb:al==='l'?-w/2+pad:-cb/2,top=-h/2+pad;let col=V[o.col]||o.col;if(o.t==='task'){if(o.done===1)col=V.ok;else if(o.done===2)col=V.bad}
+ lay(o);const{w,h,fs,_pad:pad,_cb:cb,_lh:lh,_L:L}=o,al=o.al,ax=al==='r'?w/2-pad-cb:al==='l'?-w/2+pad:-cb/2,top=-h/2+pad;let col=V[o.col]||o.col;if(o.t==='task'&&o.done===2)col=V.bad
  c.font=fnt(o);c.direction='rtl';c.fontKerning='normal';c.letterSpacing='0px';c.textBaseline='alphabetic';c.textAlign=al==='r'?'right':al==='l'?'left':'center';
  const x0=lw=>al==='r'?ax-lw:al==='l'?ax:ax-lw/2;
  let fill=col;
  if(o.bd){const bw=o._tw+pad*2;c.fillStyle=col;c.beginPath();rr(c,al==='r'?ax+pad-bw:al==='l'?ax-pad:ax-bw/2,-h/2,bw,h,fs*.35);c.fill();fill=V['on-c']}
  else if(o.hl){c.fillStyle=V['strong-bg'];L.forEach((l,i)=>{const lw=mc.measureText(l).width;c.beginPath();rr(c,x0(lw)-4,top+i*lh+lh*.2,lw+8,lh*.8,3);c.fill()});fill=V.strong}
- if(o.t==='task'){const s=fs,bx=w/2-pad-s,by=top+lh/2-s/2,st=o.done|0,cc=st===1?V.ok:st===2?V.bad:V.accent;c.beginPath();rr(c,bx,by,s,s,s*.22);c.lineWidth=s*.09;c.strokeStyle=cc;
-  if(st){c.fillStyle=cc;c.fill();c.strokeStyle='#fff';c.lineWidth=s*.13;c.lineCap='round';c.beginPath();
-   if(st===1){c.moveTo(bx+s*.24,by+s*.52);c.lineTo(bx+s*.43,by+s*.72);c.lineTo(bx+s*.76,by+s*.3)}else{c.moveTo(bx+s*.3,by+s*.3);c.lineTo(bx+s*.7,by+s*.7);c.moveTo(bx+s*.7,by+s*.3);c.lineTo(bx+s*.3,by+s*.7)}}c.stroke()}
- const dn=o.t==='task'&&o.done===1;if(dn)c.globalAlpha*=.72;
+ if(o.t==='task'){const s=fs,bx=w/2-pad-s,by=top+lh/2-s/2,st=o.done|0,cc=st===1?col:st===2?V.bad:V.accent,k=c.getTransform().a;if(st===1){c.shadowColor=col;c.shadowBlur=s*.55*k}c.beginPath();rr(c,bx,by,s,s,s*.22);c.lineWidth=s*.09;c.strokeStyle=cc;
+  if(st){c.fillStyle=cc;c.fill();c.strokeStyle=st===1&&lum(col)>.6?'#07090e':'#fff';c.lineWidth=s*.13;c.lineCap='round';c.beginPath();
+   if(st===1){c.moveTo(bx+s*.24,by+s*.52);c.lineTo(bx+s*.43,by+s*.72);c.lineTo(bx+s*.76,by+s*.3)}else{c.moveTo(bx+s*.3,by+s*.3);c.lineTo(bx+s*.7,by+s*.7);c.moveTo(bx+s*.7,by+s*.3);c.lineTo(bx+s*.3,by+s*.7)}}c.stroke();c.shadowColor='transparent'}
+ const dn=o.t==='task'&&o.done===1;
  c.fillStyle=fill;if(o.sh){c.shadowColor='rgba(0,0,0,.35)';c.shadowBlur=fs*.15;c.shadowOffsetY=fs*.06}
+ if(dn){c.shadowColor=col;c.shadowBlur=fs*.5*c.getTransform().a;c.shadowOffsetX=0;c.shadowOffsetY=0}
  mc.font=fnt(o);
- L.forEach((l,i)=>{const y=top+i*lh+lh/2+fs*.33;c.fillText(l,ax,y);if(dn){const lw=mc.measureText(l).width;c.shadowColor='transparent';c.fillRect(x0(lw),y-fs*.3,lw,Math.max(3,fs*.07))}});
+ L.forEach((l,i)=>{const y=top+i*lh+lh/2+fs*.33;c.fillText(l,ax,y);if(dn)c.fillText(l,ax,y)});
  c.shadowColor='transparent';
 }
 let bgc={};
@@ -370,8 +378,9 @@ async function exp1(mode){
  const blob=await new Promise(r=>c.toBlob(r,'image/jpeg',jq));c.width=c.height=0;dirty=1;
  if(!blob){toast('تعذّر إنشاء الصورة، جرّب جودة أقل');return}
  const name='إنجازاتي-'+day()+'.jpg',file=new File([blob],name,{type:'image/jpeg'});
- if(mode==='share'&&navigator.canShare&&navigator.canShare({files:[file]})){try{await navigator.share({files:[file]});toast('تمت المشاركة');return}catch(e){if(e.name==='AbortError')return}}
- const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),4e3);toast('تم حفظ الصورة ✓');
+ const via=mode==='wa'?'واتساب':mode==='tg'?'تيليجرام':'';
+  if(mode!=='dl'&&navigator.canShare&&navigator.canShare({files:[file]})){try{if(via)toast('اختر '+via+' من القائمة');await navigator.share({files:[file]});toast('تمت المشاركة');return}catch(e){if(e.name==='AbortError')return}}
+ const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),4e3);toast(via?'تم حفظ الصورة، افتح '+via+' وأرفقها':'تم حفظ الصورة ✓');
 }
 
 /* ---------- الأوامر ---------- */
@@ -399,7 +408,8 @@ const A={undo,redo,
  bgc(v){S.bg=S.bg||{};S.bg.col=v||null;push();A.bg()},
  bgimg(){fim='bg';$('#fi').multiple=false;$('#fi').click()},
  bgrm(){S.bg=S.bg||{};S.bg.src=null;bgc={};push();A.bg()},
- closep(){close()},desel(){sel=null;const b=$('#tb button');if(b)try{b.focus({preventScroll:true})}catch(e){}},upd(){chk(1)},
+ closep(){close()},
+ help(){P('<div class="how"><b style="font-size:17px">شرح الاستخدام</b><h4>١) الإنجازات</h4><ol><li>اضغط <b>☑ إنجاز</b> ثم اكتب نص الإنجاز في الشريط. اضغط Enter ليُضاف الإنجاز التالي تحته مباشرة.</li><li>اضغط على المربع بجانب الإنجاز في الصورة لتغيير حالته: <b>○ انتظار</b> ثم <b>✓ تمّ</b> (علامة صح وتوهج بلون الإنجاز) ثم <b>✕ لم يتم</b> (أحمر). ويمكنك تغييرها من أزرار الحالة أيضًا.</li></ol><h4>٢) النصوص</h4><ol><li>اضغط <b>T نص</b> لإضافة عنوان أو ملاحظة بدون مربع حالة. اضغط عليه مرتين لتعديله.</li></ol><h4>٣) تحريك العناصر وتعديلها</h4><ol><li>اسحب أي عنصر لتحريكه، والدائرة في الزاوية للتكبير، والدائرة العلوية للتدوير.</li><li>عند اختيار عنصر تظهر لوحة بالأسفل فيها اللون والخط والمحاذاة والتظليل والحجم والشفافية والترتيب والتكرار والحذف. اسحب المقبض لأعلى لتوسيعها، واسحب على خلفية الصورة لتنزل وترى باقي اللوحة.</li></ol><h4>٤) الخلفية</h4><ol><li>اضغط <b>◩ خلفية</b>: اختر لونًا، أو <b>صورة خلفية</b> من هاتفك، ثم اضبط <b>التعتيم</b> و<b>البلور</b>.</li></ol><h4>٥) الصور والملصقات والإيموجي</h4><ol><li><b>▣ صورة</b> لإضافة صورة، ويمكنك جعلها دائرية أو بزوايا منحنية وإضافة إطار وقلبها.</li><li><b>❖ ملصق</b> لإضافة ملصقات (يمكن اختيار أكثر من واحد، وتبقى الشفافية كما هي).</li><li><b>☺ إيموجي</b> لإضافة رموز جاهزة، و<b>✦ فاصل</b> لخط زخرفي.</li></ol><h4>٦) المقاس والمظهر</h4><ol><li><b>▭ مقاس</b>: قصة، مربع، عمودي أو أفقي. وزر <b>◐</b> لتغيير الثيم.</li><li><b>↶ ↷</b> للتراجع والإعادة. لوحة كل يوم تُحفظ تلقائيًا في جهازك.</li></ol><h4>٧) الحفظ والمشاركة</h4><ol><li>اضغط <b>تصدير JPEG</b> واختر الجودة، ثم <b>حفظ في هاتفي</b> أو شاركها مباشرة عبر <b>واتساب</b> أو <b>تيليجرام</b> أو أي تطبيق آخر.</li></ol></div><button class="primary" data-a="closep" style="width:100%;margin-top:6px;min-height:46px">فهمت</button>')},desel(){sel=null;const b=$('#tb button');if(b)try{b.focus({preventScroll:true})}catch(e){}},upd(){chk(1)},
  ch(){window.open('https://t.me/MMR_z1','_blank','noopener')},
  ct(){window.open('https://t.me/Refaei_1','_blank','noopener')},
  install(){if(dp){const p=dp;dp=null;p.prompt();p.userChoice.then(r=>{if(r.outcome==='accepted')toast('جارٍ التثبيت…')}).catch(()=>{});return}
@@ -414,8 +424,8 @@ const A={undo,redo,
  em2(){const v=$('#ei').value.trim();if(v)A.em(v)},
  edit(){if(!sel||!/text|task/.test(sel.t))return;P('<textarea id="ta" aria-label="'+(sel.t==='task'?'نص الإنجاز':'النص')+'"></textarea><button class="primary" data-a="save" style="width:100%;margin-top:8px">حفظ</button>');const t=$('#ta');t.value=sel.txt;t.focus()},
  save(){const v=$('#ta').value.trim();if(v)sel.txt=v;close();push()},
- export(){P('<b>الجودة</b><div class="g" style="grid-template-columns:repeat(3,1fr);margin:8px 0 12px">'+Object.entries(Q).map(([k,[,,l]])=>`<button data-a="q" data-v="${k}"${qk===k?' class="primary"':''}>${l}</button>`).join('')+'</div><div class="g"><button class="primary" data-a="dl">تحميل JPEG</button><button data-a="shr">مشاركة</button></div>')},
- q(v){qk=v;A.export()},dl(){close();exp('dl')},shr(){close();exp('share')},
+ export(){P('<b>الجودة</b><div class="g" style="grid-template-columns:repeat(3,1fr);margin:8px 0 12px">'+Object.entries(Q).map(([k,[,,l]])=>`<button data-a="q" data-v="${k}"${qk===k?' class="primary"':''}>${l}</button>`).join('')+'</div><div class="g xg"><button class="primary" data-a="dl" style="grid-column:1/-1">💾 حفظ في هاتفي</button><button class="wa" data-a="wa">واتساب</button><button class="tg" data-a="tg">تيليجرام</button><button data-a="shr" style="grid-column:1/-1">↗ مشاركة عبر تطبيقات أخرى</button></div><p class="hint">زر واتساب وتيليجرام يفتحان قائمة المشاركة في هاتفك فاختر التطبيق منها. على الآيفون اختر «حفظ الصورة» من القائمة لتصل إلى معرض الصور.</p>')},
+ q(v){qk=v;A.export()},dl(){close();exp('dl')},shr(){close();exp('share')},wa(){close();exp('wa')},tg(){close();exp('tg')},
  col(v){sel.col=v},fs(v){scl(sel,+v)},al(){sel.al={r:'c',c:'l',l:'r'}[sel.al]},f(){sel.f=sel.f==='h'?'b':'h'},
  hl(){sel.hl^=1;sel.bd=0},bd(){sel.bd^=1;sel.hl=0},sh(){sel.sh^=1},frame(){sel.frame^=1},
  shape(v){sel.shape=v;sel.h=v==='circle'?sel.w:sel.w/sel.ar},
