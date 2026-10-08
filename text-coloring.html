@@ -694,7 +694,7 @@ body.theme-night{--orn-rgb:224,180,90}
       <ol class="hp-steps">
         <li><b>الصق النص المكتوب بـ Markdown</b> في المربع الكبير في صفحة التحرير.<small>أو اضغط «لصق من الحافظة». يُحفظ نصك تلقائياً في متصفحك.</small></li>
         <li>اضغط <b>«ابدأ المذاكرة»</b> (أو «المذاكرة» من الشريط العلوي) لتظهر المذكرة بتنسيق وألوان جاهزة.<small>يمكنك تغيير الثيم من زر «الثيمات» وتكبير الخط أو تصغيره.</small></li>
-        <li>اضغط <b>«PDF»</b> من الشريط العلوي، واختر شكل الغلاف إن أردت، ثم <b>صمّم الصفحات</b> وأضف صورك (النص يلتف حولها)، وبعدها <b>حمّل الملف</b> على جهازك.</li>
+        <li>اضغط <b>«PDF»</b> من الشريط العلوي، واختر شكل الغلاف إن أردت، ثم <b>صمّم الصفحات</b> وأضف صورك (النص يلتف حولها)، وبعدها تظهر نافذة الطباعة: اختر <b>«حفظ كملف PDF»</b> فيُحفظ ملفًا نصيًا حقيقيًا (نص قابل للتحديد والبحث، وصور وروابط) بنفس أبعاد A4.</li>
         <li>لا تملك نصاً بصيغة Markdown؟ استخدم <b>البرومبت الجاهز</b> بالأسفل مع أي أداة ذكاء اصطناعي.</li>
       </ol>
 
@@ -1184,7 +1184,8 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
         <div class="cv-seg" role="group" aria-label="المحاذاة"><button type="button" data-k="align" data-v="center">وسط</button><button type="button" data-k="align" data-v="start">ابدأ من اليمين</button></div>
       </div>
     </div>
-    <div class="cv-pq" style="padding:6px 16px 0"><div class="cv-h">جودة PDF</div><div id="pdfQ" class="cv-seg" role="group" aria-label="جودة PDF"><button type="button" data-q="high" aria-pressed="false">عالية</button><button type="button" data-q="mid" aria-pressed="true">متوسطة</button><button type="button" data-q="low" aria-pressed="false">خفيفة</button></div></div>
+    <div class="cv-pq" style="padding:6px 16px 0"><div class="cv-h">نوع ملف PDF</div><div id="pdfM" class="cv-seg" role="group" aria-label="نوع PDF"><button type="button" data-m="vec" aria-pressed="true">نصي حقيقي</button><button type="button" data-m="img" aria-pressed="false">صور</button></div></div>
+    <div class="cv-pq" id="pdfQrow" style="padding:6px 16px 0"><div class="cv-h">جودة PDF</div><div id="pdfQ" class="cv-seg" role="group" aria-label="جودة PDF"><button type="button" data-q="high" aria-pressed="false">عالية</button><button type="button" data-q="mid" aria-pressed="true">متوسطة</button><button type="button" data-q="low" aria-pressed="false">خفيفة</button></div></div>
     <div class="cv-foot"><button id="cvGo" class="cv-btn pri" type="button">التالي: تصميم الصفحات</button><button id="cvNo" class="cv-btn" type="button" data-show="on=1">متابعة بدون غلاف</button><button id="cvCancel" class="cv-btn ghost" type="button">إلغاء</button></div>
   </div>
 </div>
@@ -2267,11 +2268,63 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
     });
     return pdfLibsP;
   }
-  function warmPdfLibs(){const go=()=>{try{ensurePdfLibs()}catch(_){}}; if(window.requestIdleCallback) requestIdleCallback(go,{timeout:4000}); else setTimeout(go,1500)}
+  /* v8: real vector PDF. The same paginated .pdf-page DOM is handed to the browser's print engine (no canvas / no JPEG),
+     so text stays text (embedded fonts, selectable, searchable), images stay images and links stay live. */
+  function pdfM(){let k='vec';try{k=localStorage.getItem(STORAGE+'-pdfm')||'vec'}catch(_){} return k==='img'?'img':'vec'}
+  function pdfMUi(){const k=pdfM();document.querySelectorAll('#pdfM [data-m]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.m===k)));const r=document.getElementById('pdfQrow');if(r)r.style.display=k==='img'?'':'none'}
+  document.querySelectorAll('#pdfM [data-m]').forEach(b=>b.addEventListener('click',()=>{lsSet(STORAGE+'-pdfm',b.dataset.m);pdfMUi()}));
+  pdfMUi();
+  let vecCleanup=null;
+  async function exportPDFVec(opts){
+    const cover=opts&&opts.cover||null;
+    const brand=_s();if(!brand){say('تعذّر التصدير: الملف تم تعديله',4500);return}
+    busy=true;pdfBtn.disabled=true;say('جاري تجهيز الصفحات…');persist();
+    if(vecCleanup)vecCleanup();
+    const stage=document.createElement('div');stage.id='pdfStage';document.body.appendChild(stage);
+    let root=null;
+    try{
+      await loadFonts();await frame();
+      const R=paginateDoc(stage,brand);const pages=R.pages;let title=R.title;
+      if(cover&&cover.title)title=cover.title.replace(/[\\\/:*?"<>|\n\r]+/g,' ').trim().slice(0,60)||title;
+      await frame();
+      if(document.fonts&&document.fonts.ready)await document.fonts.ready;
+      const sheets=[];
+      if(cover){const cpg=buildCoverPage(cover,stage);cpg.dataset.pg='cover';sheets.push(cpg)}
+      for(let i=0;i<pages.length;i++){
+        const pg=pages[i];pg.querySelector('.pg-l').textContent=brand[0];const pl=pg.querySelector('.pg-link');pl.textContent=brand[1];
+        const pr=pg.getBoundingClientRect(),lk=pl.getBoundingClientRect(),lks=plLinkRects(pg,i,pr);
+        const add=(x,y,w,h,u)=>{const a=document.createElement('a');a.href=u;a.className='pp-a';a.style.cssText='left:'+x+'px;top:'+y+'px;width:'+w+'px;height:'+h+'px';pg.appendChild(a)};
+        add(lk.left-pr.left-4,lk.top-pr.top-3,lk.width+8,lk.height+6,brand[2]); // footer link, same area as the old jsPDF link
+        lks.forEach(k=>add(k.x,k.y,k.w,k.h,k.u)); // placed "Link" objects -> real hyperlinks
+        sheets.push(pg);
+      }
+      // decode every picture first so the print engine never meets a half-loaded image
+      const pics=[];stage.querySelectorAll('img').forEach(im=>pics.push(im.decode?im.decode().catch(()=>{}):0));
+      stage.querySelectorAll('.pg-img').forEach(e=>{const m=/url\(["']?(.*?)["']?\)/.exec(e.style.backgroundImage||'');if(m){const im=new Image();im.src=m[1];pics.push(im.decode?im.decode().catch(()=>{}):0)}});
+      await Promise.all(pics);
+      root=document.createElement('div');root.id='printRoot';
+      sheets.forEach(el=>{const sh=document.createElement('div');sh.className='pp-sheet';sh.appendChild(el);root.appendChild(sh)});
+      document.body.appendChild(root);
+      const prevTitle=document.title;document.title=title; // Chrome proposes the document title as the file name
+      let done=false,tm=0;
+      const cleanup=()=>{if(done)return;done=true;clearTimeout(tm);window.removeEventListener('afterprint',cleanup);try{root.remove()}catch(_){}document.title=prevTitle;if(vecCleanup===cleanup)vecCleanup=null};
+      vecCleanup=cleanup;window.addEventListener('afterprint',cleanup);tm=setTimeout(cleanup,15*60*1000);
+      await frame();await frame();
+      say('في نافذة الطباعة اختر «حفظ كملف PDF»',6000);
+      window.print();
+    }catch(err){
+      console.error(err);say((err&&err.userMsg)||'حدث خطأ أثناء إنشاء PDF',4500);
+      if(vecCleanup)vecCleanup();else if(root)root.remove();
+    }finally{
+      stage.remove();busy=false;pdfBtn.disabled=false;
+    }
+  }
+  function warmPdfLibs(){try{if(pdfM()==='vec')return}catch(_){} const go=()=>{try{ensurePdfLibs()}catch(_){}}; if(window.requestIdleCallback) requestIdleCallback(go,{timeout:4000}); else setTimeout(go,1500)}
   async function exportPDF(opts){
     const cover=opts&&opts.cover||null;
     if(busy)return;
     if(!input.value.trim()){say('لا يوجد محتوى للتصدير',2500);return}
+    if(pdfM()==='vec'&&typeof window.print==='function')return exportPDFVec(opts);
     await ensurePdfLibs();
     if(typeof html2canvas!=='function'||!window.jspdf){say('تعذّر تحميل مكتبة PDF',3500);return}
     const brand=_s();if(!brand){say('تعذّر التصدير: الملف تم تعديله',4500);return}
@@ -3831,5 +3884,19 @@ body.sv3-fold-on .reader .md>h2.sv3-f::after{transform:translateY(0) rotate(45de
   sync();
 })();
 </script>
+<style id="pdf-vec-css">
+#printRoot{display:none}
+.pp-a{position:absolute;display:block;background:transparent;border:0;z-index:9;text-decoration:none}
+@media print{
+  @page{size:A4;margin:0}
+  html,body{margin:0!important;padding:0!important;background:#fff!important;width:auto!important;height:auto!important;min-height:0!important;overflow:visible!important;position:static!important;display:block!important}
+  body>*:not(#printRoot){display:none!important}
+  #printRoot{display:block!important;position:static!important;overflow:visible!important}
+  #printRoot,#printRoot *{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  .pp-sheet{position:relative;width:210mm;height:296.6mm;overflow:hidden;margin:0;padding:0;break-after:page;page-break-after:always;break-inside:avoid}
+  .pp-sheet:last-child{break-after:auto;page-break-after:auto}
+  .pp-sheet>.pdf-page{position:absolute;left:0;top:0;margin:0!important;transform:scale(.9995);transform-origin:0 0}
+}
+</style>
 </body>
 </html>
