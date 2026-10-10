@@ -132,29 +132,31 @@ D.addEventListener('DOMContentLoaded',function(){
   var standalone=(window.matchMedia&&matchMedia('(display-mode: standalone)').matches)||navigator.standalone===true;
   if(standalone)return;
   var KEY='pwa-dismissed',dp=null;
-  function dismissed(){try{return localStorage.getItem(KEY)==='1'}catch(e){return false}}
+  function dismissed(){try{var t=+localStorage.getItem(KEY)||0;return t>1&&Date.now()-t<3*864e5}catch(e){return false}}
   var st=D.createElement('style');
-  st.textContent='#pwaBar{position:fixed;inset-inline:12px;bottom:calc(12px + env(safe-area-inset-bottom,0px));z-index:900;display:flex;align-items:center;gap:8px;max-width:420px;margin-inline:auto;padding:8px 10px;border-radius:16px;background:var(--surface,#fffaec);color:var(--text,#1a150c);border:1px solid var(--line,#d4bd84);box-shadow:0 8px 28px rgba(0,0,0,.22);font:600 14px/1.4 "MK Body AR",system-ui,sans-serif;direction:rtl}#pwaBar[hidden],#pwaBar.pwa-off{display:none}#pwaBar span{flex:1}#pwaBar button{min-height:36px;border:0;border-radius:12px;padding:0 14px;font:inherit;cursor:pointer}#pwaInstall{background:var(--accent,#01665e);color:#fff}#pwaClose{background:transparent;color:var(--muted,#554829);padding:0 10px!important;font-size:18px!important}';
+  st.textContent='#pwaBar{position:fixed;inset-inline:12px;bottom:calc(12px + env(safe-area-inset-bottom,0px));z-index:900;display:flex;align-items:center;gap:8px;max-width:420px;margin-inline:auto;padding:8px 10px;border-radius:16px;background:var(--surface,#fffaec);color:var(--text,#1a150c);border:1px solid var(--line,#d4bd84);box-shadow:0 8px 28px rgba(0,0,0,.22);font:600 14px/1.4 "MK Body AR",system-ui,sans-serif;direction:rtl}#pwaBar[hidden],#pwaBar.pwa-off{display:none}#pwaBar span{flex:1;min-width:0}#pwaBar b{display:block;font-weight:800}#pwaBar small{display:block;font-size:12px;font-weight:600;color:var(--muted,#554829)}#pwaIco{flex:none;width:36px;height:36px;border-radius:10px;background:var(--accent,#01665e);color:#fff;display:grid;place-items:center;font-size:18px}#pwaBar{animation:pwaUp .35s ease-out}@keyframes pwaUp{from{transform:translateY(20px);opacity:0}to{transform:none;opacity:1}}@media(prefers-reduced-motion:reduce){#pwaBar{animation:none}}#pwaBar button{min-height:36px;border:0;border-radius:12px;padding:0 14px;font:inherit;cursor:pointer}#pwaInstall{background:var(--accent,#01665e);color:#fff}#pwaClose{background:transparent;color:var(--muted,#554829);min-width:36px;padding:0!important;font-size:16px!important}#pwaClose svg{width:14px;height:14px;stroke:currentColor;stroke-width:2.6;stroke-linecap:round;fill:none;pointer-events:none}';
   D.head.appendChild(st);
   var bar=D.createElement('div');bar.id='pwaBar';bar.hidden=true;bar.setAttribute('role','region');bar.setAttribute('aria-label','تثبيت التطبيق');
-  bar.innerHTML='<span id="pwaMsg">ثبّت مذاكرتي كتطبيق على جهازك</span><button type="button" id="pwaInstall">تثبيت</button><button type="button" id="pwaClose" aria-label="إغلاق">×</button>';
+  bar.innerHTML='<div id="pwaIco" aria-hidden="true">⬇</div><span id="pwaMsg"><b>ثبّت الأداة على هاتفك</b><small>كتطبيق ويب يفتح بسرعة من الشاشة الرئيسية</small></span><button type="button" id="pwaInstall">تثبيت</button><button type="button" id="pwaClose" aria-label="إغلاق"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button>';
   D.body.appendChild(bar);
-  function hide(save){bar.hidden=true;if(save){try{localStorage.setItem(KEY,'1')}catch(e){}}}
+  function hide(save){bar.hidden=true;if(save){try{localStorage.setItem(KEY,String(Date.now()))}catch(e){}}}
   D.getElementById('pwaClose').addEventListener('click',function(){hide(true)});
   D.getElementById('pwaInstall').addEventListener('click',function(){
     if(dp){dp.prompt();dp.userChoice.then(function(){dp=null;hide(false)},function(){})}
-    else hide(true);
+    else{var m=D.getElementById('pwaMsg');m.innerHTML='<b>طريقة التثبيت</b><small>'+(/iPad|iPhone|iPod/.test(navigator.userAgent||'')?'اضغط زر المشاركة ثم «إضافة إلى الشاشة الرئيسية»':'من قائمة المتصفح ⋮ اختر «تثبيت التطبيق» أو «إضافة إلى الشاشة الرئيسية»')+'</small>';this.style.display='none'}
   });
-  window.addEventListener('beforeinstallprompt',function(e){e.preventDefault();dp=e;if(!dismissed())bar.hidden=false});
+  window.addEventListener('beforeinstallprompt',function(e){e.preventDefault();dp=e;D.getElementById('pwaInstall').style.display='';if(!dismissed())bar.hidden=false});
   window.addEventListener('appinstalled',function(){hide(false)});
   /* show the bar only on the editor screen and never over popups/modals */
   function place(){try{var e=D.getElementById('editorScreen');var ok=e&&e.classList.contains('active')&&!D.querySelector('.cv-modal:not(.hidden),.pe-modal:not(.hidden),.confirm-box:not(.hidden),#goPop:not([hidden]),#tc-ad-root,.modal:not(.hidden):not([hidden])');bar.classList.toggle('pwa-off',!ok)}catch(x){}}
   place();setInterval(place,300);
   var ua=navigator.userAgent||'';
-  if(/iPad|iPhone|iPod/.test(ua)&&!window.MSStream&&!dismissed()){
-    D.getElementById('pwaMsg').textContent='للتثبيت: اضغط زر المشاركة ثم «إضافة إلى الشاشة الرئيسية»';
-    D.getElementById('pwaInstall').style.display='none';
-    bar.hidden=false;
+  if(!dismissed()){
+    if(/iPad|iPhone|iPod/.test(ua)&&!window.MSStream){
+      D.getElementById('pwaMsg').innerHTML='<b>ثبّت الأداة على هاتفك</b><small>اضغط زر المشاركة ثم «إضافة إلى الشاشة الرئيسية»</small>';
+      D.getElementById('pwaInstall').style.display='none';
+    }
+    setTimeout(function(){if(!dismissed())bar.hidden=false},1500);
   }
 });
 }catch(e){}})();
