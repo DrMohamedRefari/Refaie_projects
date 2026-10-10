@@ -1240,17 +1240,53 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
 .pdf-page .pgfix-brk{box-shadow:0 -3px 0 #0f766e}
 .pdf-page tr.pgfix-brk{box-shadow:none}.pdf-page tr.pgfix-brk>td{box-shadow:inset 0 3px 0 #0f766e}
 </style>
+
+<style id="pe-v9-css">
+/* v9: undo/redo, element size, line dock */
+.pe-hb{border-radius:12px;color:var(--accent);border-color:var(--accent);background:var(--accent-soft,var(--surface-2))}
+.pe-hb svg{stroke-width:2.4}
+.pe-hb:disabled{border-color:var(--line);border-style:solid;background:transparent;color:var(--muted);opacity:.45}
+.pe-nav{gap:8px}
+.pe-pg{min-width:84px;flex:0 1 auto}
+.pe-dock[data-mode=line]{height:auto;min-height:var(--dkh)}
+.pe-dock[data-mode=line] .pe-dk-line{flex-direction:column;align-items:stretch;gap:4px;height:auto;padding:5px 2px 6px}
+.pl-row1{display:flex;align-items:center;gap:4px;min-height:40px}
+.pl-row1 .pg-sel{flex:1;min-width:0}
+.pl-row1 .pe-ib{flex:none;width:40px;height:40px}
+.pl-row2{display:flex;align-items:center;gap:8px}
+.pl-row2 .cv-btn{flex:1 1 auto;min-width:0;max-width:none;min-height:48px;padding:0 10px;font-size:14px;white-space:normal;line-height:1.3}
+.pl-zoom{padding:0 2px 0 8px}
+.pl-zoom .pe-zb{width:46px;min-height:46px}
+.pl-v{border:0;background:transparent;font:inherit;font-size:13px;font-weight:900;min-width:52px;min-height:46px;padding:0;color:var(--heading)}
+.pl-v:disabled{color:var(--muted)}
+.pl-scope{margin:0 2px}
+.pl-scope button{min-height:38px;font-size:13px}
+.pe-dock:not(.pl-can) .pl-zoom{opacity:.45}
+.pl-ozoom{flex:none;padding:0}
+.pl-ozoom .pe-zb{width:42px}
+@media(orientation:landscape) and (max-height:520px){
+  .pe-dock[data-mode=line] .pe-dk-line{flex-direction:row;align-items:center;flex-wrap:nowrap;padding:2px}
+  .pl-row1,.pl-row2{display:contents}.pl-row1 .pg-sel{display:none}
+  .pl-row1 .pe-ib{order:5}.pl-scope{order:1;flex:none}.pl-zoom{order:2}.pl-row2 .cv-btn{order:3}
+  .pl-zoom .pe-zb{width:40px;min-height:40px}.pl-v{min-height:40px}
+}
+@media(max-width:380px){.pe-nav{gap:6px}.pe-nb{width:42px;height:42px}.pe-zoom .pe-zi{display:none}}
+</style>
 <div id="pageModal" class="pe-modal hidden" role="dialog" aria-modal="true" aria-labelledby="peTitle">
   <div class="pe-card">
     <div class="pe-head"><button id="peBack" class="pe-ib" type="button" aria-label="رجوع إلى إعدادات الغلاف"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button><b id="peTitle">تصميم الصفحات</b><button id="peGo" class="cv-btn pri pe-go" type="button" aria-label="تصدير PDF"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4v11M7.5 10.5L12 15l4.5-4.5M5 19h14"/></svg><span>تصدير PDF</span></button><button id="peX" class="pe-ib" type="button" aria-label="إغلاق"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>
-    <div class="pe-nav"><button id="pePrev" class="pe-nb" type="button" aria-label="الصفحة السابقة"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg></button><button id="peJump" class="pe-pg" type="button" aria-label="اختيار الصفحة" aria-haspopup="dialog" aria-expanded="false" disabled><span id="peLbl" class="pe-lbl" aria-live="polite"></span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></button><button id="peNext" class="pe-nb" type="button" aria-label="الصفحة التالية"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg></button></div>
+    <div class="pe-nav"><button id="peUndo" class="pe-nb pe-hb" type="button" aria-label="تراجع عن آخر تعديل" title="تراجع" disabled><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 14L4 9l5-5"/><path d="M4 9h10.5a5.5 5.5 0 0 1 0 11H11"/></svg></button><button id="pePrev" class="pe-nb" type="button" aria-label="الصفحة السابقة"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg></button><button id="peJump" class="pe-pg" type="button" aria-label="اختيار الصفحة" aria-haspopup="dialog" aria-expanded="false" disabled><span id="peLbl" class="pe-lbl" aria-live="polite"></span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></button><button id="peNext" class="pe-nb" type="button" aria-label="الصفحة التالية"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg></button><button id="peRedo" class="pe-nb pe-hb" type="button" aria-label="إعادة التعديل" title="إعادة" disabled><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 14l5-5-5-5"/><path d="M20 9H9.5a5.5 5.5 0 0 0 0 11H13"/></svg></button></div>
     <p id="peHint" class="pe-hint" role="status"></p>
     <div id="peTip" class="pe-tipbar hidden"><div class="pe-tipin" role="note"><span>المس سطرًا في الصفحة لترحيله، وأضف صورة أو شكلًا من الشريط السفلي.</span><button id="peTipX" type="button" aria-label="إخفاء النصيحة">✕</button></div></div>
     <div id="peStageWrap" class="pe-stagewrap"><div id="peSheet" class="pe-sheet"><div id="peScaler" class="pe-scaler"></div></div></div>
     <div id="peDock" class="pe-dock" data-mode="add">
       <div class="pe-dk pe-dk-add"><button id="peAdd" class="pe-tb" type="button" aria-label="إضافة صورة"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="3"/><circle cx="9" cy="10" r="1.8"/><path d="M4 18l5-5 4 4 3-3 4 4"/></svg><span class="lb">صورة</span></button><button id="peAddShape" class="pe-tb" type="button" aria-label="إضافة شكل" aria-pressed="false"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="11" width="10" height="10" rx="2"/><circle cx="16" cy="8" r="5"/></svg><span class="lb">شكل</span></button><button id="peAddEmo" class="pe-tb" type="button" aria-label="إضافة إيموجي" aria-pressed="false"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M8.5 14.5c1 1.5 2.2 2.2 3.5 2.2s2.5-.7 3.5-2.2"/><path d="M9 9.8v.4M15 9.8v.4"/></svg><span class="lb">إيموجي</span></button><button id="peAddLink" class="pe-tb" type="button" aria-label="إضافة رابط" aria-pressed="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1"/><path d="M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1"/></svg><span class="lb">رابط</span></button><button id="peMore" class="pe-tb" type="button" aria-label="المزيد من الخيارات" aria-pressed="false"><svg viewBox="0 0 24 24" aria-hidden="true"><circle class="f" cx="5" cy="12" r="1.8"/><circle class="f" cx="12" cy="12" r="1.8"/><circle class="f" cx="19" cy="12" r="1.8"/></svg><span class="lb">المزيد</span></button></div>
-      <div class="pe-dk pe-dk-obj"><button id="peUp" class="pe-tb hidden" type="button"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 16V5M7.5 9.5L12 5l4.5 4.5M4 19h16"/></svg><span class="lb">رفع صورة</span></button><button id="peEdit" class="pe-tb" type="button" aria-pressed="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h9M19 7h1M4 17h1M11 17h9"/><circle cx="16" cy="7" r="2.2"/><circle cx="8" cy="17" r="2.2"/></svg><span class="lb">تعديل</span></button><button id="peDel" class="pe-tb pe-del hidden" type="button"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/></svg><span class="lb">حذف</span></button><button id="peDone" class="pe-tb" type="button" aria-label="إنهاء التحديد"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg><span class="lb">تم</span></button></div>
-      <div class="pe-dk pe-dk-line"><span id="pgSel" class="pg-sel">المس سطرًا أو صفًّا في الصفحة لتحديده</span><button id="pgPush" class="cv-btn pri" type="button" disabled>⤓ رحّل السطر للصفحة التالية</button><button id="pgUnpush" class="cv-btn hidden" type="button">إلغاء الترحيل</button><button id="peLineX" class="pe-ib" type="button" aria-label="إلغاء تحديد السطر"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>
+      <div class="pe-dk pe-dk-obj"><div class="pe-zoom pl-ozoom" role="group" aria-label="حجم الكائن المحدد"><button id="obSm" class="pe-zb" type="button" aria-label="تصغير الكائن">−</button><button id="obLg" class="pe-zb" type="button" aria-label="تكبير الكائن">＋</button></div><button id="peUp" class="pe-tb hidden" type="button"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 16V5M7.5 9.5L12 5l4.5 4.5M4 19h16"/></svg><span class="lb">رفع صورة</span></button><button id="peEdit" class="pe-tb" type="button" aria-pressed="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h9M19 7h1M4 17h1M11 17h9"/><circle cx="16" cy="7" r="2.2"/><circle cx="8" cy="17" r="2.2"/></svg><span class="lb">تعديل</span></button><button id="peDel" class="pe-tb pe-del hidden" type="button"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/></svg><span class="lb">حذف</span></button><button id="peDone" class="pe-tb" type="button" aria-label="إنهاء التحديد"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg><span class="lb">تم</span></button></div>
+      <div class="pe-dk pe-dk-line">
+        <div class="pl-row1"><span id="pgSel" class="pg-sel">المس سطرًا أو صفًّا في الصفحة لتحديده</span><button id="peLineX" class="pe-ib" type="button" aria-label="إلغاء تحديد السطر"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>
+        <div id="elScope" class="pl-scope cv-seg hidden" role="group" aria-label="نطاق التكبير"><button id="elScope1" type="button" aria-pressed="true">هذا السطر فقط</button><button id="elScopeAll" type="button" aria-pressed="false">الكل</button></div>
+        <div class="pl-row2"><div class="pe-zoom pl-zoom" role="group" aria-label="حجم نص العنصر المحدد"><span class="pe-zi" aria-hidden="true">Aa</span><button id="elSm" class="pe-zb" type="button" aria-label="تصغير نص العنصر المحدد">−</button><button id="elV" class="pe-zv pl-v" type="button" aria-label="إعادة حجم العنصر إلى 100%">100%</button><button id="elLg" class="pe-zb" type="button" aria-label="تكبير نص العنصر المحدد">＋</button></div><button id="pgPush" class="cv-btn pri" type="button" disabled>⤓ رحّل للصفحة التالية</button><button id="pgUnpush" class="cv-btn hidden" type="button">إلغاء الترحيل</button></div>
+      </div>
     </div>
     <div id="peScrim" class="pe-scrim"></div>
     <div id="peSh" class="pe-sh" role="dialog" aria-modal="false" aria-labelledby="peShT" data-open="" inert>
@@ -1974,7 +2010,7 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
   /* Only http/https/mailto destinations are allowed (same policy as Markdown links); a bare "example.com" gets https://. */
   const plUrl=v=>{v=String(v||'').trim();if(!v)return '';if(/^(https?:\/\/|mailto:)\S+$/i.test(v))return v;if(/^[a-z][a-z0-9+.-]*:/i.test(v)||/\s/.test(v))return '';return /^[^\/?#]+\.[^\/?#]{2,}/.test(v)?'https://'+v:''};
   let PL=[],plSeq=0,plSaveT=0;
-  const PDEL=new Set(),PBRK=new Set(),PSC=new Map(); // source-block indices removed from the PDF only (page delete in the page editor); reset on every editor open
+  const PDEL=new Set(),PBRK=new Set(),PSC=new Map(),PES=new Map(); // source-block indices removed from the PDF only (page delete in the page editor); reset on every editor open
   const numOr=(v,d)=>Number.isFinite(+v)?+v:d;
   function plLim(o){const ar=o.ar;return{minW:Math.ceil(Math.max(IMG_MIN,IMG_MIN*ar)),maxW:Math.floor(Math.min(PB.w,IMG_MAXH*ar))}} // real min/max width for this object's aspect ratio
   function plFit(o){ // clamp size to sane limits (aspect kept) and keep the box inside the page body
@@ -2162,6 +2198,17 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
       d.style.cssText='display:block;box-sizing:border-box;width:'+f.w+'px;height:'+f.h+'px;margin:'+f.m+';border-radius:'+f.rad+';background-repeat:no-repeat;background-position:center;background-size:'+(same?'100% 100%':'contain')+';background-image:url("'+f.src.replace(/"/g,'%22')+'")';
       i.replaceWith(d)});
   }
+  /* v9: per-element text size (page editor). Ratios are measured against the real PDF CSS, then applied in em so page shrink/zoom still work. */
+  function pesApply(src,stage,light,BASE){
+    const tmp=document.createElement('div');tmp.className='pdf-page'+light;tmp.style.cssText='position:absolute;visibility:hidden;left:0;top:0';
+    tmp.innerHTML='<div class="pg-body md"></div>';stage.appendChild(tmp);const body=tmp.firstChild;body.style.fontSize=BASE+'px';body.appendChild(src);
+    try{
+      src.querySelectorAll('[data-bk]').forEach(e=>{const k=PES.get(e.dataset.bk);if(!k||Math.abs(k-1)<.001||e.tagName==='IMG'||e.tagName==='HR')return;
+        (e.tagName==='TR'?Array.from(e.children):[e]).forEach(t=>{const c=parseFloat(getComputedStyle(t).fontSize),q=parseFloat(getComputedStyle(t.parentElement).fontSize)||c;if(c>0&&q>0)t.style.fontSize=(c/q*k).toFixed(4)+'em'})});
+      src.querySelectorAll('table').forEach(t=>{const rows=Array.from(t.querySelectorAll('tbody tr')),ks=rows.map(r=>PES.get(r.dataset.bk)||1);
+        if(rows.length&&ks.every(x=>Math.abs(x-ks[0])<.001)&&Math.abs(ks[0]-1)>.001)t.querySelectorAll('thead th,thead td').forEach(c=>{const a=parseFloat(getComputedStyle(c).fontSize),b=parseFloat(getComputedStyle(c.parentElement).fontSize)||a;if(a>0&&b>0)c.style.fontSize=(a/b*ks[0]).toFixed(4)+'em'})});
+    }finally{try{tmp.removeChild(src)}catch(_){}stage.removeChild(tmp)}
+  }
   function paginateDoc(stage,brand){
       const light=(document.body.classList.contains('theme-night')||document.body.classList.contains('theme-amoled'))?' pdf-light':'';
       const probe=document.createElement('div');probe.className='pdf-page'+light;stage.appendChild(probe);
@@ -2172,6 +2219,7 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
       const BASE=15*pdfZoom,fs=s=>(BASE*s).toFixed(2)+'px'; // base font of the PDF page body (15px at 100%)
       fitTables(src,686,BASE); // page body is 794-2*54 = 686px wide
       src.querySelectorAll('.li-text,p,pre,tbody tr,hr,img,h1,h2,h3,h4,h5,h6').forEach((e,i)=>{e.dataset.bk=String(i)}); // stable line ids for manual page breaks
+      if(PES.size)pesApply(src,stage,light,BASE);
       Array.from(src.children).forEach((k,i)=>{k.dataset.sb=String(i);if(PDEL.has(i))k.remove()});
       const titleEl=src.querySelector('h1,h2,h3');
       let title=(titleEl?titleEl.textContent:'').replace(/[\\\/:*?"<>|\n\r]+/g,' ').trim().slice(0,60)||'مذاكرتي';
@@ -2534,10 +2582,10 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
   async function peOpen(opts){
     if(busy)return;
     const brand=_s();if(!brand){say('تعذّر التصدير: الملف تم تعديله',4500);return}
-    PDEL.clear();PBRK.clear();PSC.clear();pe.bk=null;pe.cover=opts&&opts.cover||null;pe.off=pe.cover?1:0;pe.brand=brand;pe.sel=null;pe.cur=0;peSheet(null);
+    PDEL.clear();PBRK.clear();PSC.clear();PES.clear();pe.bk=null;pe.scope='one';pe.cover=opts&&opts.cover||null;pe.off=pe.cover?1:0;pe.brand=brand;pe.sel=null;pe.cur=0;peSheet(null);
     pe.prevOv=document.body.style.overflow;document.body.style.overflow='hidden';
     peM.classList.remove('hidden');pe.on=true;peOnOpen();say('جاري تجهيز الصفحات…');
-    try{await loadFonts();await plReady;await lkReady;await frame();peBuild();peLkThumbs();peZoomUi()}
+    try{await loadFonts();await plReady;await lkReady;await frame();peBuild();peLkThumbs();peZoomUi();hReset()}
     catch(e){console.error(e);peClose();say((e&&e.userMsg)||'تعذّر تجهيز الصفحات',4000);return}
     toast.classList.add('hidden');
     peRender();requestAnimationFrame(()=>{peM.classList.add('show');peScale()});
@@ -2660,7 +2708,7 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
   const PGF_STEP=.02,PGF_MIN=.6;
   function pgfixRebuild(msg){clearTimeout(pe.pgt);pe.pgt=setTimeout(()=>{if(!pe.on)return;const before=pe.pages.length;
     try{peBuild()}catch(e){console.error(e);say((e&&e.userMsg)||'تعذّر تحديث الصفحات',3500);return}
-    peRender();if(msg){const n=pe.pages.length;say(msg+' — '+n+(n===before?' صفحة':' صفحة (كانت '+before+')'),2200)}},60)}
+    pgfixFollow();peRender();pgfixShow();if(msg){const n=pe.pages.length;say(msg+' — '+n+(n===before?' صفحة':' صفحة (كانت '+before+')'),2200)}},60)}
   function pgfixUi(){
     const box=peQ('#pePg');if(!box)return;
     const cv=peIsCover();box.classList.toggle('hidden',cv);if(cv){pe.bk=null;peDock();return}
@@ -2676,9 +2724,9 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
     lb.textContent=el?('المحدد: '+(el.textContent||'').replace(/\s+/g,' ').trim().slice(0,48)):'المس سطرًا أو صفًّا في الصفحة لتحديده';
     push.classList.toggle('hidden',marked);un.classList.toggle('hidden',!marked);
     push.disabled=!el||first;
-    push.textContent=!el?'⤓ رحّل السطر للصفحة التالية':first?'هذا أول سطر في الصفحة':'⤓ رحّل هذا السطر للصفحة التالية';
-    peQ('#pgReset').classList.toggle('hidden',!(PBRK.size||PSC.size));
-    peDock();
+    push.textContent=!el?'⤓ رحّل للصفحة التالية':first?'أول سطر في الصفحة':'⤓ رحّل للصفحة التالية';
+    peQ('#pgReset').classList.toggle('hidden',!(PBRK.size||PSC.size||PES.size));
+    elUi(el);peDock();
   }
   function pgfixSize(d){
     const i=peIdx(),pg=pe.pages[i];if(!pg)return;
@@ -2687,16 +2735,100 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
     peQ('#pgV').textContent=Math.round(v*100)+'%';peQ('#pgSm').disabled=v<=PGF_MIN+.001;peQ('#pgLg').disabled=v>=.999;
     pgfixRebuild(null);
   }
+
+  /* ---------- v9: per-element size, follow selection, strong undo/redo ---------- */
+  const EL_MIN=.4,EL_MAX=3,EL_STEP=.05;
+  pe.scope='one';
+  function elRoot(el){return !el?null:el.tagName==='TR'?'table':el.classList.contains('li-text')?'list':null}
+  function elIds(el){
+    const sb=(el.closest('[data-sb]')||{dataset:{}}).dataset.sb,kind=elRoot(el),ids=[];
+    pe.pages.forEach(pg=>pg.bodyEl.querySelectorAll('[data-bk]').forEach(e=>{const q=e.closest('[data-sb]');if(q&&q.dataset.sb===sb&&elRoot(e)===kind)ids.push(e.dataset.bk)}));
+    return ids.length?Array.from(new Set(ids)):[el.dataset.bk];
+  }
+  function elUi(el){
+    const q=peQ('#elV');if(!q)return;
+    const can=!!el&&el.tagName!=='IMG'&&el.tagName!=='HR',v=el?(PES.get(el.dataset.bk)||1):1,r=can?elRoot(el):null;
+    q.textContent=Math.round(v*100)+'%';
+    peQ('#elSm').disabled=!can||v<=EL_MIN+.001;peQ('#elLg').disabled=!can||v>=EL_MAX-.001;q.disabled=!can||Math.abs(v-1)<.001;
+    const sc=peQ('#elScope');sc.classList.toggle('hidden',!r);
+    if(r){peQ('#elScopeAll').textContent=r==='table'?'كل الجدول':'كل القائمة';peQ('#elScope1').setAttribute('aria-pressed',String(pe.scope!=='all'));peQ('#elScopeAll').setAttribute('aria-pressed',String(pe.scope==='all'))}
+    peQ('#peDock').classList.toggle('pl-can',can);
+  }
+  function elSize(d,abs){
+    if(!pe.bk)return;const pg=pe.pages[peIdx()];if(!pg)return;
+    const el=pg.bodyEl.querySelector('[data-bk="'+pe.bk.id+'"]');if(!el||el.tagName==='IMG'||el.tagName==='HR')return;
+    let v=abs!=null?abs:Math.round(((PES.get(pe.bk.id)||1)+d)*100)/100;v=Math.min(EL_MAX,Math.max(EL_MIN,v));
+    (pe.scope==='all'&&elRoot(el)?elIds(el):[pe.bk.id]).forEach(x=>{if(Math.abs(v-1)<.001)PES.delete(x);else PES.set(x,v)});
+    elUi(el);peBadge();pgfixRebuild(null);hSoon();
+  }
+  function pgfixFollow(){ // after a re-split, keep the selected line selected, even if it moved to another page
+    if(!pe.bk)return;const j=pe.pages.findIndex(p=>p.bodyEl.querySelector('[data-bk="'+pe.bk.id+'"]'));
+    if(j>=0){pe.bk.pg=j;pe.cur=j+pe.off}else pe.bk=null;
+  }
+  function pgfixShow(){
+    if(!pe.bk)return;requestAnimationFrame(()=>{const pg=pe.pages[peIdx()],el=pg&&pg.bodyEl.querySelector('.pgfix-sel'),w=peQ('#peStageWrap');if(!el||!w)return;
+      const a=el.getBoundingClientRect(),b=w.getBoundingClientRect();
+      if(a.top<b.top+8)w.scrollTop-=(b.top+8-a.top);else if(a.bottom>b.bottom-8)w.scrollTop+=a.bottom-(b.bottom-8)});
+  }
+  function obSize(d){
+    const o=peSelObj();if(!o||peIsCover())return;
+    const L=plLim(o),cx=o.x+o.w/2,cy=o.y+o.h/2,w=Math.round(Math.min(L.maxW,Math.max(L.minW,o.w*(1+d))));if(w===Math.round(o.w))return;
+    o.w=w;o.h=Math.round(w/o.ar);o.x=cx-o.w/2;o.y=cy-o.h/2;plFit(o);plSave();peOverlay();peTools();peLive();peCommit();hSoon();
+  }
+  /* hold + / − to repeat */
+  (function(){
+    let tm=0,iv=0;const stop=()=>{clearTimeout(tm);clearInterval(iv);tm=iv=0};
+    const MAP={elSm:()=>elSize(-EL_STEP),elLg:()=>elSize(EL_STEP),obSm:()=>obSize(-.06),obLg:()=>obSize(.06)};
+    peM.addEventListener('pointerdown',e=>{const b=e.target.closest('button');if(!b||!MAP[b.id]||b.disabled)return;stop();MAP[b.id]();tm=setTimeout(()=>{iv=setInterval(()=>{if(b.disabled)return stop();MAP[b.id]()},105)},380)});
+    ['pointerup','pointercancel','pointerleave','blur'].forEach(t=>peM.addEventListener(t,stop,true));
+    peM.addEventListener('click',e=>{const b=e.target.closest('button');if(!b||!MAP[b.id]||b.disabled)return;if(e.detail===0)MAP[b.id]()}); // keyboard / assistive tech
+  })();
+  /* ----- history ----- */
+  const HIST={u:[],r:[],last:null,sig:'',t:0,busy:false,MAX:80};
+  const hSnap=()=>({brk:Array.from(PBRK),psc:Array.from(PSC),pes:Array.from(PES),pdel:Array.from(PDEL),z:pdfZoom,pl:PL.map(o=>({...o})),cur:pe.cur});
+  const hSig=x=>JSON.stringify([x.brk,x.psc,x.pes,x.pdel,x.z,x.pl.map(o=>[o.id,o.type,o.pg,o.x,o.y,o.w,o.h,o.ar,o.fit,o.radius,o.rot,o.op,o.fill,o.shape,o.emo,o.mode,o.text,o.url,o.lstyle,o.src?o.src.length:0])]);
+  function hUi(){const u=peQ('#peUndo'),r=peQ('#peRedo');if(!u)return;u.disabled=!HIST.u.length;r.disabled=!HIST.r.length;u.title='تراجع'+(HIST.u.length?' ('+HIST.u.length+')':'');r.title='إعادة'+(HIST.r.length?' ('+HIST.r.length+')':'')}
+  function hReset(){clearTimeout(HIST.t);HIST.u=[];HIST.r=[];HIST.last=hSnap();HIST.sig=hSig(HIST.last);hUi()}
+  function hCheck(){clearTimeout(HIST.t);if(HIST.busy||!pe.on||!HIST.last)return;const x=hSnap(),g=hSig(x);if(g===HIST.sig)return;
+    HIST.u.push(HIST.last);if(HIST.u.length>HIST.MAX)HIST.u.shift();HIST.r=[];HIST.last=x;HIST.sig=g;hUi()}
+  function hSoon(){clearTimeout(HIST.t);HIST.t=setTimeout(hCheck,380)}
+  function hApply(x,go){
+    HIST.busy=true;
+    try{
+      PBRK.clear();x.brk.forEach(v=>PBRK.add(v));PSC.clear();x.psc.forEach(([k,v])=>PSC.set(k,v));PES.clear();x.pes.forEach(([k,v])=>PES.set(k,v));PDEL.clear();x.pdel.forEach(v=>PDEL.add(v));
+      pdfZoom=x.z;lsSet(PZ_KEY,String(x.z));
+      const keep=new Set(x.pl.map(o=>o.id));PL.forEach(o=>{if(!keep.has(o.id))plDrop(o)});
+      PL=x.pl.map(o=>({...o,_p:0}));plSave();
+      pe.sel=null;pe.bk=null;pe.scope='one';pe.cur=go;
+      try{peBuild()}catch(e){console.error(e);say((e&&e.userMsg)||'تعذّر تحديث الصفحات',3500)}
+      peZoomUi();peRender();peOverlay();peTools();peStrip();
+    }finally{HIST.busy=false}
+    HIST.last=hSnap();HIST.sig=hSig(HIST.last);hUi();
+  }
+  function hUndo(){hCheck();if(!HIST.u.length)return;const go=HIST.last.cur,prev=HIST.u.pop();HIST.r.push(HIST.last);hApply(prev,go);say('تم التراجع'+(HIST.u.length?' · '+HIST.u.length+' خطوة متبقية':''),1100)}
+  function hRedo(){hCheck();if(!HIST.r.length)return;const nx=HIST.r.pop();HIST.u.push(HIST.last);hApply(nx,nx.cur);say('تمت الإعادة'+(HIST.r.length?' · '+HIST.r.length+' خطوة متبقية':''),1100)}
+  ['click','pointerup','change','input','keyup'].forEach(t=>peM.addEventListener(t,e=>{if(pe.on&&!HIST.busy&&e.target.closest&&!e.target.closest('#peUndo,#peRedo'))hSoon()}));
+  document.addEventListener('keydown',e=>{
+    if(!pe.on||!(e.ctrlKey||e.metaKey)||e.altKey||peEd(e.target))return;const k=(e.key||'').toLowerCase();
+    if(k==='z'&&!e.shiftKey){e.preventDefault();hUndo()}else if(k==='y'||(k==='z'&&e.shiftKey)){e.preventDefault();hRedo()}
+  });
+  if(window.ResizeObserver){const dk=peQ('#peDock');new ResizeObserver(()=>{if(dk.dataset.mode==='line')peM.style.setProperty('--dkh',Math.ceil(dk.getBoundingClientRect().height)+'px');else peM.style.removeProperty('--dkh')}).observe(dk);
+    new MutationObserver(()=>{if(dk.dataset.mode!=='line')peM.style.removeProperty('--dkh')}).observe(dk,{attributes:true,attributeFilter:['data-mode']})}
   peM.addEventListener('click',e=>{
     if(!pe.on)return;
     const b=e.target.closest('button');
     if(b){
       switch(b.id){
+        case 'peUndo':hUndo();break;
+        case 'peRedo':hRedo();break;
+        case 'elV':if(pe.bk&&!b.disabled)elSize(0,1);break;
+        case 'elScope1':pe.scope='one';elUi(pe.bk&&pe.pages[peIdx()].bodyEl.querySelector('[data-bk="'+pe.bk.id+'"]'));break;
+        case 'elScopeAll':pe.scope='all';elUi(pe.bk&&pe.pages[peIdx()].bodyEl.querySelector('[data-bk="'+pe.bk.id+'"]'));break;
         case 'pgSm':pgfixSize(-PGF_STEP);break;
         case 'pgLg':pgfixSize(PGF_STEP);break;
         case 'pgPush':if(pe.bk&&!b.disabled){PBRK.add(pe.bk.id);pe.bk=null;pgfixRebuild('تم ترحيل السطر للصفحة التالية');pgfixUi()}break;
         case 'pgUnpush':if(pe.bk){PBRK.delete(pe.bk.id);pe.bk=null;pgfixRebuild('أُلغي الترحيل')}break;
-        case 'pgReset':PBRK.clear();PSC.clear();pe.bk=null;pgfixRebuild('أُعيد ضبط الصفحات');break;
+        case 'pgReset':PBRK.clear();PSC.clear();PES.clear();pe.bk=null;pgfixRebuild('أُعيد ضبط الصفحات');break;
       }
       return;
     }
@@ -2711,7 +2843,7 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
     if(!el){pe.bk=null;pgfixUi();return}
     const id=el.dataset.bk;
     if(pe.sel){pe.sel=null;peOverlay();peTools()}
-    pe.bk=(pe.bk&&pe.bk.id===id&&pe.bk.pg===peIdx())?null:{id,pg:peIdx()};if(pe.bk)peTipHide();
+    pe.bk=(pe.bk&&pe.bk.id===id&&pe.bk.pg===peIdx())?null:{id,pg:peIdx()};pe.scope='one';if(pe.bk)peTipHide();
     pgfixUi();
   });
   const peLive=()=>{const p=pe.pages[peIdx()];if(p){plApplyPage(p,peImgs());peHintSet()}};
@@ -2747,7 +2879,7 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
   function peDelPage(){ // remove this page's source blocks from the PDF, drop its objects, shift later pages' objects up, re-paginate
     const d=peIdx(),pg=pe.pages[d];if(!pg||pe.pages.length<2)return;
     const mine=new Set(Array.from(pg.querySelectorAll('[data-sb]')).map(e=>+e.dataset.sb));mine.forEach(i=>PDEL.add(i));{const m=new Map();PSC.forEach((v,k)=>{if(k<d)m.set(k,v);else if(k>d)m.set(k-1,v)});PSC.clear();m.forEach((v,k)=>PSC.set(k,v));pe.bk=null}
-    pg.querySelectorAll('[data-bk]').forEach(e=>PBRK.delete(e.dataset.bk));PL.filter(o=>o.pg===d).forEach(plDrop);PL=PL.filter(o=>o.pg!==d);PL.forEach(o=>{if(o.pg>d)o.pg--});plSave();pe.sel=null;
+    pg.querySelectorAll('[data-bk]').forEach(e=>{PBRK.delete(e.dataset.bk);PES.delete(e.dataset.bk)});PL.filter(o=>o.pg===d).forEach(plDrop);PL=PL.filter(o=>o.pg!==d);PL.forEach(o=>{if(o.pg>d)o.pg--});plSave();pe.sel=null;
     try{peBuild()}catch(e){console.error(e);say((e&&e.userMsg)||'تعذّر تحديث الصفحات',3500)}
     peRender();say('تم حذف الصفحة من PDF',2500);
   }
@@ -2929,7 +3061,7 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
     if(t)try{t.focus({preventScroll:true})}catch(_){}})}
   function peStripCenter(){const on=peQ('#peStrip .on'),sc=peQ('.pe-sh-b');if(!on||!sc)return;const br=sc.getBoundingClientRect(),cr=on.getBoundingClientRect();sc.scrollTop+=(cr.top+cr.height/2)-(br.top+br.height/2)}
   function peRows(){peQ('#peSh').querySelectorAll('.pg-row').forEach(r=>r.classList.toggle('pe-empty',!Array.from(r.children).some(c=>!c.classList.contains('hidden'))))} // JS stand-in for :has()
-  function peBadge(){const b=peQ('#peMore'),on=!!(PBRK.size||PSC.size||Math.abs(pdfZoom-1)>.001);b.classList.toggle('dot',on);b.setAttribute('aria-label',on?'المزيد من الخيارات — توجد تعديلات على الصفحات':'المزيد من الخيارات')}
+  function peBadge(){const b=peQ('#peMore'),on=!!(PBRK.size||PSC.size||PES.size||Math.abs(pdfZoom-1)>.001);b.classList.toggle('dot',on);b.setAttribute('aria-label',on?'المزيد من الخيارات — توجد تعديلات على الصفحات':'المزيد من الخيارات')}
   function peEnsureField(t){const b=peQ('.pe-sh-b');if(!b||!b.contains(t))return;const tr=t.getBoundingClientRect(),br=b.getBoundingClientRect();if(tr.top<br.top+4||tr.bottom>br.bottom-4)b.scrollTop+=(tr.top+tr.height/2)-(br.top+br.height/2)}
   function peVV(){ // follow the visual viewport (soft keyboard / iOS offset); hide dock+pager while typing
     const v=window.visualViewport;if(!v||!pe.on)return;
