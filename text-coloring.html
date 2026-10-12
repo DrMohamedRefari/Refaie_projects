@@ -2511,7 +2511,46 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
         p.querySelector('.pg-num').textContent=(i+1)+' / '+pages.length;
         p.querySelectorAll('li[data-lid]').forEach(li=>{const id=li.dataset.lid;if(seenLi.has(id))li.firstElementChild.style.visibility='hidden';else seenLi.add(id)});
       });
-      return {pages,title,light};
+      const mkToc=()=>{ // blank page with the same frame / strip / footer as the content pages (used by the table of contents)
+        const pg=document.createElement('div');pg.className='pdf-page'+light;pg.style.setProperty('--frame',pal.frame);inkSet(pg,inkMap);
+        pg.innerHTML='<div class="pg-frame"></div><div class="pg-strip"></div><div class="pg-body md toc-body"></div><div class="pg-foot"><span class="pg-l"></span><span class="pg-num"></span><span class="pg-link"></span></div>';
+        stage.appendChild(pg);pg.bodyEl=pg.querySelector('.pg-body');
+        pg.querySelector('.pg-l').textContent=brand[0];pg.querySelector('.pg-link').textContent=brand[1];
+        pg.lim=pg.bodyEl.getBoundingClientRect().top+pg.bodyEl.clientHeight+3;return pg};
+      return {pages,title,light,mkToc};
+  }
+
+  /* ---------- Table of contents page(s): main headings (##) + sub-headings (###), clickable, placed right after the cover ---------- */
+  function tocBuild(R){
+    const pages=R.pages,ents=[];
+    pages.forEach((pg,pi)=>pg.querySelectorAll('.pg-body h1,.pg-body h2,.pg-body h3').forEach(h=>{
+      const t=(h.textContent||'').replace(/\s+/g,' ').trim();if(t)ents.push({h,pg,pi,lv:+h.tagName.charAt(1),t})}));
+    if(ents.length>1&&ents[0].lv===1&&ents.filter(e=>e.lv===1).length===1)ents.shift(); // a lone H1 is the document title, not a section
+    if(!ents.length)return [];
+    const mn=Math.min.apply(null,ents.map(e=>e.lv)),out=[];let cur=null,first=true;
+    const open=()=>{const pg=R.mkToc();pg.dataset.pg='toc'+out.length;pg.i=-1-out.length;pg.tocLinks=[];
+      const hd=document.createElement('div');hd.className='toc-hd'+(first?'':' c');hd.setAttribute('dir','rtl');hd.textContent=first?'الفهرس':'الفهرس (تابع)';first=false;
+      pg.bodyEl.appendChild(hd);out.push(pg);cur=pg};
+    open();
+    ents.forEach((e,k)=>{
+      e.h.id='tocT'+k;
+      const d=Math.min(2,e.lv-mn),row=document.createElement('div');
+      row.className='toc-row d'+d;row.setAttribute('dir',dirOf(e.t));
+      ['--hc','--hd','--hb'].forEach(v=>{const x=e.h.style.getPropertyValue(v);if(x)row.style.setProperty(v,x)});
+      if(d>0){const m=document.createElement('span');m.className='toc-mk';row.appendChild(m)}
+      const t=document.createElement('span');t.className='toc-t';t.textContent=e.t;row.appendChild(t);
+      const f=document.createElement('span');f.className='toc-fill';row.appendChild(f);
+      const n=document.createElement('span');n.className='toc-n';n.textContent=String(e.pi+1);row.appendChild(n);
+      cur.bodyEl.appendChild(row);
+      const need=d===0?36:0; // a main heading is never left alone at the bottom of a page
+      if(row.getBoundingClientRect().bottom+need>cur.lim&&cur.bodyEl.children.length>1){cur.bodyEl.removeChild(row);open();cur.bodyEl.appendChild(row)}
+      e.row=row;e.tp=cur;
+    });
+    ents.forEach(e=>{
+      const pr=e.tp.getBoundingClientRect(),r=e.row.getBoundingClientRect(),tp=e.pg.getBoundingClientRect(),hr=e.h.getBoundingClientRect();
+      e.tp.tocLinks.push({x:r.left-pr.left,y:r.top-pr.top,w:r.width,h:r.height,tgt:e.pg,ty:Math.max(0,hr.top-tp.top-8),id:e.h.id});
+    });
+    return out;
   }
 
   // v6: html2canvas + jsPDF live in inert <script type="text/plain"> nodes and are parsed only when PDF export needs them.
@@ -2565,6 +2604,10 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
       if(document.fonts&&document.fonts.ready)await document.fonts.ready;
       const items=[];
       if(cover){cvOrigOn();const cpg=buildCoverPage(cover,stage,{orig:true});cpg.dataset.pg='cover';items.push(cpg)}
+      for(const tp of tocBuild(R)){
+        pageLinks(tp,brand,true).forEach(k=>{const a=document.createElement('a');a.href=k.u;a.className='pp-a';a.style.cssText='left:'+k.x+'px;top:'+k.y+'px;width:'+k.w+'px;height:'+k.h+'px';tp.appendChild(a)});
+        tp.tocLinks.forEach(k=>{const a=document.createElement('a');a.href='#'+k.id;a.className='pp-a';a.style.cssText='left:'+k.x+'px;top:'+k.y+'px;width:'+k.w+'px;height:'+k.h+'px';tp.appendChild(a)});
+        items.push(tp)}
       for(let i=0;i<pages.length;i++){
         const pg=pages[i];
         pageLinks(pg,brand,true).forEach(k=>{const a=document.createElement('a');a.href=k.u;a.className='pp-a';a.style.cssText='left:'+k.x+'px;top:'+k.y+'px;width:'+k.w+'px;height:'+k.h+'px';pg.appendChild(a)});
@@ -2616,15 +2659,18 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
       const R=paginateDoc(stage,brand),pages=R.pages;let title=R.title;
       if(cover&&cover.title)title=cover.title.replace(/[\\\/:*?"<>|\n\r]+/g,' ').trim().slice(0,60)||title;
       await frame();if(document.fonts&&document.fonts.ready)await document.fonts.ready;
-      pfGeom();window.PDFV.onStatus=m=>say(m,60000);const pdf=new window.PDFV.Doc(title),items=[],total=pages.length+(cover?1:0);let n=0;
+      pfGeom();window.PDFV.onStatus=m=>say(m,60000);const pdf=new window.PDFV.Doc(title),items=[],tocs=tocBuild(R),total=pages.length+tocs.length+(cover?1:0);let n=0;
       if(cover){cvOrigOn();const cpg=buildCoverPage(cover,stage,{orig:true});cpg.dataset.pg='cover';items.push(cpg)}
+      tocs.forEach(pg=>items.push(pg));
       pages.forEach(pg=>items.push(pg));
-      for(const sh of pfImpose(items,PF.up,PF_MODE,PF_RTL,PF_CVSOLO)){
+      const sheets=pfImpose(items,PF.up,PF_MODE,PF_RTL,PF_CVSOLO),sheetOf=new Map();
+      sheets.forEach((sh,k)=>sh.forEach(e=>{if(e)sheetOf.set(e,k)}));
+      for(const sh of sheets){
         for(let pos=0;pos<sh.length;pos++){
           const pg=sh[pos];if(!pg)continue;
           say('جاري إنشاء PDF… '+(++n)+' / '+total);await frame();
           if(pg.dataset.pg==='cover'){await pdf.paintPage(pg,[],pos);pg.remove();continue}
-          await pdf.paintPage(pg,pageLinks(pg,brand),pos);pg.remove()}
+          await pdf.paintPage(pg,pageLinks(pg,brand).concat((pg.tocLinks||[]).map(k=>({x:k.x,y:k.y,w:k.w,h:k.h,d:sheetOf.get(k.tgt),dy:k.ty})).filter(k=>k.d!==undefined)),pos);pg.remove()}
         await pdf.endSheet()}
       const blob=await pdf.finish();url=URL.createObjectURL(blob);
       const a=document.createElement('a');a.href=url;a.download=title+'.pdf';a.rel='noopener';document.body.appendChild(a);a.click();a.remove();
@@ -2667,8 +2713,10 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
       {const kmm=PW*scale/pgm.w,sw=PF.w*kmm,sh=PF.h*kmm,area=sw*sh;if(area>3.2e7)scale*=Math.sqrt(3.2e7/area)} // canvas safety: sheet bitmap <= ~32 megapixels
       const items=[];let coverFailed=false;
       if(cover){const cpg=buildCoverPage(cover,stage);cpg.dataset.pg='cover';items.push(cpg)}
+      tocBuild(R).forEach(pg=>items.push(pg));
       pages.forEach(pg=>items.push(pg));
-      const sheets=pfImpose(items,up,PF_MODE,PF_RTL,PF_CVSOLO);
+      const sheets=pfImpose(items,up,PF_MODE,PF_RTL,PF_CVSOLO),sheetOf=new Map(),tocDef=[];
+      sheets.forEach((sh,k)=>sh.forEach(e=>{if(e)sheetOf.set(e,k)}));
       const rootVars=['--pw','--ph','--fr','--mx','--mt','--mb','--cvk','--cvx','--cvb','--cvib'].map(k=>k+':'+document.documentElement.style.getPropertyValue(k)).join(';');
       const shot=async pg=>{
         const key=pg.dataset.pg,isCv=key==='cover';
@@ -2710,10 +2758,12 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
           if(tl)try{window.ttLayer(pdf,pg,{f,ox})}catch(e){console.error(e)}
           if(isCv)return;
           pageLinks(pg,brand,true).forEach(k=>pdf.link(k.x*f+ox,k.y*f,k.w*f,k.h*f,{url:k.u})); // markdown links are added by ttLayer
+          (pg.tocLinks||[]).forEach(k=>{const t=sheetOf.get(k.tgt);if(t!==undefined)tocDef.push({s:sheets.indexOf(sh),x:k.x*f+ox,y:k.y*f,w:k.w*f,h:k.h*f,t})}); // table of contents -> jump to the page
         });
         cans.forEach(c=>{if(c){c.width=c.height=0}});if(sheetCv){sheetCv.width=sheetCv.height=0}
         sh.forEach(pg=>{if(pg)pg.remove()}); // free the finished pages
       }
+      tocDef.forEach(k=>{try{pdf.setPage(k.s+1);pdf.link(k.x,k.y,k.w,k.h,{pageNumber:k.t+1})}catch(e){console.error(e)}});
       const blob=pdf.output('blob');
       url=URL.createObjectURL(blob);
       const a=document.createElement('a');a.href=url;a.download=title+'.pdf';a.rel='noopener';
@@ -4519,6 +4569,19 @@ body.sv3-fold-on .reader .md>h2.sv3-f::after{transform:translateY(0) rotate(45de
   .pp-sheet .pdf-page{margin:0!important}
 }
 </style>
+<style id="toc-css">
+.pdf-page .toc-hd{display:block;margin:.1em 0 .8em;padding-bottom:.4em;border-bottom:3px solid var(--c1,var(--accent));font-family:var(--font-head);font-weight:700;font-size:1.95em;line-height:1.6;color:var(--strong,var(--text))}
+.pdf-page .toc-hd.c{font-size:1.35em}
+.pdf-page .toc-row{display:flex;align-items:baseline;gap:.5em;margin:.1em 0;line-height:1.75}
+.pdf-page .toc-row.d0{margin-top:.65em;padding:.2em .75em;background-color:var(--hb,var(--surface-2));border-inline-start:5px solid var(--hc,var(--accent));border-radius:6px;font-family:var(--font-head);font-weight:700;color:var(--hd,var(--text))}
+.pdf-page .toc-row.d1{padding-inline-start:1.5em;font-size:.94em}
+.pdf-page .toc-row.d2{padding-inline-start:3em;font-size:.86em;color:var(--muted)}
+.pdf-page .toc-mk{flex:none;width:.5em;height:.5em;border-radius:50%;background-color:var(--hc,var(--accent));align-self:center}
+.pdf-page .toc-t{min-width:0;overflow-wrap:anywhere}
+.pdf-page .toc-fill{flex:1;min-width:1em;height:0;border-bottom:1px solid var(--line);align-self:flex-end;margin-bottom:.45em}
+.pdf-page .toc-n{flex:none;direction:ltr;unicode-bidi:isolate;min-width:1.5em;text-align:center;color:var(--hd,var(--accent))}
+.pdf-page .toc-row.d0 .toc-n{font-family:var(--font-head);font-weight:700}
+</style>
 <style id="app-night-css">
 /* ===== v9 app night mode: dresses the tool's own interface only. Study themes (.reader) and PDF pages are NOT touched. ===== */
 .night-btn{display:inline-flex;align-items:center;justify-content:center;flex:none;width:40px;min-width:40px;padding:0}
@@ -5277,12 +5340,13 @@ class Doc{
   async addPage(content,res,links){
     const cid=this.alloc(),pid=this.alloc();await this.obj(cid,'<<>>',lat1(content));
     const ann=[];for(const l of links||[]){const id=this.alloc();const ox=l.ox||0,x0=l.x*G.SX+ox,x1=(l.x+l.w)*G.SX+ox,y1=G.PH-l.y*G.SY,y0=G.PH-(l.y+l.h)*G.SY;
-      await this.obj(id,'<</Type/Annot/Subtype/Link/Rect['+nf(x0)+' '+nf(y0)+' '+nf(x1)+' '+nf(y1)+']/Border[0 0 0]/A<</S/URI/URI('+String(l.u).replace(/[^\x21-\x7e]/g,c=>'%'+hex(c.charCodeAt(0)&255,2)).replace(/([()\\])/g,'\\$1')+')>>>>');ann.push(id)}
+      if(l.d!==undefined){(this.dl||(this.dl=[])).push({id,r:nf(x0)+' '+nf(y0)+' '+nf(x1)+' '+nf(y1),d:l.d,dy:l.dy});ann.push(id);continue}await this.obj(id,'<</Type/Annot/Subtype/Link/Rect['+nf(x0)+' '+nf(y0)+' '+nf(x1)+' '+nf(y1)+']/Border[0 0 0]/A<</S/URI/URI('+String(l.u).replace(/[^\x21-\x7e]/g,c=>'%'+hex(c.charCodeAt(0)&255,2)).replace(/([()\\])/g,'\\$1')+')>>>>');ann.push(id)}
     this.pages.push({id:pid,cid,res,ann})}
   async finish(){
     if(this.sheet)await this.flushSheet();
     const fr=this.fontRefs||{},fontIds={};
     for(const k of Object.keys(fr)){fontIds[k]=fr[k];const F=FACES[k];await this.writeFont(F,fr[k])}
+    for(const q of this.dl||[]){const tp=this.pages[q.d];await this.obj(q.id,'<</Type/Annot/Subtype/Link/Rect['+q.r+']/Border[0 0 0]'+(tp?'/Dest['+tp.id+' 0 R/XYZ null '+nf(Math.max(0,Math.min(G.PH,G.PH-q.dy*G.SY)))+' null]':'')+'>>')}
     for(const p of this.pages){const fonts=Object.keys(fr).map(k=>'/F'+k+' '+fr[k]+' 0 R').join('');
       const gs=[...this.gs.values()].map(g=>'/'+g.n+' '+g.id+' 0 R').join('');
       const xo=p.res.xo.map(x=>'/'+x.n+' '+x.id+' 0 R').join(''),sh=p.res.sh.map(x=>'/'+x.n+' '+x.id+' 0 R').join(''),egs=p.res.gs.map(x=>'/'+x.n+' '+x.id+' 0 R').join('');
