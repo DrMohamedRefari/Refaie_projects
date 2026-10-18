@@ -713,6 +713,12 @@ html.app-night .pe-sh{box-shadow:0 -10px 30px rgba(0,0,0,.5)}
           <button class="theme-choice" role="menuitemradio" aria-checked="false" data-theme="contrast" type="button"><span class="theme-dot" style="background:conic-gradient(#1346ab 0deg 60deg,#970a0d 60deg 120deg,#00670a 120deg 180deg,#8f3f00 180deg 240deg,#662b98 240deg 300deg,#005e86 300deg 360deg)"></span>تباين عالٍ</button>
           <button class="theme-choice" role="menuitemradio" aria-checked="false" data-theme="cvd" type="button"><span class="theme-dot" style="background:conic-gradient(#2266a4 0deg 60deg,#994920 60deg 120deg,#00785b 120deg 180deg,#8b6e00 180deg 240deg,#8c467e 240deg 300deg,#007192 300deg 360deg)"></span>ألوان آمنة لعمى الألوان</button>
           <button class="theme-choice" role="menuitemradio" aria-checked="false" data-theme="amoled" type="button"><span class="theme-dot" style="background:conic-gradient(#40d1f7 0deg 60deg,#ff99a3 60deg 120deg,#7cd591 120deg 180deg,#deba50 180deg 240deg,#d7a6fc 240deg 300deg,#2ad7d7 300deg 360deg)"></span>أسود AMOLED</button>
+          <button class="theme-choice" role="menuitemradio" aria-checked="false" data-theme="aurora" type="button"><span class="theme-dot" style="background:conic-gradient(#0e7c86 0deg 60deg,#c2305f 60deg 120deg,#3f7d20 120deg 180deg,#b25e00 180deg 240deg,#6a3fc9 240deg 300deg,#1456c8 300deg 360deg)"></span>شفق قطبي</button>
+          <button class="theme-choice" role="menuitemradio" aria-checked="false" data-theme="lavender" type="button"><span class="theme-dot" style="background:conic-gradient(#6d3fd1 0deg 60deg,#c43d7c 60deg 120deg,#1f7f55 120deg 180deg,#a86400 180deg 240deg,#2a62c9 240deg 300deg,#0f7f8f 300deg 360deg)"></span>لافندر</button>
+          <button class="theme-choice" role="menuitemradio" aria-checked="false" data-theme="meadow" type="button"><span class="theme-dot" style="background:conic-gradient(#2f7d32 0deg 60deg,#b0472b 60deg 120deg,#8a6a00 120deg 180deg,#1a6f8a 180deg 240deg,#7a4a99 240deg 300deg,#a63d63 300deg 360deg)"></span>مرج أخضر</button>
+          <button class="theme-choice" role="menuitemradio" aria-checked="false" data-theme="coral" type="button"><span class="theme-dot" style="background:conic-gradient(#d1432b 0deg 60deg,#1d6fa5 60deg 120deg,#2e7d4f 120deg 180deg,#a86a00 180deg 240deg,#8a3fa8 240deg 300deg,#0f7d8a 300deg 360deg)"></span>مرجاني</button>
+          <button class="theme-choice" role="menuitemradio" aria-checked="false" data-theme="midnight" type="button"><span class="theme-dot" style="background:conic-gradient(#6ea8ff 0deg 60deg,#ff8fa3 60deg 120deg,#6fd9a0 120deg 180deg,#f2c35c 180deg 240deg,#c39bff 240deg 300deg,#4fd8e0 300deg 360deg)"></span>منتصف الليل</button>
+          <button class="theme-choice" role="menuitemradio" aria-checked="false" data-theme="cyber" type="button"><span class="theme-dot" style="background:conic-gradient(#2cf2b3 0deg 60deg,#ff5fa2 60deg 120deg,#b6f24a 120deg 180deg,#ffc83d 180deg 240deg,#a78bfa 240deg 300deg,#3cc8ff 300deg 360deg)"></span>سايبر نيون</button>
         </div>
       </div>
     </div>
@@ -782,25 +788,21 @@ html.app-night .pe-sh{box-shadow:0 -10px 30px rgba(0,0,0,.5)}
       <button id="helpClose" class="cv-x" type="button" aria-label="إغلاق">✕</button>
     </div>
     <div class="cv-scroll">
-      <p class="hp-intro">حوّل أي نص Markdown إلى مذكرة ملوّنة منظمة للمذاكرة، ثم احفظها كملف PDF. الخطوات:</p>
+      <a id="hp-video" class="hp-video" href="https://youtu.be/9At_3Xblrmw?si=Nf7pFFyHtDdMCrdp" target="_blank" rel="noopener noreferrer">
+        <svg viewBox="0 0 24 24" width="26" height="26" aria-hidden="true"><rect x="1.5" y="4.5" width="21" height="15" rx="4.5" fill="#fff"/><path d="M10 9l5.2 3L10 15z" fill="#d11a10"/></svg>
+        <span>شاهد فيديو شرح استعمال الأداة</span>
+      </a>
+      <p class="hp-intro"><b>الفكرة باختصار:</b> اكتب طلبك للذكاء الاصطناعي كالمعتاد، ثم ألصق <b>البرومبت</b> أسفل طلبك مباشرة، فيكتب لك الرد بتنسيق تفهمه الأداة وتحوّله إلى مذكرة ملوّنة جميلة.</p>
       <ol class="hp-steps">
-        <li><b>الصق النص المكتوب بـ Markdown</b> في المربع الكبير في صفحة التحرير.<small>أو اضغط «لصق من الحافظة». يُحفظ نصك تلقائياً في متصفحك.</small></li>
-        <li>اضغط <b>«ابدأ المذاكرة»</b> (أو «المذاكرة» من الشريط العلوي) لتظهر المذكرة بتنسيق وألوان جاهزة.<small>يمكنك تغيير الثيم من زر «الثيمات» وتكبير الخط أو تصغيره.</small></li>
-        <li>اضغط <b>«PDF»</b> من الشريط العلوي، واختر شكل الغلاف إن أردت، ثم <b>صمّم الصفحات</b> وأضف صورك (النص يلتف حولها)، وبعدها تظهر نافذة الطباعة: اختر <b>«حفظ كملف PDF»</b> فيُحفظ ملفًا نصيًا حقيقيًا (نص قابل للتحديد والبحث، وصور وروابط) بنفس أبعاد A4.</li>
-        <li>لا تملك نصاً بصيغة Markdown؟ استخدم <b>البرومبت الجاهز</b> بالأسفل مع أي أداة ذكاء اصطناعي.</li>
+        <li><b>اكتب طلبك أولاً</b> في أي ذكاء اصطناعي، مثل «اشرح لي دورة كريبس».<small>البرومبت وحده لا يجعل الذكاء الاصطناعي يفعل شيئاً، لا بد من ذكر طلبك قبله.</small></li>
+        <li><b>انسخ البرومبت</b> بالزر الذي بالأسفل، والصقه <b>أسفل طلبك</b> ثم أرسل.</li>
+        <li><b>انسخ الرد كاملاً</b> من صندوق الكود، والصقه هنا في مربع النص.</li>
+        <li>اضغط <b>«ابدأ المذاكرة»</b> لتظهر مذكرتك ملوّنة. غيّر الثيم من «الثيمات»، وحمّلها ملف <b>PDF</b> من الزر العلوي.</li>
       </ol>
-
-      <div class="hp-tip"><b>تلميح:</b> التنبيهات الملوّنة تُكتب هكذا: <code>&gt; [!TIP] عنوان</code> ثم سطر جديد يبدأ بـ <code>&gt;</code> ويحتوي النص.</div>
       <!-- AIP:HTML:START (AI prompt helper) -->
       <section id="aip-section" class="aip-section" aria-labelledby="aip-heading">
         <h3 id="aip-heading" class="aip-h">برومبت جاهز للذكاء الاصطناعي</h3>
-        <p class="aip-p">التطبيق يلوّن النص ويرتّبه تلقائيًا من بنية Markdown، لذلك انسخ البرومبت بالأسفل والصقه في <b>نهاية طلبك</b> (أسفل ما تطلبه من الذكاء الاصطناعي مباشرة، مثل «اشرح لي كذا» أو «اكتب محاضرة عن كذا») ثم أرسله. سيصلك الرد داخل <b>صندوق كود واحد</b>، انسخه والصقه في مربع النص هنا.</p>
-        <ol class="hp-steps aip-steps">
-          <li>اضغط <b>«نسخ البرومبت»</b>.</li>
-          <li>الصقه أسفل طلبك في أداة الذكاء الاصطناعي وأرسل.</li>
-          <li>انسخ الرد كاملاً من صندوق الكود.</li>
-          <li>الصقه هنا في مربع النص ثم اضغط <b>«ابدأ المذاكرة»</b>.</li>
-        </ol>
+        <p class="aip-p">انسخه والصقه <b>في نهاية طلبك</b> (أسفله مباشرة)، ثم أرسل الطلب والبرومبت معاً.</p>
         <details id="aip-details" class="aip-details">
           <summary>عرض نص البرومبت</summary>
           <textarea id="aip-prompt-text" class="aip-pre" readonly dir="ltr" spellcheck="false" aria-label="نص البرومبت"></textarea>
@@ -1445,7 +1447,7 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
   const input=$('#markdownInput'), content=$('#content'), editorScreen=$('#editorScreen'), readerScreen=$('#readerScreen');
   const pdfBtn=$('#pdfBtn'), toast=$('#toast'); const helpBtn=$('#helpBtn'), editorBtn=$('#editorBtn'), studyBtn=$('#studyBtn'), themeToggle=$('#themeToggle'), themeMenu=$('#themeMenu');
   const STORAGE='refaie-minimal-study-v1';
-  const themes=['authentic','royal','emerald','sunset','rose','ocean','ink','night','sepia','contrast','cvd','amoled'];
+  const themes=['authentic','royal','emerald','sunset','rose','ocean','ink','night','sepia','contrast','cvd','amoled','aurora','lavender','meadow','coral','midnight','cyber'];
   const EMPTY='<div class="empty">لا يوجد محتوى بعد.</div>';
   const MAX_CHARS=2000000, MAX_DEPTH=24, MAX_COLS=64, INLINE_LIMIT=8000, MAX_PAGES=400;
   const lsGet=k=>{try{return localStorage.getItem(k)}catch(_){return null}};
@@ -1862,7 +1864,69 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
     root.querySelectorAll('ul,ol').forEach(l=>Array.from(l.children).forEach((li,i)=>set(li,i)));
     root.querySelectorAll('tr').forEach(tr=>Array.from(tr.children).forEach((c,i)=>{if(c.tagName==='TH')set(c,i)}));
   }
-  function recolor(){if(!document.body.style.getPropertyValue('--ink-dark'))inkApply(document.body);colorize(content,readPalette(document.body))}
+  function ultraColor(root,pal){
+    const n=pal.colors.length;
+    root.querySelectorAll(':not(pre)>code').forEach((e,i)=>{const k=i%n;e.style.setProperty('--cc',pal.colors[k]);e.style.setProperty('--cb',pal.tints[k]);e.style.setProperty('--cd',pal.heads[k])});
+    let cur=null;
+    Array.from(root.children).forEach(el=>{
+      if(el.tagName==='H2')cur=el;
+      else if(cur&&(el.tagName==='HR'||el.classList.contains('table-wrap'))){
+        ['--hc','--hb','--hd'].forEach(v=>{const x=cur.style.getPropertyValue(v);if(x&&(el.tagName==='HR'||!el.style.getPropertyValue('--sc')))el.style.setProperty(el.tagName==='HR'?v:'--sc',x)});
+      }
+    });
+  }
+  function ultraText(root,pal){
+    const n=pal.colors.length;
+    /* A) every top-level block inherits its section colour (--sc); first paragraph after a heading becomes a "lead" */
+    let sc=pal.colors[0],prev=null;
+    Array.from(root.children).forEach(el=>{
+      if(el.tagName==='H2'){const x=el.style.getPropertyValue('--hc');if(x)sc=x}
+      el.style.setProperty('--sc',sc);
+      if(el.tagName==='P'){el.classList.toggle('u2-lead',!!prev&&/^H[12]$/.test(prev.tagName))}
+      prev=el;
+    });
+    /* B) plain text decoration: label chips, numbers, «quotes», (English terms) */
+    const NUM='[0-9\u0660-\u0669]+(?:[.,\u066B][0-9\u0660-\u0669]+)?(?:\\s?(?:%|\u066A|mg|mcg|kg|g|mL|ml|L|mmHg|mmol/L|mEq/L|IU|bpm|\u00B0C|\u00B0F|\u0633\u0645|\u0645\u0645|\u0643\u062C\u0645|\u063A\u0645|\u0645\u0644\u063A|\u0645\u0644\u062C\u0645|\u062F\u0642\u064A\u0642\u0629|\u0633\u0627\u0639\u0629|\u064A\u0648\u0645|\u0623\u064A\u0627\u0645|\u0633\u0646\u0629|\u0633\u0646\u0648\u0627\u062A))?';
+    const RX=new RegExp('(\\(([A-Za-z][^()\\n]{2,60})\\))|(\u00AB[^\u00BB\\n]{1,90}\u00BB)|('+NUM+')','g');
+    const LBL=/^(\s*)([^:\uFF1A\n.!?\u061F\u060C,;0-9\/\\]{2,28}?)([:\uFF1A])(\s+|$)/;
+    let li=0;
+    root.querySelectorAll('p,li').forEach(blk=>{
+      if(blk.closest('.viz,.fns,pre')) return;
+      /* label chip: "الأعراض: ..." */
+      let first=blk.firstChild;
+      while(first&&first.nodeType===1&&(first.classList.contains('cb')||first.classList.contains('ln'))){
+        if(first.classList.contains('cb'))first=first.nextSibling;else first=first.firstChild;
+      }
+      if(first&&first.nodeType===3&&!(first.parentNode.closest&&first.parentNode.closest('.u2l'))){
+        const m=first.nodeValue.match(LBL);
+        if(m&&m[2].trim().split(/\s+/).length<=4&&!/https?|www/i.test(m[2])){
+          const k=(li++)%n,sp=document.createElement('span');sp.className='u2l';sp.textContent=m[2].trim();
+          sp.style.setProperty('--cc',pal.colors[k]);sp.style.setProperty('--cb',pal.tints[k]);sp.style.setProperty('--cd',pal.heads[k]);
+          first.parentNode.insertBefore(sp,first);first.nodeValue=' '+first.nodeValue.slice(m[0].length);
+        }
+      }
+      /* inline tokens */
+      const w=document.createTreeWalker(blk,NodeFilter.SHOW_TEXT,{acceptNode(t){
+        const p=t.parentNode;if(!p||!t.nodeValue.trim())return NodeFilter.FILTER_REJECT;
+        if(p.closest('code,pre,a,sup,sub,.u2l,.u2n,.u2e,.u2q,.cb,mark,.co-t'))return NodeFilter.FILTER_REJECT;
+        return NodeFilter.FILTER_ACCEPT}});
+      const nodes=[];while(w.nextNode())nodes.push(w.currentNode);
+      nodes.forEach(t=>{
+        const txt=t.nodeValue;RX.lastIndex=0;let m,last=0,frag=null;
+        while((m=RX.exec(txt))){
+          if(m[4]){const b=txt[m.index-1];if(b&&/[A-Za-z0-9_\u0660-\u0669.]/.test(b))continue;}
+          frag=frag||document.createDocumentFragment();
+          if(m.index>last)frag.appendChild(document.createTextNode(txt.slice(last,m.index)));
+          const sp=document.createElement('span');
+          sp.className=m[1]?'u2e':m[3]?'u2q':'u2n';
+          if(m[1])sp.setAttribute('dir','ltr');
+          sp.textContent=m[0];frag.appendChild(sp);last=m.index+m[0].length;
+        }
+        if(frag){if(last<txt.length)frag.appendChild(document.createTextNode(txt.slice(last)));t.parentNode.replaceChild(frag,t)}
+      });
+    });
+  }
+  function recolor(){if(!document.body.style.getPropertyValue('--ink-dark'))inkApply(document.body);const __pal=readPalette(document.body);colorize(content,__pal);try{ultraColor(content,__pal);ultraText(content,__pal)}catch(_){}}
   /* self-check: contrast ratios per theme, no UI. Usage: __inkAudit() -> {rows,failures,table}. Restores the active theme. */
   window.__inkAudit=function(){
     const body=document.body,prev=themes.find(t=>body.classList.contains('theme-'+t)),rows=[],fails=[];
@@ -2441,7 +2505,7 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
     }finally{try{tmp.removeChild(src)}catch(_){}stage.removeChild(tmp)}
   }
   function paginateDoc(stage,brand){
-      const light=(document.body.classList.contains('theme-night')||document.body.classList.contains('theme-amoled'))?' pdf-light':'';
+      const light=(document.body.classList.contains('theme-night')||document.body.classList.contains('theme-amoled')||document.body.classList.contains('theme-midnight')||document.body.classList.contains('theme-cyber'))?' pdf-light':'';
       const probe=document.createElement('div');probe.className='pdf-page'+light;stage.appendChild(probe);
       const inkMap=inkApply(probe);const pal=readPalette(probe);stage.removeChild(probe);
       const src=document.createElement('div');
@@ -3638,6 +3702,10 @@ html.app-night .cv-scroll{background:#212836}
 /* AIP: AI-prompt helper. Isolated + fail-safe: nothing here can break the main app. */
 (function(){try{
 var AIP_PROMPT=[
+  "=== READ THIS FIRST ===",
+  "",
+  "The text ABOVE this block is my real request (my topic or task). First fulfil that request completely and accurately. Then deliver your answer ONLY in the output format defined below. The rules below describe how to format the answer; they are not the task itself.",
+  "",
   "=== OUTPUT FORMAT (MANDATORY, NO EXCEPTIONS) ===",
   "",
   "1. Your ENTIRE reply must be ONE single code block and nothing else. No greeting, no intro, no closing remarks, no explanations, no text before or after the block.",
@@ -3705,7 +3773,7 @@ var AIP_PROMPT=[
   "- Safe: letters, digits, standard punctuation, % < > ( ) [ ] / and the symbols × ÷ ± ° ½ – —",
   "- Avoid: arrows (→ ← ↑ ↓), ≥ ≤ ≈ ≠, µ, ✓ and ✗, Unicode superscript or subscript digits, bullets typed by hand, and all emojis. Use words instead (\"increases\", \"leads to\", \"at least\", \"about\", \"mcg\"), or the plain ASCII forms > < and -> when needed. For exponents and chemistry use the ^ and ~ markup above.",
   "",
-  "--- Visual callouts (optional, 1 to 3 per document) ---",
+  "--- Visual callouts (recommended, 2 to 4 per document) ---",
   "",
   "- Same callout syntax with the type VISUAL, then a visual kind, a colon and a title: > [!VISUAL] steps: Title. The body is ONE plain list of 2 to 7 items (no nesting, no blank lines inside it). It renders as designed cards, and in any other Markdown viewer it still reads as a normal list.",
   "  - steps: a numbered list (1. 2. 3.) for procedures or algorithms. Items become connected numbered cards.",
@@ -3718,6 +3786,7 @@ var AIP_PROMPT=[
   "",
   "- Be accurate, well organized, and exam-oriented: move from simple to complex, define each term once, then build on it.",
   "- Prefer lists and tables over long prose. Never write a wall of text.",
+  "- Make the result visually rich and colorful: every H2 section must contain at least one non-paragraph element (a table, a callout, or a VISUAL block); vary the callout types so neighboring boxes get different colors; put ==highlight== on the single most important fact of each section; use **bold** on key terms so the automatic colors have something to work with.",
   "- Mix element types so the page looks rich: after every 1-2 paragraphs or lists, add a table, a callout, or a highlighted key point. Do not stack more than 7 bullets in a row.",
   "- Suggested lecture skeleton: H1 title, ABSTRACT callout, then numbered H2 sections each with H3 parts, comparison tables where useful, a TIP callout for mnemonics, a WARNING for pitfalls, a final \"Summary\" H2 with a recap table, a \"Self-test\" H2 with QUESTION callouts, and a short \"Review checklist\" with task items.",
   "- Always use tables for comparisons, classifications, differential diagnosis, drugs, and \"site / cause / feature\" style data.",
@@ -3780,7 +3849,7 @@ if(scr){
       sec.classList.add('aip-flash');setTimeout(function(){sec.classList.remove('aip-flash')},1400);
     }catch(e){}
   });
-  row.appendChild(tb);scr.insertBefore(row,scr.firstChild);
+  row.appendChild(tb);var vid=document.getElementById('hp-video');scr.insertBefore(row,vid?vid.nextSibling:scr.firstChild);
 }
 }catch(e){try{console.warn('aip-script',e)}catch(_){}}})();
 </script>
@@ -5848,5 +5917,109 @@ P.embedImage=async function(doc,src,el){
 })();
 
 </script>
+<style id="ultra-v1">
+/* ===== ULTRA v1: richer colour, new themes, video button (study view only; PDF pages untouched) ===== */
+body.theme-aurora{--c1:#0e7c86;--c2:#c2305f;--c3:#3f7d20;--c4:#b25e00;--c5:#6a3fc9;--c6:#1456c8;--on-c:#fff;--sh-x:-4px;--sh-y:4px;--sh-b:0px;--sh-s:0px;--sh-mix:.2;--sh-a:.3;--grid-k:.9;--grid-size:22px;--glass-min:.74;--bg:#e3f3f6;--surface:#f7fcfd;--surface-2:#e1f1f5;--text:#0f1a1f;--muted:#43565e;--line:#b4d3dc;--accent:#0e7c86;--accent-soft:#d3f0f2;--strong:#075158;--strong-bg:#bfe8ec;--heading:#075158;--quote:#0e7c86;--code-bg:#0b2430;--mark:#ffe27a;--frame:#5aa3b0;--code-text:#eef3ff}
+body.theme-aurora{--orn-rgb:14,124,134}
+body.theme-lavender{--c1:#6d3fd1;--c2:#c43d7c;--c3:#1f7f55;--c4:#a86400;--c5:#2a62c9;--c6:#0f7f8f;--on-c:#fff;--sh-x:-4px;--sh-y:4px;--sh-b:0px;--sh-s:0px;--sh-mix:.2;--sh-a:.3;--grid-k:.9;--grid-size:22px;--glass-min:.74;--bg:#ebe5fa;--surface:#fbf9ff;--surface-2:#efe9fc;--text:#17131f;--muted:#504663;--line:#cdc1e6;--accent:#6d3fd1;--accent-soft:#e6dcfb;--strong:#44228f;--strong-bg:#dccffa;--heading:#44228f;--quote:#6d3fd1;--code-bg:#1c1233;--mark:#f8c8ea;--frame:#9a7fd6;--code-text:#eef3ff}
+body.theme-lavender{--orn-rgb:109,63,209}
+body.theme-meadow{--c1:#2f7d32;--c2:#b0472b;--c3:#8a6a00;--c4:#1a6f8a;--c5:#7a4a99;--c6:#a63d63;--on-c:#fff;--sh-x:-4px;--sh-y:4px;--sh-b:0px;--sh-s:0px;--sh-mix:.2;--sh-a:.3;--grid-k:.9;--grid-size:22px;--glass-min:.74;--bg:#e2ebd7;--surface:#f8fbf3;--surface-2:#e8f1dc;--text:#121a10;--muted:#475640;--line:#bccdae;--accent:#2f7d32;--accent-soft:#d8ecd0;--strong:#1b4d1e;--strong-bg:#c9e6bf;--heading:#1b4d1e;--quote:#2f7d32;--code-bg:#112417;--mark:#e8e07a;--frame:#7da36a;--code-text:#eef3ff}
+body.theme-meadow{--orn-rgb:47,125,50}
+body.theme-coral{--c1:#d1432b;--c2:#1d6fa5;--c3:#2e7d4f;--c4:#a86a00;--c5:#8a3fa8;--c6:#0f7d8a;--on-c:#fff;--sh-x:-4px;--sh-y:4px;--sh-b:0px;--sh-s:0px;--sh-mix:.2;--sh-a:.3;--grid-k:.9;--grid-size:22px;--glass-min:.74;--bg:#fde3da;--surface:#fff9f6;--surface-2:#ffe8df;--text:#1f1412;--muted:#664c46;--line:#e6c3b9;--accent:#d1432b;--accent-soft:#fddcd2;--strong:#7a2314;--strong-bg:#fbcfc2;--heading:#7a2314;--quote:#d1432b;--code-bg:#2a1511;--mark:#ffd77a;--frame:#d98a76;--code-text:#eef3ff}
+body.theme-coral{--orn-rgb:209,67,43}
+body.theme-midnight{--c1:#6ea8ff;--c2:#ff8fa3;--c3:#6fd9a0;--c4:#f2c35c;--c5:#c39bff;--c6:#4fd8e0;--on-c:#fff;--sh-x:0px;--sh-y:0px;--sh-b:16px;--sh-s:0px;--sh-mix:0;--sh-a:.34;--grid-k:1;--grid-size:22px;--glass-min:.7;--shadow:0 18px 50px rgba(0,0,0,.7);--danger:#fb7185;--bg:#070b17;--surface:#0e1426;--surface-2:#161d35;--text:#e8ecfa;--muted:#a3acc9;--line:#29324f;--accent:#7fb2ff;--accent-soft:#15233f;--strong:#b9d4ff;--strong-bg:#1b2c52;--heading:#cfe0ff;--quote:#6ea8ff;--code-bg:#060914;--mark:#5b4a00;--frame:#6ea8ff;--code-text:#eef3ff}
+body.theme-midnight{--orn-rgb:110,168,255}
+body.theme-cyber{--c1:#2cf2b3;--c2:#ff5fa2;--c3:#b6f24a;--c4:#ffc83d;--c5:#a78bfa;--c6:#3cc8ff;--on-c:#fff;--sh-x:0px;--sh-y:0px;--sh-b:16px;--sh-s:0px;--sh-mix:0;--sh-a:.34;--grid-k:1;--grid-size:22px;--glass-min:.7;--shadow:0 18px 50px rgba(0,0,0,.7);--danger:#fb7185;--bg:#05070a;--surface:#0a0f14;--surface-2:#111a21;--text:#e6fff6;--muted:#9fc4b8;--line:#1f3a34;--accent:#2cf2b3;--accent-soft:#0c2a24;--strong:#8cffd9;--strong-bg:#0f3a30;--heading:#9dffe0;--quote:#2cf2b3;--code-bg:#03090a;--mark:#4a5a00;--frame:#2cf2b3;--code-text:#eef3ff}
+body.theme-cyber{--orn-rgb:44,242,179}
+
+/* soft themed atmosphere behind the page */
+body[class*="theme-"]{background-image:radial-gradient(1100px 520px at 88% -8%,color-mix(in srgb,var(--c1) 15%,transparent),transparent 62%),radial-gradient(900px 520px at -8% 108%,color-mix(in srgb,var(--c5) 13%,transparent),transparent 62%);background-attachment:fixed}
+/* headings: glossy sheen + marker dot */
+.reader .md h2{background-image:linear-gradient(115deg,rgba(255,255,255,.2),rgba(255,255,255,0) 58%)}
+.reader .md h2::before{content:"";display:inline-block;width:.36em;height:.36em;border-radius:50%;background:currentColor;opacity:.9;margin-inline-end:.6em;vertical-align:.12em;box-shadow:0 0 0 .17em color-mix(in srgb,currentColor 30%,transparent)}
+.reader .md blockquote.callout>.co-t{background-image:linear-gradient(115deg,rgba(255,255,255,.17),rgba(255,255,255,0) 60%)}
+.reader .md th{background-image:linear-gradient(180deg,rgba(255,255,255,.16),rgba(255,255,255,0))}
+.reader .md tbody tr{transition:background-color .18s}
+.reader .md tbody tr:hover td{background:color-mix(in srgb,var(--sc,var(--c1)) 13%,transparent)}
+.reader .md .table-wrap{border-color:color-mix(in srgb,var(--sc,var(--accent)) 38%,var(--line))}
+/* inline accents */
+.reader .md strong{box-shadow:inset 0 -2px 0 color-mix(in srgb,var(--hc,var(--accent)) 70%,transparent)}
+.reader .md em{text-decoration:underline dotted color-mix(in srgb,var(--hc,var(--accent)) 70%,transparent) 2px;text-underline-offset:5px}
+.reader .md :not(pre)>code{background:var(--cb,var(--accent-soft));border-color:color-mix(in srgb,var(--cc,var(--line)) 55%,transparent);color:var(--cd,var(--strong))}
+.reader .md hr::before{background-image:linear-gradient(90deg,transparent,var(--hc,rgba(176,141,62,.9)))}
+.reader .md hr::after{background-image:linear-gradient(90deg,var(--hc,rgba(176,141,62,.9)),transparent)}
+/* gentle entrance */
+@keyframes ultraIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+.reader .md>h2,.reader .md>blockquote,.reader .md>.table-wrap{animation:ultraIn .55s ease both}
+@media(prefers-reduced-motion:reduce){.reader .md>h2,.reader .md>blockquote,.reader .md>.table-wrap{animation:none}}
+/* reading progress */
+#rdProg{position:fixed;top:0;left:0;right:0;height:4px;z-index:60;transform-origin:right center;transform:scaleX(0);opacity:0;pointer-events:none;transition:opacity .2s;background:linear-gradient(90deg,var(--c1),var(--c2),var(--c4),var(--c3),var(--c6),var(--c5))}
+/* help modal: video button + notes */
+.hp-video{display:flex;align-items:center;justify-content:center;gap:.65em;min-height:52px;margin:0 0 12px;padding:8px 16px;border-radius:15px;font-weight:900;font-size:15.5px;text-decoration:none;color:#fff;background:linear-gradient(135deg,#e62117,#a60f08);box-shadow:0 7px 18px rgba(214,28,18,.32)}
+.hp-video:active{transform:translateY(1px)}
+.hp-intro b{color:var(--heading)}
+</style>
+<script id="ultra-v1-js">
+(function(){try{
+  var b=document.createElement('div');b.id='rdProg';b.setAttribute('aria-hidden','true');document.body.appendChild(b);
+  var rtl=getComputedStyle(document.documentElement).direction==='rtl';b.style.transformOrigin=rtl?'right center':'left center';
+  function upd(){
+    var rs=document.getElementById('readerScreen');
+    if(!rs||!rs.classList.contains('active')){b.style.opacity=0;return}
+    var h=document.documentElement,t=h.scrollTop||document.body.scrollTop,m=h.scrollHeight-h.clientHeight;
+    b.style.opacity=1;b.style.transform='scaleX('+(m>0?Math.min(1,Math.max(0,t/m)):0)+')';
+  }
+  addEventListener('scroll',upd,{passive:true});addEventListener('resize',upd);setInterval(upd,500);
+}catch(e){}})();
+</script>
+<style id="ultra-v2">
+/* ===== ULTRA v2: Markdown rendering made beautiful for every theme (study view; PDF pages untouched) ===== */
+/* plain paragraphs become soft section-coloured text cards */
+.reader .md>p{position:relative;margin:1.05em 0;padding:.62em 1em;border-radius:14px;
+  background:linear-gradient(270deg,color-mix(in srgb,var(--sc,var(--accent)) 8%,transparent),color-mix(in srgb,var(--sc,var(--accent)) 1.5%,transparent) 88%);
+  border-inline-start:4px solid color-mix(in srgb,var(--sc,var(--accent)) 55%,transparent)}
+.reader .md>p::first-line{font-weight:600}
+/* lead paragraph: the opening line under a title/section */
+.reader .md>p.u2-lead{font-size:1.07em;line-height:2;padding:.8em 1.15em;border-radius:18px;
+  background:linear-gradient(270deg,color-mix(in srgb,var(--sc,var(--accent)) 17%,transparent),color-mix(in srgb,var(--sc,var(--accent)) 3%,transparent) 92%);
+  border:1.5px solid color-mix(in srgb,var(--sc,var(--accent)) 35%,transparent);border-inline-start-width:7px;
+  box-shadow:0 6px 18px color-mix(in srgb,var(--sc,var(--accent)) 14%,transparent)}
+.reader .md>p.u2-lead::after{content:"";position:absolute;inset-inline-end:14px;top:-6px;width:34px;height:12px;border-radius:99px;background:var(--sc,var(--accent));opacity:.9}
+/* headings */
+.reader .md h1{text-shadow:var(--ink-tglow),3px 3px 0 color-mix(in srgb,var(--c1) 24%,transparent),6px 6px 0 color-mix(in srgb,var(--c5) 14%,transparent)}
+.reader .md h3{border-bottom:0;padding:.34em .85em;border-radius:14px;border-inline-start:6px solid var(--hc,var(--accent));
+  background:linear-gradient(270deg,var(--hb,var(--accent-soft)),transparent 92%);width:fit-content;max-width:100%;min-width:40%}
+.reader .md h4,.reader .md h5,.reader .md h6{border-inline-start:0;padding:.18em .75em;border-radius:999px;width:fit-content;max-width:100%;
+  background:var(--hb,var(--accent-soft));color:var(--hd,var(--heading));box-shadow:inset 0 0 0 1.5px color-mix(in srgb,var(--hc,var(--accent)) 55%,transparent)}
+/* inline smart tokens */
+.u2l{display:inline-block;padding:0 .75em;margin-inline-end:.15em;border-radius:999px;background:var(--cb,var(--accent-soft));color:var(--cd,var(--strong));
+  border:1.5px solid color-mix(in srgb,var(--cc,var(--accent)) 60%,transparent);font-weight:850;font-size:.93em;line-height:1.75;box-shadow:-2px 2px 0 color-mix(in srgb,var(--cc,var(--accent)) 25%,transparent)}
+.u2n{font-weight:800;font-variant-numeric:tabular-nums;color:color-mix(in srgb,var(--sc,var(--accent)) 62%,var(--text))}
+.u2e{display:inline-block;direction:ltr;unicode-bidi:isolate;padding:0 .45em;border-radius:8px;font-style:italic;font-size:.9em;line-height:1.7;font-family:var(--font-body);
+  color:color-mix(in srgb,var(--sc,var(--accent)) 52%,var(--text));background:color-mix(in srgb,var(--sc,var(--accent)) 11%,transparent);
+  box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--sc,var(--accent)) 28%,transparent)}
+.u2q{padding:0 .3em;border-radius:8px;font-weight:650;background:color-mix(in srgb,var(--sc,var(--accent)) 12%,transparent);box-shadow:inset 0 -2px 0 color-mix(in srgb,var(--sc,var(--accent)) 55%,transparent);-webkit-box-decoration-break:clone;box-decoration-break:clone}
+/* plain blockquote: big quote mark */
+.reader .md blockquote:not(.callout){position:relative;padding-inline-start:3.1em;font-weight:500}
+.reader .md blockquote:not(.callout)::before{content:"\201D";position:absolute;inset-inline-start:.28em;top:-.02em;font:900 4.2em/1 Georgia,serif;color:var(--hc,var(--accent));opacity:.28;pointer-events:none}
+/* tables: row-header column + soft shadow */
+.reader .md tbody tr td:first-child{font-weight:800;background:color-mix(in srgb,var(--sc,var(--accent)) 10%,transparent)}
+.reader .md .table-wrap{box-shadow:0 8px 22px color-mix(in srgb,var(--sc,var(--accent)) 16%,transparent),var(--box-sh) var(--ink-shadow)}
+/* code block: window dots + accent edge */
+.reader .md pre{position:relative;padding-top:2.35em;border-left:5px solid var(--sc,var(--accent))}
+.reader .md pre::before{content:"";position:absolute;left:14px;top:12px;width:10px;height:10px;border-radius:50%;background:#ff6b6b;box-shadow:16px 0 0 #ffc542,32px 0 0 #3ddc84}
+/* links */
+.reader .md a{text-decoration:none;border-bottom:2px solid color-mix(in srgb,var(--link,var(--accent)) 45%,transparent);font-weight:650;transition:background-color .15s}
+.reader .md a:hover{background:color-mix(in srgb,var(--link,var(--accent)) 12%,transparent);border-radius:4px}
+/* images */
+.reader .md img{border:5px solid var(--surface);box-shadow:0 10px 28px rgba(0,0,0,.2),0 0 0 1.5px color-mix(in srgb,var(--sc,var(--accent)) 40%,transparent)}
+/* task list as tiles */
+.reader .md li.task{padding-block:.42em!important;padding-inline:.9em!important;border-radius:13px;background:var(--hb,var(--accent-soft));
+  border:1.5px solid color-mix(in srgb,var(--hc,var(--accent)) 45%,transparent);box-shadow:-3px 3px 0 color-mix(in srgb,var(--hc,var(--accent)) 20%,transparent)}
+/* list items: soft hover lift */
+.reader .md ul>li,.reader .md ol:not(.fns)>li{transition:transform .15s}
+@media(hover:hover){.reader .md ul>li:hover,.reader .md ol:not(.fns)>li:hover{transform:translateX(-3px)}}
+@media(max-width:700px){.reader .md>p{padding:.55em .8em}.reader .md>p.u2-lead{padding:.7em .9em}}
+</style>
 </body>
 </html>
