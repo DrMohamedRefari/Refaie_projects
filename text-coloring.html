@@ -1990,9 +1990,12 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
       const cbEl=body.querySelector(':scope>.cb');
       const mark=cbEl||document.createElement('span');
       if(cbEl){cbEl.remove();mark.classList.add('li-mark')}else{
-      const art=!li.closest('.viz');
-      mark.className='li-mark'+(ordered?'':' dot')+(art?(ordered?' art ol':' art d'+(depth%3)):'');
-      mark.textContent=art?(ordered?(depth%2?String.fromCharCode(96+(((idx-1)%26+26)%26+1)):String(idx)):''):(ordered?String(idx):['\u25CF','\u25CB','\u25A0'][depth%3]);}
+      mark.className='li-mark'+(ordered?'':' dot');
+      if(li.closest('.viz')||list.classList.contains('fns')){mark.textContent=ordered?(li.closest('.viz')?String(idx):idx+'.'):['●','○','■'][depth%3]}
+      else{ /* parity with the study view: diamond / ring / bar bullets, numbered discs, lettered boxes */
+        mark.classList.add('am');mark.dataset.lv=String(Math.min(depth,2));
+        const ltr=n=>{let s='';n=Math.max(1,n);while(n>0){s=String.fromCharCode(97+((n-1)%26))+s;n=Math.floor((n-1)/26)}return s};
+        mark.textContent=ordered?(depth===0?String(idx):ltr(idx)):'';}}
       let run=null;Array.from(body.childNodes).forEach(nd=>{
         if(nd.nodeType===1&&/^(UL|OL)$/.test(nd.tagName)){run=null;return}
         if(!run){run=document.createElement('div');run.className='li-text';run.setAttribute('dir','auto');body.insertBefore(run,nd)}
@@ -2510,50 +2513,24 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
         if(rows.length&&ks.every(x=>Math.abs(x-ks[0])<.001)&&Math.abs(ks[0]-1)>.001)t.querySelectorAll('thead th,thead td').forEach(c=>{const a=parseFloat(getComputedStyle(c).fontSize),b=parseFloat(getComputedStyle(c.parentElement).fontSize)||a;if(a>0&&b>0)c.style.fontSize=(a/b*ks[0]).toFixed(4)+'em'})});
     }finally{try{tmp.removeChild(src)}catch(_){}stage.removeChild(tmp)}
   }
-  /* ---------- PDF ultra: the study view's extra colour + decorations, carried over to the PDF pages ----------
-     Same engines as the study view (ultraColor / ultraText), plus plain hex/rgba variables (no color-mix) so that BOTH PDF engines
-     (vector painter and html2canvas) can paint them. */
-  function pdfProbeVars(probe){
-    const cs=getComputedStyle(probe),o={};
-    ['--line','--surface','--surface-2','--text','--link'].forEach(n=>{const v=cs.getPropertyValue(n).trim();if(/^#(?:[0-9a-f]{3}|[0-9a-f]{6})$/i.test(v))o[n]=v});
-    return o;
-  }
-  function pdfUltra(src,pal,pv){
-    const hx=v=>/^#(?:[0-9a-f]{3}|[0-9a-f]{6})$/i.test(v||''),sv=(el,n,v)=>el.style.setProperty(n,v),gv=(el,n)=>(el.style.getPropertyValue(n)||'').trim();
-    /* 1) same text/colour passes as the study view (heading direction attributes are restored afterwards: the PDF layout already owns them) */
-    const hd=Array.from(src.querySelectorAll('h1,h2,h3,h4,h5,h6')).map(h=>[h,h.getAttribute('dir')]);
-    try{ultraColor(src,pal);ultraText(src,pal)}catch(e){console.error('pdf ultra',e)}
-    hd.forEach(([h,d])=>{if(d===null)h.removeAttribute('dir');else h.setAttribute('dir',d)});
-    /* 2) derived solid colours */
-    const S=pv['--surface']||pal.surface,S2=pv['--surface-2']||S,T=pv['--text']||pal.text,LN=pv['--line']||pal.muted;
-    Array.from(src.children).forEach(el=>{
-      const sc=gv(el,'--sc');if(!hx(sc))return;
-      sv(el,'--p7',mixHex(sc,S,.07));sv(el,'--p11',mixHex(sc,S,.11));
-      sv(el,'--sc16',rgba(sc,.16));sv(el,'--sc40',rgba(sc,.4));
-      sv(el,'--sc11a',rgba(sc,.11));sv(el,'--sc12a',rgba(sc,.12));sv(el,'--sc28a',rgba(sc,.28));sv(el,'--sc55a',rgba(sc,.55));
-      sv(el,'--u2n',mixHex(sc,T,.62));sv(el,'--u2e',mixHex(sc,T,.52));
-      sv(el,'--twb',mixHex(sc,LN,.38));sv(el,'--fc',mixHex(sc,S,.10));sv(el,'--fcz',mixHex(sc,S2,.10));
-    });
-    src.querySelectorAll('[style*="--hc"]').forEach(el=>{
-      const hc=gv(el,'--hc');if(!hx(hc))return;
-      sv(el,'--hc18',rgba(hc,.18));sv(el,'--hc20',rgba(hc,.2));sv(el,'--hc30',rgba(hc,.3));sv(el,'--hc45',rgba(hc,.45));sv(el,'--hc55',rgba(hc,.55));sv(el,'--hc70',rgba(hc,.7));
-      const on=gv(el,'--hon');if(el.tagName==='H2'&&hx(on))sv(el,'--hon30',rgba(on,.3));
-      const hb=gv(el,'--hb');if(hx(hb))sv(el,'--hb0',rgba(hb,0)); // fully transparent in the same hue (html2canvas fades to grey with plain 'transparent')
-    });
-    src.querySelectorAll('[style*="--cc"]').forEach(el=>{
-      const cc=gv(el,'--cc');if(!hx(cc))return;
-      sv(el,'--cc25',rgba(cc,.25));sv(el,'--cc55',rgba(cc,.55));sv(el,'--cc60',rgba(cc,.6));
-    });
-    const n=pal.colors.length;
-    src.querySelectorAll('h1').forEach(h=>{sv(h,'--h1s1',rgba(pal.colors[0],.24));sv(h,'--h1s2',rgba(pal.colors[4%n],.14))});
-  }
+  /* html2canvas (image fallback) cannot parse the color(srgb …) values that color-mix() resolves to: freeze them as rgba() rules first */
+  function freezeColors(root){
+    const P=['color','backgroundColor','borderTopColor','borderRightColor','borderBottomColor','borderLeftColor','textDecorationColor','boxShadow','textShadow','backgroundImage'];
+    const kb=p=>p.replace(/[A-Z]/g,m=>'-'+m.toLowerCase());
+    const cv=m=>m.replace(/color\(srgb ([\d.e-]+) ([\d.e-]+) ([\d.e-]+)(?: \/ ([\d.e-]+))?\)/g,(x,r,g,b,a)=>'rgba('+Math.round(r*255)+','+Math.round(g*255)+','+Math.round(b*255)+','+(a===undefined?1:a)+')');
+    let n=0,css='';
+    [root,...root.querySelectorAll('*')].forEach(e=>{['','::before','::after'].forEach(ps=>{
+      const c=getComputedStyle(e,ps||null);let d='';
+      P.forEach(p=>{const v=c[p];if(v&&v.indexOf('color(')>=0)d+=kb(p)+':'+cv(v)+'!important;'});
+      if(d){let id=e.getAttribute('data-fz');if(!id){id=String(++n);e.setAttribute('data-fz',id)}css+='[data-fz="'+id+'"]'+ps+'{'+d+'}'}})});
+    const st=document.createElement('style');st.textContent=css;document.head.appendChild(st);return st}
   function paginateDoc(stage,brand){
       const light=(document.body.classList.contains('theme-night')||document.body.classList.contains('theme-amoled')||document.body.classList.contains('theme-midnight')||document.body.classList.contains('theme-cyber'))?' pdf-light':'';
       const probe=document.createElement('div');probe.className='pdf-page'+light;stage.appendChild(probe);
-      const inkMap=inkApply(probe);const pal=readPalette(probe);const pv=pdfProbeVars(probe);try{if(pv['--link'])inkMap['--link45']=rgba(pv['--link'],.45)}catch(_){}stage.removeChild(probe);
+      const inkMap=inkApply(probe);const pal=readPalette(probe);stage.removeChild(probe);
       const src=document.createElement('div');
       src.innerHTML=renderMarkdown(input.value);
-      applyDir(src);colorize(src,pal);try{pdfUltra(src,pal,pv)}catch(e){console.error(e)}prepPdfLists(src);
+      applyDir(src);colorize(src,pal);try{ultraColor(src,pal);ultraText(src,pal)}catch(_){}prepPdfLists(src);
       const BASE=15*pdfZoom,fs=s=>(BASE*s).toFixed(2)+'px'; // base font of the PDF page body (15px at 100%)
       fitTables(src,PB.w,BASE); // page body width (PW - 2*margin) in logical px
       src.querySelectorAll('.li-text,p,pre,tbody tr,hr,img,h1,h2,h3,h4,h5,h6').forEach((e,i)=>{e.dataset.bk=String(i)}); // stable line ids for manual page breaks
@@ -2683,7 +2660,7 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
       const seenLi=new Set();
       pages.forEach((p,i)=>{
         p.querySelector('.pg-num').textContent=(i+1)+' / '+pages.length;
-        p.querySelectorAll('li[data-lid]').forEach(li=>{const id=li.dataset.lid;if(seenLi.has(id)){const mk=li.firstElementChild;mk.style.cssText+=';visibility:hidden;opacity:0;background:none;border-color:transparent;box-shadow:none;color:transparent'}else seenLi.add(id)});
+        p.querySelectorAll('li[data-lid]').forEach(li=>{const id=li.dataset.lid;if(seenLi.has(id))li.firstElementChild.style.visibility='hidden';else seenLi.add(id)});
       });
       const mkToc=()=>{ // blank page with the same frame / strip / footer as the content pages (used by the table of contents)
         const pg=document.createElement('div');pg.className='pdf-page'+light;pg.style.setProperty('--frame',pal.frame);inkSet(pg,inkMap);
@@ -2896,13 +2873,13 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
         const key=pg.dataset.pg,isCv=key==='cover';
         if(!isCv){pg.querySelector('.pg-l').textContent=brand[0];pg.querySelector('.pg-link').textContent=brand[1];try{if(window.__pdfHlFix)window.__pdfHlFix(pg)}catch(e){console.error(e)}}
         const imgInfo=isCv?null:await pdfImgPrep(pg);
+        let fz=null;pg.classList.add('fb-img');try{fz=freezeColors(pg)}catch(e){console.error(e)}
         try{
           return await html2canvas(pg,{
             scale:scale,backgroundColor:'#ffffff',useCORS:true,logging:false,
             width:PW,height:PGH,windowWidth:PW,windowHeight:PGH,scrollX:0,scrollY:0,x:0,y:0,
             onclone:doc=>{
               const q=doc.querySelector('[data-pg="'+key+'"]');
-              {const us=doc.getElementById('pdf-ultra');if(us)doc.head.appendChild(us)} // body <style>s are dropped below; keep the PDF decorations
               doc.body.replaceChildren(q);if(imgInfo)pdfImgApply(doc,q,imgInfo);
               doc.body.style.cssText='margin:0;padding:0;overflow:visible';
               doc.documentElement.style.cssText='margin:0;padding:0;overflow:visible;'+rootVars; // the cloned <html> loses the page-geometry variables otherwise
@@ -2913,7 +2890,7 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
           console.error(e);
           if(isCv){coverFailed=true;return null}
           throw userErr('تعذّر رسم الصفحة '+(pg.i+1)+' من '+pages.length+'. حاول مرة أخرى أو قسّم المحتوى.');
-        }
+        }finally{pg.classList.remove('fb-img');if(fz)fz.remove()}
       };
       let n=0,firstSheet=true;
       for(const sh of sheets){
@@ -5524,7 +5501,7 @@ class Doc{
   async rawStream(id,dict,data,filter){this.offs[id]=this.len;this.push(id+' 0 obj\n'+dict.replace(/>>$/,'')+(filter?'/Filter/'+filter:'')+'/Length '+data.length+'>>\nstream\n');this.push(data);this.push('\nendstream\nendobj\n')}
   async rawParts(id,dict,chunks,filter){let n=0;for(const c of chunks)n+=c.length;this.offs[id]=this.len;this.push(id+' 0 obj\n'+dict.replace(/>>$/,'')+(filter?'/Filter/'+filter:'')+'/Length '+n+'>>\nstream\n');for(const c of chunks)this.push(c);this.push('\nendstream\nendobj\n')}
   fontRef(k){ // lazily reserve the Type0 font object ids (written in finish)
-    if(!this.fontRefs)this.fontRefs={};return this.fontRefs[k]||(this.fontRefs[k]=this.alloc())}
+    if(!this.fontRefs)this.fontRefs={};if(/z$/.test(k)&&FACES[k.slice(0,-1)])this.fontRef(k.slice(0,-1));return this.fontRefs[k]||(this.fontRefs[k]=this.alloc())}
   gsRef(a){const k=nf(a);let r=this.gs.get(k);if(!r){r={id:this.alloc(),n:'G'+this.gs.size};this.gs.set(k,r);this.obj(r.id,'<</Type/ExtGState/ca '+k+'/CA '+k+'>>')}return r}
   async addPage(content,res,links){
     const cid=this.alloc(),pid=this.alloc();await this.obj(cid,'<<>>',lat1(content));
@@ -5534,7 +5511,8 @@ class Doc{
   async finish(){
     if(this.sheet)await this.flushSheet();
     const fr=this.fontRefs||{},fontIds={};
-    for(const k of Object.keys(fr)){fontIds[k]=fr[k];const F=FACES[k];await this.writeFont(F,fr[k])}
+    for(const k of Object.keys(fr)){if(/z$/.test(k)&&FACES[k.slice(0,-1)])continue;fontIds[k]=fr[k];const F=FACES[k];await this.writeFont(F,fr[k])}
+    for(const k of Object.keys(fr)){if(!(/z$/.test(k)&&FACES[k.slice(0,-1)]))continue;fontIds[k]=fr[k];await this.writeFontZ(FACES[k.slice(0,-1)].zf,fr[k])}
     for(const q of this.dl||[]){const tp=this.pages[q.d];await this.obj(q.id,'<</Type/Annot/Subtype/Link/Rect['+q.r+']/Border[0 0 0]'+(tp?'/Dest['+tp.id+' 0 R/XYZ null '+nf(Math.max(0,Math.min(G.PH,G.PH-q.dy*G.SY)))+' null]':'')+'>>')}
     for(const p of this.pages){const fonts=Object.keys(fr).map(k=>'/F'+k+' '+fr[k]+' 0 R').join('');
       const gs=[...this.gs.values()].map(g=>'/'+g.n+' '+g.id+' 0 R').join('');
@@ -5546,8 +5524,13 @@ class Doc{
     const xr=this.len;let s='xref\n0 '+(this.n+1)+'\n0000000000 65535 f \n';for(let i=1;i<=this.n;i++)s+=String(this.offs[i]||0).padStart(10,'0')+' 00000 '+(this.offs[i]?'n':'f')+' \n';
     this.push(s+'trailer\n<</Size '+(this.n+1)+'/Root 1 0 R/Info '+info+' 0 R>>\nstartxref\n'+xr+'\n%%EOF\n');
     return new Blob(this.parts,{type:'application/pdf'})}
+  async writeFontZ(Fz,id){ // same glyphs/outlines as the base font, but every code maps to U+200C: shadow copies never appear in copied or searched text
+    const tu=this.alloc(),ents=[...Fz.uni.keys()].sort((a,b)=>a-b);let cm='/CIDInit /ProcSet findresource begin 12 dict begin begincmap /CIDSystemInfo<</Registry(Adobe)/Ordering(UCS)/Supplement 0>> def /CMapName/Adobe-Identity-UCS def /CMapType 2 def 1 begincodespacerange <0000> <FFFF> endcodespacerange\n';
+    for(let i=0;i<ents.length;i+=100){const ch=ents.slice(i,i+100);cm+=ch.length+' beginbfchar\n'+ch.map(g=>'<'+hex(g,4)+'> <200C>').join('\n')+'\nendbfchar\n'}
+    cm+='endcmap CMapName currentdict /CMap defineresource pop end end';await this.obj(tu,'<<>>',lat1(cm));
+    await this.obj(id,'<</Type/Font/Subtype/Type0/BaseFont/'+Fz.name+'/Encoding/Identity-H/DescendantFonts['+this.cidfs[Fz.base.k]+' 0 R]/ToUnicode '+tu+' 0 R>>')}
   async writeFont(F,id){
-    const desc=this.alloc(),cidf=this.alloc(),tu=this.alloc(),ff=this.alloc();
+    const desc=this.alloc(),cidf=this.alloc(),tu=this.alloc(),ff=this.alloc();(this.cidfs||(this.cidfs={}))[F.k]=cidf;
     const t=F.tb,fb=F.cff?F.bytes.subarray(t['CFF '].off,t['CFF '].off+t['CFF '].len):F.bytes;
     await this.obj(ff,F.cff?'<</Subtype/CIDFontType0C>>':'<</Length1 '+fb.length+'>>',fb);
     await this.obj(desc,'<</Type/FontDescriptor/FontName/'+F.name+'/Flags 4/FontBBox['+F.bbox.join(' ')+']/ItalicAngle 0/Ascent '+F.asc+'/Descent '+F.desc+'/CapHeight '+Math.round(F.asc*.7)+'/StemV 80/'+(F.cff?'FontFile3 ':'FontFile2 ')+ff+' 0 R>>');
@@ -5559,7 +5542,8 @@ class Doc{
     await this.obj(id,'<</Type/Font/Subtype/Type0/BaseFont/'+F.name+'/Encoding/Identity-H/DescendantFonts['+cidf+' 0 R]/ToUnicode '+tu+' 0 R>>');
     this.stats.conf+=F.conf}
 }
-W.PDFV={ORDER:'visual',load,Doc,G,setGeom,nf,lat1,deflate,faces:()=>FACES,hb:()=>HB,faceFor,inR,EN_R,AR_R,ready:()=>!!HB};
+const shadowFace=F=>F.zf||(F.zf=Object.assign(Object.create(F),{k:F.k+'z',uni:new Map(),conf:0,used:0,base:F}));
+W.PDFV={shadowFace,ORDER:'visual',load,Doc,G,setGeom,nf,lat1,deflate,faces:()=>FACES,hb:()=>HB,faceFor,inR,EN_R,AR_R,ready:()=>!!HB};
 })();
 
 (function(){
@@ -5645,9 +5629,28 @@ class Painter{
       const outside=(e)=>shp(e)+rr(x,y,w,h,r);
       if(bl<.5)this.fillPath(outside(sp),col,op,true);
       else{const K=5;for(let k=0;k<K;k++){const e=sp-bl+2*bl*(k+.5)/K;this.fillPath(outside(e),[col[0],col[1],col[2],col[3]/K],op,true)}}})}
+  shadowIn(cs,x,y,w,h,r,op){const v=cs.boxShadow;if(!v||v==='none'||!/inset/.test(v))return;
+    splitTop(v).filter(s=>/inset/.test(s)).reverse().forEach(s=>{const cm=/(rgba?\([^)]*\)|color\([^)]*\))/.exec(s);if(!cm)return;const col=pcol(cm[1]),nums=s.replace(cm[1],'').replace('inset','').trim().split(/\s+/).map(parseFloat);
+      const ox=nums[0]||0,oy=nums[1]||0,bl=nums[2]||0,sp=nums[3]||0;if(bl>.5||col[3]<=.002)return;
+      const ri=r.map(v=>Math.max(0,v-sp));this.o('q '+rr(x,y,w,h,r)+'W n ');this.fillPath(rr(x,y,w,h,r)+rr(x+ox+sp,y+oy+sp,Math.max(0,w-2*sp),Math.max(0,h-2*sp),ri),col,op,true);this.o('Q ')})}
+  /* dashed / dotted single borders (stroked along the border centre line) */
+  dashSides(x,y,w,h,bw,st,co,ok,op){const L=[[x,y+bw[0]/2,x+w,y+bw[0]/2],[x+w-bw[1]/2,y,x+w-bw[1]/2,y+h],[x,y+h-bw[2]/2,x+w,y+h-bw[2]/2],[x+bw[3]/2,y,x+bw[3]/2,y+h]];
+    for(let i=0;i<4;i++){if(!ok[i]||(st[i]!=='dashed'&&st[i]!=='dotted'))continue;const t=bw[i],c=co[i],dot=st[i]==='dotted';
+      this.alpha(c[3]*op,()=>this.o('q '+rg(c)+' RG '+nf(t)+' w '+(dot?'1 J [0 '+nf(t*2)+'] 0 d ':'0 J ['+nf(t*3)+' '+nf(t*2)+'] 0 d ')+nf(L[i][0])+' '+nf(L[i][1])+' m '+nf(L[i][2])+' '+nf(L[i][3])+' l S Q '))}}
+  /* repeating 1px grid lines (study-view graph paper): drawn as thin rectangles, no per-tile shading */
+  gridLines(arg,tx,ty,tw,th,ow,oh,ox,oy){const a=splitTop(arg);let ang=180,i=0;if(/^-?[\d.]+deg$/.test(a[0])){ang=parseFloat(a[0]);i=1}
+    const st=a.slice(i);if(st.length!==2)return null;const p=st.map(q=>{const m=/^(.*?)\s+(-?[\d.]+)px$/.exec(q.trim());return m?{c:pcol(m[1]),l:parseFloat(m[2])}:null});
+    if(!p[0]||!p[1]||p[0].l!==p[1].l||p[0].l>4||p[0].l<=0||p[1].c[3]>.002||p[0].c[3]<=.002||!(tw>2)||!(th>2))return null;
+    const L=p[0].l;let path='';
+    if(ang===180){for(let yy=ty;yy<oy+oh;yy+=th)path+=nf(ox)+' '+nf(yy)+' '+nf(ow)+' '+nf(L)+' re '}
+    else if(ang===90){for(let xx=tx;xx<ox+ow;xx+=tw)path+=nf(xx)+' '+nf(oy)+' '+nf(L)+' '+nf(oh)+' re '}
+    else return null;return {path,col:p[0].c}}
+  /* text-shadow copies (hard offsets only) */
+  tshadows(cs){const v=cs.textShadow;if(!v||v==='none')return [];return splitTop(v).map(s=>{const cm=/(rgba?\([^)]*\)|color\([^)]*\))/.exec(s);if(!cm)return null;const n=s.replace(cm[1],'').trim().split(/\s+/).map(parseFloat);return {col:pcol(cm[1]),x:n[0]||0,y:n[1]||0,bl:n[2]||0}}).filter(o=>o&&o.col[3]>.002&&o.bl<=.5&&(o.x||o.y)).reverse()}
   borders(cs,x,y,w,h,r,op){
     const S=['Top','Right','Bottom','Left'],bw=S.map(s=>parseFloat(cs['border'+s+'Width'])||0),st=S.map(s=>cs['border'+s+'Style']),co=S.map(s=>pcol(cs['border'+s+'Color']));
-    const ok=bw.map((v,i)=>v>.05&&st[i]!=='none'&&st[i]!=='hidden'&&co[i][3]>.002);if(!ok.some(Boolean))return;
+    let ok=bw.map((v,i)=>v>.05&&st[i]!=='none'&&st[i]!=='hidden'&&co[i][3]>.002);if(!ok.some(Boolean))return;
+    if(ok.some((v,i)=>v&&(st[i]==='dashed'||st[i]==='dotted'))){this.dashSides(x,y,w,h,bw,st,co,ok,op);ok=ok.map((v,i)=>v&&st[i]!=='dashed'&&st[i]!=='dotted');if(!ok.some(Boolean))return}
     const ix=x+bw[3],iy=y+bw[0],iw=Math.max(0,w-bw[3]-bw[1]),ih=Math.max(0,h-bw[0]-bw[2]);
     const ir=[Math.max(0,r[0]-bw[3]),Math.max(0,r[1]-bw[0]),Math.max(0,r[2]-bw[1]),Math.max(0,r[3]-bw[0]),Math.max(0,r[4]-bw[1]),Math.max(0,r[5]-bw[2]),Math.max(0,r[6]-bw[3]),Math.max(0,r[7]-bw[2])];
     const ring=rr(x,y,w,h,r)+rr(ix,iy,iw,ih,ir);
@@ -5673,6 +5676,7 @@ class Painter{
       else{tw=len(size[0],ow);th=len(size[1]===undefined?'auto':size[1],oh);if(tw===null&&th===null){if(nat){tw=nat.w;th=nat.h}else{tw=ow;th=oh}}else if(tw===null)tw=nat?th*nat.w/nat.h:ow;else if(th===null)th=nat?tw*nat.h/nat.w:oh}
       const px=len(pos[0],ow-tw),py=len(pos[1]===undefined?'50%':pos[1],oh-th);
       const tx=ox+(pos[0].endsWith('%')?(ow-tw)*parseFloat(pos[0])/100:parseFloat(pos[0])),ty=oy+(pos[1]&&pos[1].endsWith('%')?(oh-th)*parseFloat(pos[1])/100:parseFloat(pos[1]||'50%'));
+      if(m&&m[1]==='linear'&&!/no-repeat/.test(rp[i%rp.length]||'')){const gl=this.gridLines(m[2],tx,ty,tw,th,ow,oh,ox,oy);if(gl){this.o('q '+rr(x,y,w,h,r)+'W n ');this.fillPath(gl.path,gl.col,op);this.o('Q ');continue}}
       this.o('q '+rr(x,y,w,h,r)+'W n '+nf(Math.max(tx,x))+' '+nf(Math.max(ty,y))+' '+nf(Math.min(tw,w))+' '+nf(Math.min(th,h))+' re W n ');
       if(um)this.drawImg(nat,tx,ty,tw,th,op);
       else if(m[1]==='linear')this.linear(m[2],tx,ty,tw,th,op);
@@ -5693,7 +5697,7 @@ class Painter{
     if(/^(SCRIPT|STYLE|BR|WBR|TEMPLATE|NOSCRIPT)$/.test(tag)||e.classList.contains('xfw'))return;
     const op=ctx.op*(parseFloat(cs.opacity));if(op<=.002)return;
     const vis=cs.visibility!=='hidden',inl=cs.display==='inline',contents=cs.display==='contents';
-    let deco=ctx.deco;const dl=cs.textDecorationLine;if(dl&&dl!=='none')deco=(deco||[]).concat([{u:/underline/.test(dl),s:/line-through/.test(dl),c:pcol(cs.textDecorationColor||cs.color)}]);
+    let deco=ctx.deco;const dl=cs.textDecorationLine;if(dl&&dl!=='none')deco=(deco||[]).concat([{u:/underline/.test(dl),s:/line-through/.test(dl),c:pcol(cs.textDecorationColor||cs.color),st:cs.textDecorationStyle,th:parseFloat(cs.textDecorationThickness)||0,of:parseFloat(cs.textUnderlineOffset)||0}]);
     const c2={op,deco,hd:ctx.hd};
     if(contents){this.kids(e,c2);return}
     let rects;
@@ -5711,11 +5715,12 @@ class Painter{
     const ovf=cs.overflowX!=='visible'||cs.overflowY!=='visible';
     if(vis&&!inl){const r0=rects[0],R=radii(cs,r0.w,r0.h);
       this.shadow(cs,r0.x,r0.y,r0.w,r0.h,R,op);
-      this.layers(cs,r0.x,r0.y,r0.w,r0.h,R,op);this.borders(cs,r0.x,r0.y,r0.w,r0.h,R,op)}
-    else if(vis&&inl){rects.forEach(r0=>{const R=radii(cs,r0.w,r0.h);this.layers(cs,r0.x,r0.y,r0.w,r0.h,R,op);this.borders(cs,r0.x,r0.y,r0.w,r0.h,R,op)})}
+      this.layers(cs,r0.x,r0.y,r0.w,r0.h,R,op);this.shadowIn(cs,r0.x,r0.y,r0.w,r0.h,R,op);this.borders(cs,r0.x,r0.y,r0.w,r0.h,R,op)}
+    else if(vis&&inl){rects.forEach(r0=>{const R=radii(cs,r0.w,r0.h);this.layers(cs,r0.x,r0.y,r0.w,r0.h,R,op);this.shadowIn(cs,r0.x,r0.y,r0.w,r0.h,R,op);this.borders(cs,r0.x,r0.y,r0.w,r0.h,R,op)})}
     if(vis&&tag==='IMG')this.image(e,cs,rects[0],op);
     if(ovf&&!inl){const r0=rects[0],R=radii(cs,r0.w,r0.h),bw=['Top','Right','Bottom','Left'].map(s=>parseFloat(cs['border'+s+'Width'])||0);
-      this.o('q '+rr(r0.x+bw[3],r0.y+bw[0],r0.w-bw[1]-bw[3],r0.h-bw[0]-bw[2],R.map((v,i)=>Math.max(0,v-bw[[3,0,1,0,1,2,3,2][i]])))+'W n ');q++}
+      const cmg=cs.overflowX==='clip'?(parseFloat((/(-?[\d.]+)px/.exec(cs.overflowClipMargin)||[])[1])||0):0;
+      this.o('q '+(cmg>0?rr(r0.x+bw[3]-cmg,r0.y+bw[0]-cmg,r0.w-bw[1]-bw[3]+2*cmg,r0.h-bw[0]-bw[2]+2*cmg,null):rr(r0.x+bw[3],r0.y+bw[0],r0.w-bw[1]-bw[3],r0.h-bw[0]-bw[2],R.map((v,i)=>Math.max(0,v-bw[[3,0,1,0,1,2,3,2][i]]))))+'W n ');q++}
     if(tag!=='IMG')this.kids(e,Object.assign({},c2,{cs}));
     while(q--)this.o('Q ')}
   kids(e,ctx){
@@ -5728,17 +5733,10 @@ class Painter{
     if(fit==='contain'||fit==='scale-down'){const k=Math.min(w/rec.w,h/rec.h);dw=rec.w*k;dh=rec.h*k}else if(fit==='cover'){const k=Math.max(w/rec.w,h/rec.h);dw=rec.w*k;dh=rec.h*k}else if(fit==='none'){dw=rec.w;dh=rec.h}
     this.o('q '+rr(x,y,w,h,radii(cs,w,h))+'W n ');this.drawImg(rec,x+(w-dw)/2,y+(h-dh)/2,dw,dh,op);this.o('Q ')}
   /* ---- text ---- */
-  text(tn,ctx){ /* text-shadow (solid offset shadows, e.g. the study-view title shadow): the same glyphs drawn first, shifted, in the shadow colour; hidden from text extraction */
-    try{const el0=tn.parentElement,cs0=getComputedStyle(el0),ts=cs0.textShadow;
-      if(ts&&ts!=='none'&&cs0.visibility!=='hidden')splitTop(ts).reverse().forEach(sd=>{
-        const cm=/(rgba?\([^)]*\)|color\([^)]*\))/.exec(sd);if(!cm)return;const col=pcol(cm[1]),nm=sd.replace(cm[1],'').trim().split(/\s+/).map(parseFloat);
-        const ox=nm[0]||0,oy=nm[1]||0,bl=nm[2]||0;if(col[3]<=.01||bl>.5||(!ox&&!oy))return;
-        this.o('q 1 0 0 1 '+nf(ox)+' '+nf(oy)+' cm /Span<</ActualText<FEFF>>>BDC ');this.text0(tn,ctx,{col});this.o('EMC Q ')})}catch(e){console.warn('text-shadow',e)}
-    this.text0(tn,ctx)}
-  text0(tn,ctx,ov){
+  text(tn,ctx){
     const el=tn.parentElement,cs=getComputedStyle(el);if(cs.visibility==='hidden')return;
     const fs=parseFloat(cs.fontSize),fam=cs.fontFamily,mk=/MK (Head|Body)/.exec(fam),head=!!mk&&mk[1]==='Head',primMK=/^\s*"MK (Head|Body) EN"/.test(fam);
-    const bold=!head&&(parseInt(cs.fontWeight)||400)>=600,s=tn.data,rgn=document.createRange(),col=ov?ov.col:pcol(cs.webkitTextFillColor&&cs.webkitTextFillColor!==cs.color&&!/^rgba?\(0, 0, 0, 0\)/.test(cs.webkitTextFillColor)?cs.webkitTextFillColor:cs.color),tt=cs.textTransform,ls=parseFloat(cs.letterSpacing)||0;
+    const bold=!head&&(parseInt(cs.fontWeight)||400)>=600,s=tn.data,rgn=document.createRange(),col=pcol(cs.webkitTextFillColor&&cs.webkitTextFillColor!==cs.color&&!/^rgba?\(0, 0, 0, 0\)/.test(cs.webkitTextFillColor)?cs.webkitTextFillColor:cs.color),tt=cs.textTransform,ls=parseFloat(cs.letterSpacing)||0;
     const L=[];let cur=null,lastMid=-1e9;
     for(let i=0;i<s.length;i++){let c=s.charCodeAt(i);if(c===10||c===13||c===9&&false)continue;if(c>=0xd800&&c<=0xdfff){i++;continue}
       rgn.setStart(tn,i);rgn.setEnd(tn,i+1);let r=null;const rs=rgn.getClientRects();for(let k=0;k<rs.length;k++)if(rs[k].height>0&&(rs[k].width>0||MARK.test(s[i]))){r=rs[k];break}
@@ -5775,9 +5773,12 @@ class Painter{
           if(!rn||d!==lastD||brk){rn={d,ch:[]};runs.push(rn);lastD=d}rn.ch.push(k)}
         for(const rn of runs)this.run(tk.F,rn,fs,col,ctx,base,cs,ls,head,primMK);
       }
-      if(P.ORDER==='visual')items.sort((p,q)=>p.x-q.x);else if(P.ORDER==='desc')items.sort((p,q)=>q.x-p.x);for(const it of items)this.emit(...it.a);this.__buf=null;
+      if(P.ORDER==='visual')items.sort((p,q)=>p.x-q.x);else if(P.ORDER==='desc')items.sort((p,q)=>q.x-p.x);
+      for(const sd of this.tshadows(cs))for(const it of items){const a=it.a;this.emit(P.shadowFace(a[0]),a[1],sd.col,a[3],a[4].map(g=>({g:g.g,x:g.x+sd.x,y:g.y,uni:'\u200c'})),a[5]+sd.y,a[6])}
+      for(const it of items)this.emit(...it.a);this.__buf=null;
       if(ctx.deco){const x0=Math.min(...vis.map(k=>k.r.l)),x1=Math.max(...vis.map(k=>k.r.r)),th=Math.max(.8,fs*.04);
-        ctx.deco.forEach(d=>{if(d.u)this.fillPath(nf(x0)+' '+nf(base+fs*.1)+' '+nf(x1-x0)+' '+nf(th)+' re ',d.c,ctx.op);if(d.s)this.fillPath(nf(x0)+' '+nf(base-fs*.30)+' '+nf(x1-x0)+' '+nf(th)+' re ',d.c,ctx.op)})}
+        ctx.deco.forEach(d=>{const tk=d.th>0?d.th:th,line=(y)=>{if(d.st==='dotted'||d.st==='dashed'){const on=d.st==='dotted'?tk:tk*3,gap=d.st==='dotted'?tk:tk*2;let p='';for(let xx=x0;xx<x1;xx+=on+gap)p+=nf(xx)+' '+nf(y)+' '+nf(Math.min(on,x1-xx))+' '+nf(tk)+' re ';this.fillPath(p,d.c,ctx.op)}else this.fillPath(nf(x0)+' '+nf(y)+' '+nf(x1-x0)+' '+nf(tk)+' re ',d.c,ctx.op)};
+          if(d.u)line(base+(d.of>0?d.of:fs*.1));if(d.s)line(base-fs*.30)})}
     }}
   shape(k,fs,base,col,ctx){const cp=k.c,cx=(k.r.l+k.r.r)/2,cw=k.r.r-k.r.l,d=Math.min(cw*.9,fs*.62),cy=base-fs*.34,r=d/2,K=.5523*r;
     const circ=(R,KK)=>nf(cx+R)+' '+nf(cy)+' m '+nf(cx+R)+' '+nf(cy+KK)+' '+nf(cx+KK)+' '+nf(cy+R)+' '+nf(cx)+' '+nf(cy+R)+' c '+nf(cx-KK)+' '+nf(cy+R)+' '+nf(cx-R)+' '+nf(cy+KK)+' '+nf(cx-R)+' '+nf(cy)+' c '+nf(cx-R)+' '+nf(cy-KK)+' '+nf(cx-KK)+' '+nf(cy-R)+' '+nf(cx)+' '+nf(cy-R)+' c '+nf(cx+KK)+' '+nf(cy-R)+' '+nf(cx+R)+' '+nf(cy-KK)+' '+nf(cx+R)+' '+nf(cy)+' c h ';
@@ -6079,63 +6080,79 @@ body[class*="theme-"]{background-image:radial-gradient(1100px 520px at 88% -8%,c
 @media(hover:hover){.reader .md ul>li:hover,.reader .md ol:not(.fns)>li:hover{transform:translateX(-3px)}}
 @media(max-width:700px){.reader .md>p{padding:.6em .9em}.reader .md>p.u2-lead{padding:.7em 1em}}
 </style>
-<style id="pdf-ultra">
-/* ===== PDF ULTRA: everything beautiful in the study view (themes, headings, tables, lists, chips, code, quotes ...) now also on the PDF pages.
-   Colours come from variables computed in JS (no color-mix) so the vector exporter AND the image exporter can paint them. ===== */
-.pdf-page .md{--box-sh:var(--sh-x,-4px) var(--sh-y,4px) var(--sh-b,0px) var(--sh-s,0px)}
-/* shadows that follow the theme (offset, soft or glow) */
-.pdf-page .md h2{box-shadow:var(--box-sh) var(--hs,var(--ink-shadow,rgba(40,40,40,.3)));background-image:linear-gradient(115deg,rgba(255,255,255,.2),rgba(255,255,255,0) 58%)}
-.pdf-page .md blockquote{box-shadow:var(--box-sh) var(--hs,var(--ink-shadow,rgba(40,40,40,.3)))}
-.pdf-page .md pre{box-shadow:var(--box-sh) var(--ink-shadow,rgba(40,40,40,.3))}
-.pdf-page .md h2::before{content:"";display:inline-block;width:.36em;height:.36em;border-radius:50%;background:currentColor;opacity:.9;margin-inline-end:.6em;vertical-align:.12em;box-shadow:0 0 0 .17em var(--hon30,rgba(255,255,255,.3))}
-/* title shadow */
-.pdf-page .md h1{text-shadow:3px 3px 0 var(--h1s1,rgba(0,0,0,0)),6px 6px 0 var(--h1s2,rgba(0,0,0,0))}
-/* sub-headings: accent bar + soft fade, direction-aware */
+<style id="pdf-parity">
+/* ===== PDF parity: every decoration of the study view (.reader .md) is applied to the exported pages (.pdf-page .md) too =====
+   Pseudo-elements are materialised by the PDFV painter; counters are replaced by real .li-mark elements (see prepPdfLists). */
+.pdf-page{--grid-img:linear-gradient(var(--grid-line) 1px,transparent 1px),linear-gradient(90deg,var(--grid-line) 1px,transparent 1px);--box-sh:var(--sh-x) var(--sh-y) var(--sh-b) var(--sh-s)}
+@supports (overflow-clip-margin:1px){.pdf-page .pg-body{overflow:clip;overflow-clip-margin:12px}}
+body.theme-royal .pdf-page:not(.pdf-light){background-image:var(--grid-img);background-size:var(--grid-size) var(--grid-size);background-color:var(--surface)}
+/* ---- headings ---- */
+.pdf-page .md h1{text-shadow:var(--ink-tglow),3px 3px 0 color-mix(in srgb,var(--c1) 24%,transparent),6px 6px 0 color-mix(in srgb,var(--c5) 14%,transparent)}
+.pdf-page .md h2{box-shadow:var(--box-sh) var(--hs,var(--ink-shadow));background-image:linear-gradient(115deg,rgba(255,255,255,.2),rgba(255,255,255,0) 58%)}
+.pdf-page .md h2::before{content:"";display:inline-block;width:.36em;height:.36em;border-radius:50%;background:currentColor;opacity:.9;margin-inline-end:.6em;vertical-align:.12em;box-shadow:0 0 0 .17em color-mix(in srgb,currentColor 30%,transparent)}
 .pdf-page .md h3{border:0;padding:.34em .9em;border-radius:12px;width:fit-content;max-width:100%;min-width:40%;background-repeat:no-repeat;background-color:transparent;
-  background-image:linear-gradient(var(--hc,var(--accent)),var(--hc,var(--accent))),linear-gradient(90deg,var(--hb,var(--accent-soft)),var(--hb0,transparent) 92%);
-  background-size:6px 62%,100% 100%;background-position:right center,center}
-.pdf-page .md h3[data-d="rtl"]{background-image:linear-gradient(var(--hc,var(--accent)),var(--hc,var(--accent))),linear-gradient(270deg,var(--hb,var(--accent-soft)),var(--hb0,transparent) 92%);background-position:right center,center;padding-inline-start:1.1em}
+  background-image:linear-gradient(var(--hc,var(--accent)),var(--hc,var(--accent))),linear-gradient(90deg,var(--hb,var(--accent-soft)),transparent 92%);
+  background-size:6px 62%,100% 100%;background-position:right center,center;
+  text-shadow:var(--ink-tglow),1px 0 var(--hh,transparent),-1px 0 var(--hh,transparent),0 1px var(--hh,transparent),0 -1px var(--hh,transparent)}
+.pdf-page .md h3[data-d="rtl"]{background-image:linear-gradient(var(--hc,var(--accent)),var(--hc,var(--accent))),linear-gradient(270deg,var(--hb,var(--accent-soft)),transparent 92%);background-position:right center,center;padding-inline-start:1.1em}
 .pdf-page .md h3[data-d="ltr"]{background-position:left center,center;padding-inline-start:1.1em}
-.pdf-page .md h4,.pdf-page .md h5,.pdf-page .md h6{padding:.18em .75em;border:1.5px solid var(--hc55,var(--hc,var(--accent)));border-radius:999px;width:fit-content;max-width:100%;background:var(--hb,var(--accent-soft));color:var(--hd,var(--heading))}
-/* calm tinted paragraphs */
-.pdf-page .md>p{margin:.8em 0;padding:.5em .95em;border-radius:14px;background:var(--p7,var(--surface))}
-.pdf-page .md>p.u2-lead{font-size:1.05em;line-height:2;padding:.6em 1em;border-radius:16px;background:var(--p11,var(--surface))}
-/* inline accents */
-.pdf-page .md strong{background-image:linear-gradient(to top,var(--hb,var(--strong-bg)) 80%,transparent 80%),linear-gradient(var(--hc70,var(--hc,var(--accent))),var(--hc70,var(--hc,var(--accent))));background-repeat:no-repeat;background-size:100% 100%,100% 2px;background-position:0 0,0 100%}
-.pdf-page .md th strong{background:none}
-.pdf-page .md :not(pre)>code{background:var(--cb,var(--accent-soft));border-color:var(--cc55,var(--line));color:var(--cd,var(--strong))}
-.pdf-page .md a{text-decoration:none;border-bottom:2px solid var(--link45,var(--accent));font-weight:650}
-.pdf-page .u2l{border-color:var(--cc60,var(--cc,var(--accent)));box-shadow:-2px 2px 0 var(--cc25,rgba(0,0,0,.08))}
-.pdf-page .u2n{color:var(--u2n,var(--text))}
-.pdf-page .u2e{color:var(--u2e,var(--text));background:var(--sc11a,transparent);border:1px solid var(--sc28a,transparent);box-shadow:none}
-.pdf-page .u2q{background-color:var(--sc12a,transparent);box-shadow:none;background-image:linear-gradient(var(--sc55a,transparent),var(--sc55a,transparent));background-repeat:no-repeat;background-size:100% 2px;background-position:0 100%}
-/* quotes: big quotation mark */
-.pdf-page .md blockquote:not(.callout){position:relative;padding-inline-start:3.1em}
-.pdf-page .md blockquote:not(.callout)::before{content:"\201D";position:absolute;inset-inline-start:.28em;top:-.02em;font:400 4.2em/1 var(--font-body);color:var(--hc,var(--accent));opacity:.28;pointer-events:none}
+.pdf-page .md h4,.pdf-page .md h5,.pdf-page .md h6{border-inline-start:0;padding:.18em .75em;border-radius:999px;width:fit-content;max-width:100%;background:var(--hb,var(--accent-soft));color:var(--hd,var(--heading));box-shadow:inset 0 0 0 1.5px color-mix(in srgb,var(--hc,var(--accent)) 55%,transparent)}
+.pdf-page .md h2[data-d="ltr"],.pdf-page .md h3[data-d="ltr"],.pdf-page .md h4[data-d="ltr"],.pdf-page .md h5[data-d="ltr"],.pdf-page .md h6[data-d="ltr"]{margin-left:0;margin-right:auto}
+.pdf-page .md h2[data-d="rtl"],.pdf-page .md h3[data-d="rtl"],.pdf-page .md h4[data-d="rtl"],.pdf-page .md h5[data-d="rtl"],.pdf-page .md h6[data-d="rtl"]{margin-right:0;margin-left:auto}
+/* ---- paragraphs on calm tinted cards ---- */
+.pdf-page .md>p{position:relative;margin:1em 0;padding:.6em 1em;border-radius:16px;border:0;background:color-mix(in srgb,var(--sc,var(--accent)) 7%,var(--surface))}
+.pdf-page .md>p.u2-lead{font-size:1.05em;line-height:2;padding:.7em 1.05em;border-radius:18px;background:color-mix(in srgb,var(--sc,var(--accent)) 11%,var(--surface))}
+/* ---- inline ---- */
+.pdf-page .md strong,.pdf-page .md em{text-shadow:1px 0 var(--hh,transparent),-1px 0 var(--hh,transparent),0 1px var(--hh,transparent),0 -1px var(--hh,transparent)}
+.pdf-page .md strong{box-shadow:inset 0 -2px 0 color-mix(in srgb,var(--hc,var(--accent)) 70%,transparent)}
+.pdf-page .md th strong{box-shadow:none}
+.pdf-page .md em{text-decoration:underline dotted color-mix(in srgb,var(--hc,var(--accent)) 70%,transparent) 2px;text-underline-offset:5px}
+.pdf-page .md :not(pre)>code{background:var(--cb,var(--accent-soft));border-color:color-mix(in srgb,var(--cc,var(--line)) 55%,transparent);color:var(--cd,var(--strong))}
+.pdf-page .md a{text-decoration:none;border-bottom:2px solid color-mix(in srgb,var(--link,var(--accent)) 45%,transparent);font-weight:650}
+.pdf-page .md hr::before{background-image:linear-gradient(90deg,transparent,var(--hc,rgba(176,141,62,.9)))}
+.pdf-page .md hr::after{background-image:linear-gradient(90deg,var(--hc,rgba(176,141,62,.9)),transparent)}
+/* ---- callouts / quotes ---- */
+.pdf-page .md blockquote{box-shadow:var(--box-sh) var(--hs,var(--ink-shadow));background-image:var(--grid-img);background-size:var(--grid-size) var(--grid-size);background-color:var(--hb,var(--accent-soft))}
 .pdf-page .md blockquote.callout>.co-t{background-image:linear-gradient(115deg,rgba(255,255,255,.17),rgba(255,255,255,0) 60%)}
-/* tables */
-.pdf-page .md th{background-image:linear-gradient(180deg,rgba(255,255,255,.16),rgba(255,255,255,0))}
-.pdf-page .md .table-wrap{border-color:var(--twb,var(--line));box-shadow:0 4px 12px var(--sc16,rgba(0,0,0,0)),var(--box-sh) var(--ink-shadow,rgba(40,40,40,.3))}
-.pdf-page .md tbody tr td:first-child{font-weight:800;background:var(--fc,transparent)}
-.pdf-page .md tbody tr.zb td:first-child{background:var(--fcz,var(--fc,transparent))}
-/* code block: window dots + accent edge */
-.pdf-page .md pre{position:relative;padding-top:2.35em;border-left:5px solid var(--sc,var(--accent))}
+.pdf-page .md blockquote:not(.callout){position:relative;padding-inline-start:3.1em;font-weight:500}
+.pdf-page .md blockquote:not(.callout)::before{content:"\201D";position:absolute;inset-inline-start:.28em;top:-.02em;font:700 4.2em/1 var(--font-head);color:var(--hc,var(--accent));opacity:.28}
+/* ---- code ---- */
+.pdf-page .md pre{position:relative;padding-top:2.35em;border-left:5px solid var(--sc,var(--accent));box-shadow:var(--box-sh) var(--ink-shadow);
+  background-image:linear-gradient(var(--grid-code) 1px,transparent 1px),linear-gradient(90deg,var(--grid-code) 1px,transparent 1px);background-size:var(--grid-size) var(--grid-size)}
+.pdf-page .md pre code{background-image:none}
 .pdf-page .md pre::before{content:"";position:absolute;left:14px;top:12px;width:10px;height:10px;border-radius:50%;background:#ff6b6b;box-shadow:16px 0 0 #ffc542,32px 0 0 #3ddc84}
-/* images */
-.pdf-page .md img{border:4px solid var(--surface);box-shadow:0 5px 14px rgba(0,0,0,.18),0 0 0 1.5px var(--sc40,var(--line))}
-/* task list as tiles */
-.pdf-page .md li.task{padding:.3em .8em;border-radius:13px;background:var(--hb,var(--accent-soft));border:1.5px solid var(--hc45,var(--line));box-shadow:-3px 3px 0 var(--hc20,rgba(0,0,0,.1))}
-/* list markers: diamond / ring / dash bullets and numbered badges (viz lists keep their own look) */
-.pdf-page .md li>.li-mark.art.dot{font-size:1em;width:.58em;height:.58em;min-width:0;margin:.68em .3em 0 .42em;align-self:flex-start;border-radius:2px;transform:rotate(45deg);background:var(--hc,var(--accent));box-shadow:0 0 0 3px var(--hc18,rgba(0,0,0,.08))}
-.pdf-page .md li>.li-mark.art.dot.d1{width:.52em;height:.52em;border-radius:50%;transform:none;background:transparent;border:2px solid var(--hc,var(--accent));box-shadow:none}
-.pdf-page .md li>.li-mark.art.dot.d2{width:.7em;height:3px;margin-top:.92em;border-radius:3px;transform:none;background:var(--hc,var(--accent));box-shadow:none;opacity:.8}
-.pdf-page .md li>.li-mark.art.ol{display:grid;place-items:center;font-size:.8em;font-weight:900;line-height:1;width:1.7em;height:1.7em;min-width:0;margin:.37em .15em 0 0;align-self:flex-start;border-radius:50%;background:var(--hc,var(--accent));color:var(--hon,var(--on-c));box-shadow:-2px 2px 0 var(--hc30,rgba(0,0,0,.12))}
-.pdf-page .md ol ol>li>.li-mark.art.ol{background:transparent;color:var(--hc,var(--accent));border:2px solid var(--hc,var(--accent));border-radius:.4em;box-shadow:none}
-/* visual callouts (viz): connector line for steps, dots on the timeline line */
-.pdf-page .md .viz-steps ol{position:relative}
-.pdf-page .md .viz-steps ol::before{content:"";position:absolute;top:1em;bottom:1em;inset-inline-start:calc(.85em + 6px + 1em - 1.5px);width:3px;background:var(--hc,var(--line));opacity:.4}
-.pdf-page .md .viz-timeline li{position:relative}
-.pdf-page .md .viz-timeline li::before{content:"";position:absolute;inset-inline-start:calc(-1.3em - 4px - 6px - 5px);top:.95em;width:14px;height:14px;border-radius:50%;background:var(--hc,var(--accent));border:3px solid var(--hb,var(--surface))}
+/* ---- tables ---- */
+.pdf-page .md .table-wrap{background-color:var(--surface);background-image:var(--grid-img);background-size:var(--grid-size) var(--grid-size);border-color:color-mix(in srgb,var(--sc,var(--accent)) 38%,var(--line));box-shadow:var(--box-sh) var(--ink-shadow)}
+.pdf-page .md th{background-image:linear-gradient(180deg,rgba(255,255,255,.16),rgba(255,255,255,0))}
+.pdf-page .md tbody tr td{background:transparent}
+.pdf-page .md tbody tr.zb td{background:var(--zebra)}
+.pdf-page .md tbody tr td:first-child{font-weight:800;background:color-mix(in srgb,var(--sc,var(--accent)) 10%,transparent);min-width:4.6em}
+/* ---- images ---- */
+.pdf-page .md img{border:5px solid var(--surface);box-shadow:0 10px 28px rgba(0,0,0,.2),0 0 0 1.5px color-mix(in srgb,var(--sc,var(--accent)) 40%,transparent)}
+/* ---- lists: diamond / ring / bar bullets, numbered discs, lettered boxes, connectors ---- */
+.pdf-page .md li{margin:.38em 0}
+.pdf-page .md ul>li,.pdf-page .md ol:not(.fns)>li{position:relative}
+.pdf-page .md li>.li-mark.am{flex:none;align-self:flex-start;min-width:0;text-align:center;font-weight:900;color:var(--hc,var(--accent))}
+.pdf-page .md li>.li-mark.am.dot{font-size:1em;width:.58em;height:.58em;margin-block-start:.58em;margin-inline:.5em .52em;border-radius:2px;transform:rotate(45deg);background:var(--hc,var(--accent));box-shadow:0 0 0 3px color-mix(in srgb,var(--hc,var(--accent)) 18%,transparent)}
+.pdf-page .md li>.li-mark.am.dot[data-lv="1"]{width:.52em;height:.52em;border:2px solid var(--hc,var(--accent));border-radius:50%;transform:none;background:transparent;box-shadow:none}
+.pdf-page .md li>.li-mark.am.dot[data-lv="2"]{width:.7em;height:3px;margin-block-start:.85em;border:0;border-radius:3px;transform:none;background:var(--hc,var(--accent));opacity:.8;box-shadow:none}
+.pdf-page .md li>.li-mark.am:not(.dot){width:1.6em;height:1.6em;line-height:1.6;margin-block-start:.12em;margin-inline-end:.4em;border-radius:50%;background:var(--hc,var(--accent));color:var(--hon,var(--on-c));font-family:var(--font-body);font-size:.8em;box-shadow:-2px 2px 0 color-mix(in srgb,var(--hc,var(--accent)) 30%,transparent)}
+.pdf-page .md li>.li-mark.am:not(.dot):not([data-lv="0"]){border-radius:.4em;background:transparent;color:var(--hc,var(--accent));border:2px solid var(--hc,var(--accent));box-shadow:none}
+.pdf-page .md ol:not(.fns)>li:not(:last-child)::after{content:"";position:absolute;inset-inline-start:calc(.8em - 1px);top:1.9em;bottom:-.7em;border-inline-start:2px dashed color-mix(in srgb,var(--hc,var(--accent)) 35%,transparent)}
+.pdf-page .md .viz li::after,.pdf-page .md li.task::before,.pdf-page .md li.task::after{content:none!important;display:none!important}
+.pdf-page .md .li-body>ul,.pdf-page .md .li-body>ol:not(.fns){position:relative;margin:.3em 0 .1em}
+.pdf-page .md ul ul::before{content:"";position:absolute;inset-inline-start:-.95em;top:.1em;bottom:.2em;border-inline-start:1.5px dotted color-mix(in srgb,var(--accent) 30%,transparent)}
+.pdf-page .md .viz ul ul::before{content:none}
+.pdf-page .md li.task{padding-block:.42em;padding-inline:.9em;border-radius:13px;background:var(--hb,var(--accent-soft));border:1.5px solid color-mix(in srgb,var(--hc,var(--accent)) 45%,transparent);box-shadow:-3px 3px 0 color-mix(in srgb,var(--hc,var(--accent)) 20%,transparent)}
+.pdf-page.fb-img .md ol>li::after,.pdf-page.fb-img .md ul ul::before,.pdf-page.fb-img .md pre::before{display:none!important}
+/* ---- per-theme art direction (dark themes print on the light palette, so they are skipped) ---- */
+body.theme-ink .pdf-page:not(.pdf-light) .md blockquote,body.theme-ink .pdf-page:not(.pdf-light) .md .table-wrap,
+body.theme-contrast .pdf-page:not(.pdf-light) .md blockquote,body.theme-contrast .pdf-page:not(.pdf-light) .md .table-wrap{border-color:var(--text);border-width:2px}
+body.theme-ink .pdf-page:not(.pdf-light) .md blockquote{border-inline-start-color:var(--hc,var(--text))}
+body.theme-contrast .pdf-page:not(.pdf-light) .md blockquote{border-inline-start-color:var(--hc,var(--text))}
+body.theme-ink .pdf-page:not(.pdf-light) .md h2,body.theme-contrast .pdf-page:not(.pdf-light) .md h2{border-inline-start-color:var(--text)}
+body.theme-rose .pdf-page:not(.pdf-light) .md h2{border-radius:20px}
+body.theme-cvd .pdf-page:not(.pdf-light) .md blockquote.callout>.co-t{text-decoration:underline;text-decoration-thickness:2px;text-underline-offset:.22em}
 </style>
 </body>
 </html>
