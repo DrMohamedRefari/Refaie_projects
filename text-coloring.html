@@ -1992,7 +1992,7 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
       if(cbEl){cbEl.remove();mark.classList.add('li-mark')}else{
       const art=!li.closest('.viz');
       mark.className='li-mark'+(ordered?'':' dot')+(art?(ordered?' art ol':' art d'+(depth%3)):'');
-      mark.textContent=art?(ordered?(depth%2?String.fromCharCode(96+(((idx-1)%26+26)%26+1)):String(idx)):''):(ordered?idx+'.':['\u25CF','\u25CB','\u25A0'][depth%3]);}
+      mark.textContent=art?(ordered?(depth%2?String.fromCharCode(96+(((idx-1)%26+26)%26+1)):String(idx)):''):(ordered?String(idx):['\u25CF','\u25CB','\u25A0'][depth%3]);}
       let run=null;Array.from(body.childNodes).forEach(nd=>{
         if(nd.nodeType===1&&/^(UL|OL)$/.test(nd.tagName)){run=null;return}
         if(!run){run=document.createElement('div');run.className='li-text';run.setAttribute('dir','auto');body.insertBefore(run,nd)}
@@ -2538,6 +2538,7 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
       const hc=gv(el,'--hc');if(!hx(hc))return;
       sv(el,'--hc18',rgba(hc,.18));sv(el,'--hc20',rgba(hc,.2));sv(el,'--hc30',rgba(hc,.3));sv(el,'--hc45',rgba(hc,.45));sv(el,'--hc55',rgba(hc,.55));sv(el,'--hc70',rgba(hc,.7));
       const on=gv(el,'--hon');if(el.tagName==='H2'&&hx(on))sv(el,'--hon30',rgba(on,.3));
+      const hb=gv(el,'--hb');if(hx(hb))sv(el,'--hb0',rgba(hb,0)); // fully transparent in the same hue (html2canvas fades to grey with plain 'transparent')
     });
     src.querySelectorAll('[style*="--cc"]').forEach(el=>{
       const cc=gv(el,'--cc');if(!hx(cc))return;
@@ -2682,7 +2683,7 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
       const seenLi=new Set();
       pages.forEach((p,i)=>{
         p.querySelector('.pg-num').textContent=(i+1)+' / '+pages.length;
-        p.querySelectorAll('li[data-lid]').forEach(li=>{const id=li.dataset.lid;if(seenLi.has(id))li.firstElementChild.style.visibility='hidden';else seenLi.add(id)});
+        p.querySelectorAll('li[data-lid]').forEach(li=>{const id=li.dataset.lid;if(seenLi.has(id)){const mk=li.firstElementChild;mk.style.cssText+=';visibility:hidden;opacity:0;background:none;border-color:transparent;box-shadow:none;color:transparent'}else seenLi.add(id)});
       });
       const mkToc=()=>{ // blank page with the same frame / strip / footer as the content pages (used by the table of contents)
         const pg=document.createElement('div');pg.className='pdf-page'+light;pg.style.setProperty('--frame',pal.frame);inkSet(pg,inkMap);
@@ -2901,6 +2902,7 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
             width:PW,height:PGH,windowWidth:PW,windowHeight:PGH,scrollX:0,scrollY:0,x:0,y:0,
             onclone:doc=>{
               const q=doc.querySelector('[data-pg="'+key+'"]');
+              {const us=doc.getElementById('pdf-ultra');if(us)doc.head.appendChild(us)} // body <style>s are dropped below; keep the PDF decorations
               doc.body.replaceChildren(q);if(imgInfo)pdfImgApply(doc,q,imgInfo);
               doc.body.style.cssText='margin:0;padding:0;overflow:visible';
               doc.documentElement.style.cssText='margin:0;padding:0;overflow:visible;'+rootVars; // the cloned <html> loses the page-geometry variables otherwise
@@ -6090,9 +6092,9 @@ body[class*="theme-"]{background-image:radial-gradient(1100px 520px at 88% -8%,c
 .pdf-page .md h1{text-shadow:3px 3px 0 var(--h1s1,rgba(0,0,0,0)),6px 6px 0 var(--h1s2,rgba(0,0,0,0))}
 /* sub-headings: accent bar + soft fade, direction-aware */
 .pdf-page .md h3{border:0;padding:.34em .9em;border-radius:12px;width:fit-content;max-width:100%;min-width:40%;background-repeat:no-repeat;background-color:transparent;
-  background-image:linear-gradient(var(--hc,var(--accent)),var(--hc,var(--accent))),linear-gradient(90deg,var(--hb,var(--accent-soft)),transparent 92%);
+  background-image:linear-gradient(var(--hc,var(--accent)),var(--hc,var(--accent))),linear-gradient(90deg,var(--hb,var(--accent-soft)),var(--hb0,transparent) 92%);
   background-size:6px 62%,100% 100%;background-position:right center,center}
-.pdf-page .md h3[data-d="rtl"]{background-image:linear-gradient(var(--hc,var(--accent)),var(--hc,var(--accent))),linear-gradient(270deg,var(--hb,var(--accent-soft)),transparent 92%);background-position:right center,center;padding-inline-start:1.1em}
+.pdf-page .md h3[data-d="rtl"]{background-image:linear-gradient(var(--hc,var(--accent)),var(--hc,var(--accent))),linear-gradient(270deg,var(--hb,var(--accent-soft)),var(--hb0,transparent) 92%);background-position:right center,center;padding-inline-start:1.1em}
 .pdf-page .md h3[data-d="ltr"]{background-position:left center,center;padding-inline-start:1.1em}
 .pdf-page .md h4,.pdf-page .md h5,.pdf-page .md h6{padding:.18em .75em;border:1.5px solid var(--hc55,var(--hc,var(--accent)));border-radius:999px;width:fit-content;max-width:100%;background:var(--hb,var(--accent-soft));color:var(--hd,var(--heading))}
 /* calm tinted paragraphs */
@@ -6129,6 +6131,11 @@ body[class*="theme-"]{background-image:radial-gradient(1100px 520px at 88% -8%,c
 .pdf-page .md li>.li-mark.art.dot.d2{width:.7em;height:3px;margin-top:.92em;border-radius:3px;transform:none;background:var(--hc,var(--accent));box-shadow:none;opacity:.8}
 .pdf-page .md li>.li-mark.art.ol{display:grid;place-items:center;font-size:.8em;font-weight:900;line-height:1;width:1.7em;height:1.7em;min-width:0;margin:.37em .15em 0 0;align-self:flex-start;border-radius:50%;background:var(--hc,var(--accent));color:var(--hon,var(--on-c));box-shadow:-2px 2px 0 var(--hc30,rgba(0,0,0,.12))}
 .pdf-page .md ol ol>li>.li-mark.art.ol{background:transparent;color:var(--hc,var(--accent));border:2px solid var(--hc,var(--accent));border-radius:.4em;box-shadow:none}
+/* visual callouts (viz): connector line for steps, dots on the timeline line */
+.pdf-page .md .viz-steps ol{position:relative}
+.pdf-page .md .viz-steps ol::before{content:"";position:absolute;top:1em;bottom:1em;inset-inline-start:calc(.85em + 6px + 1em - 1.5px);width:3px;background:var(--hc,var(--line));opacity:.4}
+.pdf-page .md .viz-timeline li{position:relative}
+.pdf-page .md .viz-timeline li::before{content:"";position:absolute;inset-inline-start:calc(-1.3em - 4px - 6px - 5px);top:.95em;width:14px;height:14px;border-radius:50%;background:var(--hc,var(--accent));border:3px solid var(--hb,var(--surface))}
 </style>
 </body>
 </html>
