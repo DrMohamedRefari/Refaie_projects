@@ -5974,17 +5974,12 @@ body[class*="theme-"]{background-image:radial-gradient(1100px 520px at 88% -8%,c
 </script>
 <style id="ultra-v2">
 /* ===== ULTRA v2: Markdown rendering made beautiful for every theme (study view; PDF pages untouched) ===== */
-/* plain paragraphs become soft section-coloured text cards */
-.reader .md>p{position:relative;margin:1.05em 0;padding:.62em 1em;border-radius:14px;
-  background:linear-gradient(270deg,color-mix(in srgb,var(--sc,var(--accent)) 8%,transparent),color-mix(in srgb,var(--sc,var(--accent)) 1.5%,transparent) 88%);
-  border-inline-start:4px solid color-mix(in srgb,var(--sc,var(--accent)) 55%,transparent)}
-.reader .md>p::first-line{font-weight:600}
-/* lead paragraph: the opening line under a title/section */
-.reader .md>p.u2-lead{font-size:1.07em;line-height:2;padding:.8em 1.15em;border-radius:18px;
-  background:linear-gradient(270deg,color-mix(in srgb,var(--sc,var(--accent)) 17%,transparent),color-mix(in srgb,var(--sc,var(--accent)) 3%,transparent) 92%);
-  border:1.5px solid color-mix(in srgb,var(--sc,var(--accent)) 35%,transparent);border-inline-start-width:7px;
-  box-shadow:0 6px 18px color-mix(in srgb,var(--sc,var(--accent)) 14%,transparent)}
-.reader .md>p.u2-lead::after{content:"";position:absolute;inset-inline-end:14px;top:-6px;width:34px;height:12px;border-radius:99px;background:var(--sc,var(--accent));opacity:.9}
+/* plain paragraphs sit on a very calm, simple tinted background (never bare on the page) */
+.reader .md>p{position:relative;margin:1em 0;padding:.7em 1.1em;border-radius:16px;border:0;box-shadow:none;
+  background:color-mix(in srgb,var(--sc,var(--accent)) 7%,var(--surface))}
+.reader .md>p.u2-lead{font-size:1.05em;line-height:2;padding:.8em 1.15em;border-radius:18px;
+  background:color-mix(in srgb,var(--sc,var(--accent)) 11%,var(--surface))}
+.reader .md>p.u2-lead::after{display:none}
 /* headings */
 .reader .md h1{text-shadow:var(--ink-tglow),3px 3px 0 color-mix(in srgb,var(--c1) 24%,transparent),6px 6px 0 color-mix(in srgb,var(--c5) 14%,transparent)}
 .reader .md h3{border-bottom:0;padding:.34em .85em;border-radius:14px;border-inline-start:6px solid var(--hc,var(--accent));
@@ -6019,7 +6014,7 @@ body[class*="theme-"]{background-image:radial-gradient(1100px 520px at 88% -8%,c
 /* list items: soft hover lift */
 .reader .md ul>li,.reader .md ol:not(.fns)>li{transition:transform .15s}
 @media(hover:hover){.reader .md ul>li:hover,.reader .md ol:not(.fns)>li:hover{transform:translateX(-3px)}}
-@media(max-width:700px){.reader .md>p{padding:.55em .8em}.reader .md>p.u2-lead{padding:.7em .9em}}
+@media(max-width:700px){.reader .md>p{padding:.6em .9em}.reader .md>p.u2-lead{padding:.7em 1em}}
 </style>
 </body>
 </html>
