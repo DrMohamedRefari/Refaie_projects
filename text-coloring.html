@@ -1990,8 +1990,9 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
       const cbEl=body.querySelector(':scope>.cb');
       const mark=cbEl||document.createElement('span');
       if(cbEl){cbEl.remove();mark.classList.add('li-mark')}else{
-      mark.className='li-mark'+(ordered?'':' dot');
-      mark.textContent=ordered?idx+'.':['●','○','■'][depth%3];}
+      const art=!li.closest('.viz');
+      mark.className='li-mark'+(ordered?'':' dot')+(art?(ordered?' art ol':' art d'+(depth%3)):'');
+      mark.textContent=art?(ordered?(depth%2?String.fromCharCode(96+(((idx-1)%26+26)%26+1)):String(idx)):''):(ordered?idx+'.':['\u25CF','\u25CB','\u25A0'][depth%3]);}
       let run=null;Array.from(body.childNodes).forEach(nd=>{
         if(nd.nodeType===1&&/^(UL|OL)$/.test(nd.tagName)){run=null;return}
         if(!run){run=document.createElement('div');run.className='li-text';run.setAttribute('dir','auto');body.insertBefore(run,nd)}
@@ -2509,13 +2510,49 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
         if(rows.length&&ks.every(x=>Math.abs(x-ks[0])<.001)&&Math.abs(ks[0]-1)>.001)t.querySelectorAll('thead th,thead td').forEach(c=>{const a=parseFloat(getComputedStyle(c).fontSize),b=parseFloat(getComputedStyle(c.parentElement).fontSize)||a;if(a>0&&b>0)c.style.fontSize=(a/b*ks[0]).toFixed(4)+'em'})});
     }finally{try{tmp.removeChild(src)}catch(_){}stage.removeChild(tmp)}
   }
+  /* ---------- PDF ultra: the study view's extra colour + decorations, carried over to the PDF pages ----------
+     Same engines as the study view (ultraColor / ultraText), plus plain hex/rgba variables (no color-mix) so that BOTH PDF engines
+     (vector painter and html2canvas) can paint them. */
+  function pdfProbeVars(probe){
+    const cs=getComputedStyle(probe),o={};
+    ['--line','--surface','--surface-2','--text','--link'].forEach(n=>{const v=cs.getPropertyValue(n).trim();if(/^#(?:[0-9a-f]{3}|[0-9a-f]{6})$/i.test(v))o[n]=v});
+    return o;
+  }
+  function pdfUltra(src,pal,pv){
+    const hx=v=>/^#(?:[0-9a-f]{3}|[0-9a-f]{6})$/i.test(v||''),sv=(el,n,v)=>el.style.setProperty(n,v),gv=(el,n)=>(el.style.getPropertyValue(n)||'').trim();
+    /* 1) same text/colour passes as the study view (heading direction attributes are restored afterwards: the PDF layout already owns them) */
+    const hd=Array.from(src.querySelectorAll('h1,h2,h3,h4,h5,h6')).map(h=>[h,h.getAttribute('dir')]);
+    try{ultraColor(src,pal);ultraText(src,pal)}catch(e){console.error('pdf ultra',e)}
+    hd.forEach(([h,d])=>{if(d===null)h.removeAttribute('dir');else h.setAttribute('dir',d)});
+    /* 2) derived solid colours */
+    const S=pv['--surface']||pal.surface,S2=pv['--surface-2']||S,T=pv['--text']||pal.text,LN=pv['--line']||pal.muted;
+    Array.from(src.children).forEach(el=>{
+      const sc=gv(el,'--sc');if(!hx(sc))return;
+      sv(el,'--p7',mixHex(sc,S,.07));sv(el,'--p11',mixHex(sc,S,.11));
+      sv(el,'--sc16',rgba(sc,.16));sv(el,'--sc40',rgba(sc,.4));
+      sv(el,'--sc11a',rgba(sc,.11));sv(el,'--sc12a',rgba(sc,.12));sv(el,'--sc28a',rgba(sc,.28));sv(el,'--sc55a',rgba(sc,.55));
+      sv(el,'--u2n',mixHex(sc,T,.62));sv(el,'--u2e',mixHex(sc,T,.52));
+      sv(el,'--twb',mixHex(sc,LN,.38));sv(el,'--fc',mixHex(sc,S,.10));sv(el,'--fcz',mixHex(sc,S2,.10));
+    });
+    src.querySelectorAll('[style*="--hc"]').forEach(el=>{
+      const hc=gv(el,'--hc');if(!hx(hc))return;
+      sv(el,'--hc18',rgba(hc,.18));sv(el,'--hc20',rgba(hc,.2));sv(el,'--hc30',rgba(hc,.3));sv(el,'--hc45',rgba(hc,.45));sv(el,'--hc55',rgba(hc,.55));sv(el,'--hc70',rgba(hc,.7));
+      const on=gv(el,'--hon');if(el.tagName==='H2'&&hx(on))sv(el,'--hon30',rgba(on,.3));
+    });
+    src.querySelectorAll('[style*="--cc"]').forEach(el=>{
+      const cc=gv(el,'--cc');if(!hx(cc))return;
+      sv(el,'--cc25',rgba(cc,.25));sv(el,'--cc55',rgba(cc,.55));sv(el,'--cc60',rgba(cc,.6));
+    });
+    const n=pal.colors.length;
+    src.querySelectorAll('h1').forEach(h=>{sv(h,'--h1s1',rgba(pal.colors[0],.24));sv(h,'--h1s2',rgba(pal.colors[4%n],.14))});
+  }
   function paginateDoc(stage,brand){
       const light=(document.body.classList.contains('theme-night')||document.body.classList.contains('theme-amoled')||document.body.classList.contains('theme-midnight')||document.body.classList.contains('theme-cyber'))?' pdf-light':'';
       const probe=document.createElement('div');probe.className='pdf-page'+light;stage.appendChild(probe);
-      const inkMap=inkApply(probe);const pal=readPalette(probe);stage.removeChild(probe);
+      const inkMap=inkApply(probe);const pal=readPalette(probe);const pv=pdfProbeVars(probe);try{if(pv['--link'])inkMap['--link45']=rgba(pv['--link'],.45)}catch(_){}stage.removeChild(probe);
       const src=document.createElement('div');
       src.innerHTML=renderMarkdown(input.value);
-      applyDir(src);colorize(src,pal);prepPdfLists(src);
+      applyDir(src);colorize(src,pal);try{pdfUltra(src,pal,pv)}catch(e){console.error(e)}prepPdfLists(src);
       const BASE=15*pdfZoom,fs=s=>(BASE*s).toFixed(2)+'px'; // base font of the PDF page body (15px at 100%)
       fitTables(src,PB.w,BASE); // page body width (PW - 2*margin) in logical px
       src.querySelectorAll('.li-text,p,pre,tbody tr,hr,img,h1,h2,h3,h4,h5,h6').forEach((e,i)=>{e.dataset.bk=String(i)}); // stable line ids for manual page breaks
@@ -5689,10 +5726,17 @@ class Painter{
     if(fit==='contain'||fit==='scale-down'){const k=Math.min(w/rec.w,h/rec.h);dw=rec.w*k;dh=rec.h*k}else if(fit==='cover'){const k=Math.max(w/rec.w,h/rec.h);dw=rec.w*k;dh=rec.h*k}else if(fit==='none'){dw=rec.w;dh=rec.h}
     this.o('q '+rr(x,y,w,h,radii(cs,w,h))+'W n ');this.drawImg(rec,x+(w-dw)/2,y+(h-dh)/2,dw,dh,op);this.o('Q ')}
   /* ---- text ---- */
-  text(tn,ctx){
+  text(tn,ctx){ /* text-shadow (solid offset shadows, e.g. the study-view title shadow): the same glyphs drawn first, shifted, in the shadow colour; hidden from text extraction */
+    try{const el0=tn.parentElement,cs0=getComputedStyle(el0),ts=cs0.textShadow;
+      if(ts&&ts!=='none'&&cs0.visibility!=='hidden')splitTop(ts).reverse().forEach(sd=>{
+        const cm=/(rgba?\([^)]*\)|color\([^)]*\))/.exec(sd);if(!cm)return;const col=pcol(cm[1]),nm=sd.replace(cm[1],'').trim().split(/\s+/).map(parseFloat);
+        const ox=nm[0]||0,oy=nm[1]||0,bl=nm[2]||0;if(col[3]<=.01||bl>.5||(!ox&&!oy))return;
+        this.o('q 1 0 0 1 '+nf(ox)+' '+nf(oy)+' cm /Span<</ActualText<FEFF>>>BDC ');this.text0(tn,ctx,{col});this.o('EMC Q ')})}catch(e){console.warn('text-shadow',e)}
+    this.text0(tn,ctx)}
+  text0(tn,ctx,ov){
     const el=tn.parentElement,cs=getComputedStyle(el);if(cs.visibility==='hidden')return;
     const fs=parseFloat(cs.fontSize),fam=cs.fontFamily,mk=/MK (Head|Body)/.exec(fam),head=!!mk&&mk[1]==='Head',primMK=/^\s*"MK (Head|Body) EN"/.test(fam);
-    const bold=!head&&(parseInt(cs.fontWeight)||400)>=600,s=tn.data,rgn=document.createRange(),col=pcol(cs.webkitTextFillColor&&cs.webkitTextFillColor!==cs.color&&!/^rgba?\(0, 0, 0, 0\)/.test(cs.webkitTextFillColor)?cs.webkitTextFillColor:cs.color),tt=cs.textTransform,ls=parseFloat(cs.letterSpacing)||0;
+    const bold=!head&&(parseInt(cs.fontWeight)||400)>=600,s=tn.data,rgn=document.createRange(),col=ov?ov.col:pcol(cs.webkitTextFillColor&&cs.webkitTextFillColor!==cs.color&&!/^rgba?\(0, 0, 0, 0\)/.test(cs.webkitTextFillColor)?cs.webkitTextFillColor:cs.color),tt=cs.textTransform,ls=parseFloat(cs.letterSpacing)||0;
     const L=[];let cur=null,lastMid=-1e9;
     for(let i=0;i<s.length;i++){let c=s.charCodeAt(i);if(c===10||c===13||c===9&&false)continue;if(c>=0xd800&&c<=0xdfff){i++;continue}
       rgn.setStart(tn,i);rgn.setEnd(tn,i+1);let r=null;const rs=rgn.getClientRects();for(let k=0;k<rs.length;k++)if(rs[k].height>0&&(rs[k].width>0||MARK.test(s[i]))){r=rs[k];break}
@@ -6032,6 +6076,59 @@ body[class*="theme-"]{background-image:radial-gradient(1100px 520px at 88% -8%,c
 .reader .md ul>li,.reader .md ol:not(.fns)>li{transition:transform .15s}
 @media(hover:hover){.reader .md ul>li:hover,.reader .md ol:not(.fns)>li:hover{transform:translateX(-3px)}}
 @media(max-width:700px){.reader .md>p{padding:.6em .9em}.reader .md>p.u2-lead{padding:.7em 1em}}
+</style>
+<style id="pdf-ultra">
+/* ===== PDF ULTRA: everything beautiful in the study view (themes, headings, tables, lists, chips, code, quotes ...) now also on the PDF pages.
+   Colours come from variables computed in JS (no color-mix) so the vector exporter AND the image exporter can paint them. ===== */
+.pdf-page .md{--box-sh:var(--sh-x,-4px) var(--sh-y,4px) var(--sh-b,0px) var(--sh-s,0px)}
+/* shadows that follow the theme (offset, soft or glow) */
+.pdf-page .md h2{box-shadow:var(--box-sh) var(--hs,var(--ink-shadow,rgba(40,40,40,.3)));background-image:linear-gradient(115deg,rgba(255,255,255,.2),rgba(255,255,255,0) 58%)}
+.pdf-page .md blockquote{box-shadow:var(--box-sh) var(--hs,var(--ink-shadow,rgba(40,40,40,.3)))}
+.pdf-page .md pre{box-shadow:var(--box-sh) var(--ink-shadow,rgba(40,40,40,.3))}
+.pdf-page .md h2::before{content:"";display:inline-block;width:.36em;height:.36em;border-radius:50%;background:currentColor;opacity:.9;margin-inline-end:.6em;vertical-align:.12em;box-shadow:0 0 0 .17em var(--hon30,rgba(255,255,255,.3))}
+/* title shadow */
+.pdf-page .md h1{text-shadow:3px 3px 0 var(--h1s1,rgba(0,0,0,0)),6px 6px 0 var(--h1s2,rgba(0,0,0,0))}
+/* sub-headings: accent bar + soft fade, direction-aware */
+.pdf-page .md h3{border:0;padding:.34em .9em;border-radius:12px;width:fit-content;max-width:100%;min-width:40%;background-repeat:no-repeat;background-color:transparent;
+  background-image:linear-gradient(var(--hc,var(--accent)),var(--hc,var(--accent))),linear-gradient(90deg,var(--hb,var(--accent-soft)),transparent 92%);
+  background-size:6px 62%,100% 100%;background-position:right center,center}
+.pdf-page .md h3[data-d="rtl"]{background-image:linear-gradient(var(--hc,var(--accent)),var(--hc,var(--accent))),linear-gradient(270deg,var(--hb,var(--accent-soft)),transparent 92%);background-position:right center,center;padding-inline-start:1.1em}
+.pdf-page .md h3[data-d="ltr"]{background-position:left center,center;padding-inline-start:1.1em}
+.pdf-page .md h4,.pdf-page .md h5,.pdf-page .md h6{padding:.18em .75em;border:1.5px solid var(--hc55,var(--hc,var(--accent)));border-radius:999px;width:fit-content;max-width:100%;background:var(--hb,var(--accent-soft));color:var(--hd,var(--heading))}
+/* calm tinted paragraphs */
+.pdf-page .md>p{margin:.8em 0;padding:.5em .95em;border-radius:14px;background:var(--p7,var(--surface))}
+.pdf-page .md>p.u2-lead{font-size:1.05em;line-height:2;padding:.6em 1em;border-radius:16px;background:var(--p11,var(--surface))}
+/* inline accents */
+.pdf-page .md strong{background-image:linear-gradient(to top,var(--hb,var(--strong-bg)) 80%,transparent 80%),linear-gradient(var(--hc70,var(--hc,var(--accent))),var(--hc70,var(--hc,var(--accent))));background-repeat:no-repeat;background-size:100% 100%,100% 2px;background-position:0 0,0 100%}
+.pdf-page .md th strong{background:none}
+.pdf-page .md :not(pre)>code{background:var(--cb,var(--accent-soft));border-color:var(--cc55,var(--line));color:var(--cd,var(--strong))}
+.pdf-page .md a{text-decoration:none;border-bottom:2px solid var(--link45,var(--accent));font-weight:650}
+.pdf-page .u2l{border-color:var(--cc60,var(--cc,var(--accent)));box-shadow:-2px 2px 0 var(--cc25,rgba(0,0,0,.08))}
+.pdf-page .u2n{color:var(--u2n,var(--text))}
+.pdf-page .u2e{color:var(--u2e,var(--text));background:var(--sc11a,transparent);border:1px solid var(--sc28a,transparent);box-shadow:none}
+.pdf-page .u2q{background-color:var(--sc12a,transparent);box-shadow:none;background-image:linear-gradient(var(--sc55a,transparent),var(--sc55a,transparent));background-repeat:no-repeat;background-size:100% 2px;background-position:0 100%}
+/* quotes: big quotation mark */
+.pdf-page .md blockquote:not(.callout){position:relative;padding-inline-start:3.1em}
+.pdf-page .md blockquote:not(.callout)::before{content:"\201D";position:absolute;inset-inline-start:.28em;top:-.02em;font:400 4.2em/1 var(--font-body);color:var(--hc,var(--accent));opacity:.28;pointer-events:none}
+.pdf-page .md blockquote.callout>.co-t{background-image:linear-gradient(115deg,rgba(255,255,255,.17),rgba(255,255,255,0) 60%)}
+/* tables */
+.pdf-page .md th{background-image:linear-gradient(180deg,rgba(255,255,255,.16),rgba(255,255,255,0))}
+.pdf-page .md .table-wrap{border-color:var(--twb,var(--line));box-shadow:0 4px 12px var(--sc16,rgba(0,0,0,0)),var(--box-sh) var(--ink-shadow,rgba(40,40,40,.3))}
+.pdf-page .md tbody tr td:first-child{font-weight:800;background:var(--fc,transparent)}
+.pdf-page .md tbody tr.zb td:first-child{background:var(--fcz,var(--fc,transparent))}
+/* code block: window dots + accent edge */
+.pdf-page .md pre{position:relative;padding-top:2.35em;border-left:5px solid var(--sc,var(--accent))}
+.pdf-page .md pre::before{content:"";position:absolute;left:14px;top:12px;width:10px;height:10px;border-radius:50%;background:#ff6b6b;box-shadow:16px 0 0 #ffc542,32px 0 0 #3ddc84}
+/* images */
+.pdf-page .md img{border:4px solid var(--surface);box-shadow:0 5px 14px rgba(0,0,0,.18),0 0 0 1.5px var(--sc40,var(--line))}
+/* task list as tiles */
+.pdf-page .md li.task{padding:.3em .8em;border-radius:13px;background:var(--hb,var(--accent-soft));border:1.5px solid var(--hc45,var(--line));box-shadow:-3px 3px 0 var(--hc20,rgba(0,0,0,.1))}
+/* list markers: diamond / ring / dash bullets and numbered badges (viz lists keep their own look) */
+.pdf-page .md li>.li-mark.art.dot{font-size:1em;width:.58em;height:.58em;min-width:0;margin:.68em .3em 0 .42em;align-self:flex-start;border-radius:2px;transform:rotate(45deg);background:var(--hc,var(--accent));box-shadow:0 0 0 3px var(--hc18,rgba(0,0,0,.08))}
+.pdf-page .md li>.li-mark.art.dot.d1{width:.52em;height:.52em;border-radius:50%;transform:none;background:transparent;border:2px solid var(--hc,var(--accent));box-shadow:none}
+.pdf-page .md li>.li-mark.art.dot.d2{width:.7em;height:3px;margin-top:.92em;border-radius:3px;transform:none;background:var(--hc,var(--accent));box-shadow:none;opacity:.8}
+.pdf-page .md li>.li-mark.art.ol{display:grid;place-items:center;font-size:.8em;font-weight:900;line-height:1;width:1.7em;height:1.7em;min-width:0;margin:.37em .15em 0 0;align-self:flex-start;border-radius:50%;background:var(--hc,var(--accent));color:var(--hon,var(--on-c));box-shadow:-2px 2px 0 var(--hc30,rgba(0,0,0,.12))}
+.pdf-page .md ol ol>li>.li-mark.art.ol{background:transparent;color:var(--hc,var(--accent));border:2px solid var(--hc,var(--accent));border-radius:.4em;box-shadow:none}
 </style>
 </body>
 </html>
