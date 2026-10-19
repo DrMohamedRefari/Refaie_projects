@@ -1307,6 +1307,7 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
         <p><b>مقاس مخصص:</b> العرض والارتفاع بين 90 و500 مم. الاتجاه العرضي يضع صفحتين في الورقة (عرض الورقة 120 مم على الأقل).</p>
       </div></details></div>
     <div class="cv-pq" style="padding:6px 0 0"><div class="cv-h">نوع ملف PDF</div><div id="pdfM" class="cv-seg" role="group" aria-label="نوع PDF"><button type="button" data-m="dir" aria-pressed="true">تحميل مباشر (PDF متجهي)</button><button type="button" data-m="img" aria-pressed="false">صور (احتياطي)</button><button type="button" data-m="vec" aria-pressed="false">نصي كامل (نافذة الطباعة)</button></div></div>
+    <div class="cv-pq" style="padding:6px 0 0"><div class="cv-h">عمق الفهرس</div><div id="pdfToc" class="cv-seg" role="group" aria-label="عمق الفهرس"><button type="button" data-t="h2" aria-pressed="true">الأقسام الرئيسية</button><button type="button" data-t="full" aria-pressed="false">كل المستويات</button></div></div><!-- UP6 -->
     <div class="cv-pq" id="pdfQrow" style="padding:6px 0 0"><div class="cv-h">جودة PDF</div><div id="pdfQ" class="cv-seg" role="group" aria-label="جودة PDF"><button type="button" data-q="high" aria-pressed="false">عالية</button><button type="button" data-q="mid" aria-pressed="true">متوسطة</button><button type="button" data-q="low" aria-pressed="false">خفيفة</button></div></div>
     </div>
     <div class="cv-foot"><button id="cvGo" class="cv-btn pri" type="button">التالي: تصميم الصفحات</button><button id="cvNo" class="cv-btn" type="button" data-show="on=1">متابعة بدون غلاف</button><button id="cvCancel" class="cv-btn ghost" type="button">إلغاء</button></div>
@@ -1616,12 +1617,108 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
     const html=`<div class="table-wrap"><table data-cols="${n}" data-dem="${dem}"><colgroup>${pct.map(p=>`<col style="width:${p}%">`).join('')}</colgroup><thead><tr>${th.join('')}</tr></thead><tbody>${body.join('')}</tbody></table></div>`;
     return {html,next:j};
   }
-  const CALL={note:{t:'ملاحظة',i:'i',ci:0},info:{t:'معلومة',i:'i',ci:5},abstract:{t:'خلاصة',i:'=',ci:0},summary:{t:'خلاصة',i:'=',ci:0},tip:{t:'نصيحة',i:'+',ci:2},hint:{t:'نصيحة',i:'+',ci:2},important:{t:'مهم',i:'!',ci:4},warning:{t:'تنبيه',i:'!',ci:3},caution:{t:'احذر',i:'×',ci:1},danger:{t:'خطر',i:'×',ci:1},success:{t:'صحيح',i:'✓',ci:2},question:{t:'سؤال',i:'?',ci:4},example:{t:'مثال',i:'#',ci:5}};
+  const CALL={note:{t:'ملاحظة',i:'N',ci:0},info:{t:'معلومة',i:'I',ci:5},abstract:{t:'خلاصة',i:'S',ci:0},summary:{t:'خلاصة',i:'S',ci:0},tip:{t:'نصيحة',i:'T',ci:2},hint:{t:'نصيحة',i:'H',ci:2},important:{t:'مهم',i:'!',ci:4},warning:{t:'تنبيه',i:'W',ci:3},caution:{t:'احذر',i:'C',ci:1},danger:{t:'خطر',i:'D',ci:1},success:{t:'صحيح',i:'OK',ci:2},question:{t:'سؤال',i:'Q',ci:4},example:{t:'مثال',i:'E',ci:5},highyield:{t:'نقطة عالية الأهمية',i:'H',ci:2},trap:{t:'فخ امتحاني',i:'T',ci:1},redflag:{t:'علامة خطر',i:'!',ci:1},evidence:{t:'دليل',i:'E',ci:4}};/* UP2 */
   const HR=/^\s*([-*_])(?:\s*\1){2,}\s*$/;
   /* ---------- Visual callouts: > [!VISUAL] steps|timeline|metrics|mnemonic: Title  (plain list body, degrades to a normal list) ---------- */
-  const VIZ={steps:{k:'steps',tag:'ol',ci:0,t:'خطوات'},process:{k:'steps',tag:'ol',ci:0,t:'خطوات'},timeline:{k:'timeline',tag:'ul',ci:5,t:'تسلسل زمني'},metrics:{k:'metrics',tag:'ul',ci:2,t:'أرقام مهمة'},stats:{k:'metrics',tag:'ul',ci:2,t:'أرقام مهمة'},kpi:{k:'metrics',tag:'ul',ci:2,t:'أرقام مهمة'},mnemonic:{k:'mnemonic',tag:'ul',ci:4,t:'حيلة للحفظ'},mnemo:{k:'mnemonic',tag:'ul',ci:4,t:'حيلة للحفظ'}};
+  const VIZ={steps:{k:'steps',tag:'ol',ci:0,t:'خطوات'},process:{k:'steps',tag:'ol',ci:0,t:'خطوات'},timeline:{k:'timeline',tag:'ul',ci:5,t:'تسلسل زمني'},metrics:{k:'metrics',tag:'ul',ci:2,t:'أرقام مهمة'},stats:{k:'metrics',tag:'ul',ci:2,t:'أرقام مهمة'},kpi:{k:'metrics',tag:'ul',ci:2,t:'أرقام مهمة'},mnemonic:{k:'mnemonic',tag:'ul',ci:4,t:'حيلة للحفظ'},mnemo:{k:'mnemonic',tag:'ul',ci:4,t:'حيلة للحفظ'},compare:{k:'compare',tag:'ul',ci:5,t:'مقارنة'},algorithm:{k:'algorithm',tag:'ol',ci:0,t:'مسار قرار'},definition:{k:'definition',tag:'ul',ci:5,t:'تعريف'},numbers:{k:'numbers',tag:'ul',ci:2,t:'أرقام مهمة'},mcq:{k:'mcq',tag:'ul',ci:4,t:'سؤال للمراجعة'},redflags:{k:'redflags',tag:'ul',ci:1,t:'علامات خطر'},classification:{k:'classification',tag:'ul',ci:5,t:'تصنيف'},anatomy:{k:'anatomy',tag:'ul',ci:5,t:'طبقات'},legend:{k:'legend',tag:'ul',ci:4,t:'دليل الرموز'}};/* UP4 */
+  /* UP4: structured components. Anything malformed returns '' so renderBlocks() falls back to readable Markdown (no text is dropped). */
+  const VIZ_COMPLEX=new Set(['compare','algorithm','definition','numbers','mcq','redflags','classification','anatomy','legend']);
+  function vizStableId(s){s=String(s);let h=2166136261;for(let i=0;i<s.length;i++)h=Math.imul(h^s.charCodeAt(i),16777619);return 'q'+(h>>>0).toString(36)}
+  function complexVizBlock(v,title,body,opts){
+    opts=opts||{};
+    const raw=body.map(x=>String(x)).filter(x=>x.trim());
+    const rows=raw.map(line=>{const m=listMatch(line);if(!m)return null;return {depth:Math.min(2,Math.floor(indentOf(m[1])/2)),text:m[3].trim()}});
+    if(!raw.length||rows.some(x=>!x))return '';
+    const data=rows;
+    const vals=raw.map(l=>{const m=listMatch(l);return m?m[3].replace(/^[^:\uFF1A]{1,24}[:\uFF1A]\s*/,''):''}).join(' ');
+    const ar=((vals.match(/[\u0600-\u06FF]/g)||[]).length)>=((vals.match(/[A-Za-z]/g)||[]).length);/* UP10: card language follows its content */
+    const ENT={compare:'Comparison',algorithm:'Decision path',definition:'Definition',numbers:'Key numbers',redflags:'Red flags',classification:'Classification',anatomy:'Layers',legend:'Legend',mcq:'Review question'};
+    const kv=s=>{const i=s.search(/[:\uFF1A]/);return i>0?{key:s.slice(0,i).replace(/\*\*/g,'').trim(),value:s.slice(i+1).trim()}:{key:'',value:s}};
+    const txt=s=>inlineMarkdown(String(s));
+    const wrap=(inner,atomic)=>`<blockquote class="callout viz viz-${v.k}" data-ci="${v.ci}" data-sem="${v.k}"${opts.legacy?' data-legacy="1"':''}>${opts.legacy?'':`<div class="co-t"><span>${txt(title||(ar?v.t:(ENT[v.k]||v.t)))}</span></div>`}${v.k==='mcq'?inner:`<div class="viz-in" dir="${ar?'rtl':'ltr'}">${inner}</div>`}</blockquote>`;
+    const lv=(r,i)=>{const p=kv(r.text);return {key:p.key||((ar?'\u0639\u0646\u0635\u0631 ':'Item ')+(i+1)),value:p.value}};
+    const count=(a,b)=>data.length>=a&&data.length<=b;
+    const flat=()=>!data.some(x=>x.depth);
+    if(v.k==='compare'){if(!count(2,4)||!flat())return '';
+      return wrap('<div class="viz-compare-list">'+data.map((r,i)=>{const p=lv(r,i);return `<div class="vc-side"><b class="vc-label" dir="auto">${txt(p.key)}</b><p class="vc-copy" dir="auto">${txt(p.value)}</p></div>`}).join('')+'</div>')}
+    if(v.k==='algorithm'){if(!count(2,8)||!flat())return '';
+      return wrap('<div class="viz-algorithm-list">'+data.map((r,i)=>{const p=lv(r,i);return `<div class="va-row"><span class="va-n" dir="ltr">${i+1}</span><div class="va-t"><b dir="auto">${txt(p.key)}</b><p dir="auto">${txt(p.value)}</p></div></div>`}).join('')+'</div>')}
+    if(v.k==='definition'){if(!count(1,4)||!flat())return '';
+      const d=lv(data[0],0),rest=data.slice(1).map((r,i)=>{const p=lv(r,i+1);return `<p dir="auto"><b>${txt(p.key)}:</b> ${txt(p.value)}</p>`}).join('');
+      return wrap(`<div class="viz-definition"><div class="vd-term" dir="auto">${txt(d.key)}</div><p dir="auto">${txt(d.value)}</p>${rest}</div>`)}
+    if(v.k==='numbers'){if(!count(2,8)||!flat())return '';
+      return wrap('<div class="viz-number-list">'+data.map((r,i)=>{const p=lv(r,i);return `<div class="vn-card"><b class="vn-value" dir="ltr">${txt(p.key)}</b><p class="vn-label" dir="auto">${txt(p.value)}</p></div>`}).join('')+'</div>')}
+    if(v.k==='redflags'){if(!count(1,8)||!flat())return '';
+      return wrap('<div class="viz-redflag-list">'+data.map((r,i)=>{const p=lv(r,i);return `<div class="vr-row">${i===0?'<span class="vr-tag">RED FLAG</span>':''}<p dir="auto"><b>${txt(p.key)}</b> ${txt(p.value)}</p></div>`}).join('')+'</div>')}
+    if(v.k==='classification'){if(!count(1,12))return '';
+      return wrap('<div class="viz-tree">'+data.map(r=>`<div class="vt-row level-${r.depth}"><p dir="auto">${txt(r.text)}</p></div>`).join('')+'</div>')}
+    if(v.k==='anatomy'){if(!count(2,8)||!flat())return '';
+      return wrap('<div class="viz-layers">'+data.map((r,i)=>{const p=lv(r,i);return `<div class="vl-row"><b dir="auto">${txt(p.key)}</b><p dir="auto">${txt(p.value)}</p></div>`}).join('')+'</div>')}
+    if(v.k==='legend'){if(!count(2,8)||!flat())return '';
+      return wrap('<div class="viz-legend">'+data.map((r,i)=>{const p=lv(r,i);return `<div class="vleg-row"><b dir="auto">${txt(p.key)}</b><p dir="auto">${txt(p.value)}</p></div>`}).join('')+'</div>')}
+    if(v.k==='mcq'){
+      const f={question:'',options:[],answer:'',why:'',takeaway:'',wrong:{}};
+      for(const r of data){
+        if(r.depth)return '';
+        const m=r.text.match(/^([^:\uFF1A]{1,24})\s*[:\uFF1A]\s*(.+)$/);if(!m)return '';
+        const key=m[1].trim().toLowerCase(),value=m[2].trim();
+        if(key==='q'||key==='question')f.question=value;
+        else if(/^[a-f]$/.test(key))f.options.push({letter:key.toUpperCase(),value});
+        else if(key==='answer'||key==='correct')f.answer=value;
+        else if(key==='why'||key==='explanation')f.why=value;
+        else if(key==='takeaway')f.takeaway=value;
+        else{const wm=key.match(/^(?:wrong|distractor|review|note)\s*([a-f])$/);if(wm)f.wrong[wm[1].toUpperCase()]=value;else return ''}
+      }
+      const am=f.answer.match(/^\s*([A-Fa-f])(?:[).:\s]|$)/),correct=am&&am[1].toUpperCase();
+      if(!f.question||f.options.length<2||f.options.length>6||!correct||!f.options.some(x=>x.letter===correct))return '';
+      const id=vizStableId(f.question+'|'+f.options.map(x=>x.letter+':'+x.value).join('|'));
+      const opts=f.options.map(o=>`<div class="mcq-option" data-option="${o.letter}" data-correct="${String(o.letter===correct)}"><span class="mcq-letter" dir="ltr">${o.letter}</span> <p class="mcq-text" dir="auto">${txt(o.value)}</p></div>`).join('');
+      const wrong=Object.keys(f.wrong).map(k=>`<p dir="auto"><b>${ar?'\u062E\u064A\u0627\u0631 ':'Option '}${k}:</b> ${txt(f.wrong[k])}</p>`).join('');
+      const ans=f.answer.replace(/^\s*[A-Fa-f](?:[).:]?\s*)/,'');
+      return wrap(`<section class="mcq-card" data-qid="${id}" dir="${ar?'rtl':'ltr'}"><div class="mcq-stem"><div class="mcq-question" dir="auto"><p>${txt(f.question)}</p></div><div class="mcq-options">${opts}</div><p class="mcq-answer" dir="auto"><b>${ar?'\u0627\u0644\u0625\u062C\u0627\u0628\u0629 \u0627\u0644\u0635\u062D\u064A\u062D\u0629:':'Correct answer:'}</b> <span class="mcq-letter" dir="ltr">${correct}</span> ${txt(ans)}</p><div class="mcq-actions"><button type="button" class="mcq-action" data-mcq-action="reveal" aria-expanded="false">\u0625\u0638\u0647\u0627\u0631 \u0627\u0644\u0625\u062C\u0627\u0628\u0629</button><button type="button" class="mcq-action" data-mcq-action="weak" aria-pressed="false">\u062A\u0639\u0644\u064A\u0645 \u0643\u0636\u0639\u064A\u0641</button></div></div><div class="mcq-review">${f.why?`<p dir="auto"><b>${ar?'\u0627\u0644\u062A\u0641\u0633\u064A\u0631:':'Explanation:'}</b> ${txt(f.why)}</p>`:''}${wrong?`<div class="mcq-distractors"><p class="mcq-dh"><b>${ar?'\u0645\u0631\u0627\u062C\u0639\u0629 \u0627\u0644\u062E\u064A\u0627\u0631\u0627\u062A':'Option review'}</b></p>${wrong}</div>`:''}${f.takeaway?`<p class="mcq-takeaway" dir="auto"><b>${ar?'\u0627\u0644\u062E\u0644\u0627\u0635\u0629:':'Takeaway:'}</b> ${txt(f.takeaway)}</p>`:''}</div></section>`)}
+    return '';
+  }
+  /* UP5: bridge for the legacy "### Qn / Options: / **Answer:**" notes. Returns null unless the whole pattern parses. */
+  function renderLegacyMcq(lines,start,hid){
+    const hm=headingMatch(lines[start]);
+    if(!hm||hm[1].length!==3||!/^Q\s*\d+\b/i.test(hm[2]))return null;
+    let i=start+1;while(i<lines.length&&!lines[i].trim())i++;
+    const om=lines[i]&&lines[i].match(/^\s*Options:\s*(.+)$/i);if(!om)return null;
+    const source=om[1],marks=[...source.matchAll(/(?:^|\s)([a-f])\.\s+/gi)];
+    if(marks.length<2||marks.length>6)return null;
+    const options=marks.map((m,j)=>({letter:m[1].toUpperCase(),value:source.slice(m.index+m[0].length,j+1<marks.length?marks[j+1].index:source.length).trim()}));
+    if(options.some((o,j)=>!o.value||o.letter!==String.fromCharCode(65+j)))return null;
+    if(source.slice(0,marks[0].index+marks[0].length).trim().length>2)return null; // text before the first option letter would be lost
+    i++;while(i<lines.length&&!lines[i].trim())i++;
+    const answerText=(lines[i]||'').replace(/\*\*/g,'');
+    const am=answerText.match(/^\s*Answer:\s*([a-f])(?:[).:]|\s)+(.+?)\s*$/i);if(!am)return null;
+    const correct=am[1].toUpperCase();if(!options.some(o=>o.letter===correct))return null;
+    i++;const tail=[];
+    while(i<lines.length){if(lines[i].trim()&&headingMatch(lines[i]))break;tail.push(lines[i]);i++}
+    let why='',takeaway='';const review=[];let para=[];
+    const flush=()=>{if(!para.length)return;const rawp=para.join(' ').trim().replace(/\s+/g,' ');para=[];if(!rawp)return;
+      const tm=rawp.replace(/\*\*/g,'').match(/^Takeaway:\s*(.+)$/i);if(tm)takeaway=takeaway?takeaway+' '+tm[1]:tm[1];else why=why?why+' '+rawp:rawp};
+    for(const line of tail){
+      if(!line.trim()){flush();continue}
+      if(HR.test(line))break; /* UP10: a rule ends the question */
+      if(takeaway&&!listMatch(line)&&!/^\s*(\*\*)?\s*Takeaway/i.test(line))break;
+      const lm=listMatch(line);
+      if(lm){if(takeaway)break;flush();const item=lm[3].trim(),rm=item.match(/^([a-f])\.\s*(.+)$/i);
+        if(rm&&options.some(o=>o.letter===rm[1].toUpperCase()))review.push({letter:rm[1].toUpperCase(),text:rm[2]});else return null}
+      else if(/^\s*(>|```|~~~|\|)/.test(line)||headingMatch(line))return null;
+      else para.push(line.replace(/\s{2,}$/,''));
+    }
+    flush();
+    const body=[`- Q: ${hm[2]}`,...options.map(o=>`- ${o.letter}: ${o.value}`),`- Answer: ${correct}. ${am[2]}`];
+    if(why)body.push(`- Why: ${why}`);
+    review.forEach(r=>body.push(`- Review ${r.letter}: ${r.text}`));
+    if(takeaway)body.push(`- Takeaway: ${takeaway}`);
+    const card=complexVizBlock(VIZ.mcq,'',body,{legacy:true});
+    return card?{html:`<h3 id="${hid}" class="mcq-h">${inlineMarkdown(hm[2])}</h3>`+card,next:i}:null;
+  }
   function vizBlock(spec,body){
     const m=String(spec||'').match(/^\s*([A-Za-z]+)\s*(?::\s*(.*))?$/), v=m&&VIZ[m[1].toLowerCase()]; if(!v) return '';
+    if(VIZ_COMPLEX.has(v.k)) return complexVizBlock(v,(m[2]||'').trim(),body); /* UP4 */
     const items=body.map(l=>listMatch(l)).filter(Boolean).map(x=>x[3].trim()).filter(Boolean).slice(0,12);
     if(items.length<2) return '';
     const split=s=>{const r=s.match(/^(.+?)\s*[:：]\s+(.+)$/);return r?[r[1].replace(/\*\*/g,'').trim(),r[2]]:['',s]};
@@ -1642,6 +1739,7 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
       const line=lines[i];
       if(!line.trim()){i++;continue}
       const hm=headingMatch(line);
+      if(depth===0&&hm&&hm[1].length===3&&/^Q\s*\d+\b/i.test(hm[2])){const lg=renderLegacyMcq(lines,i,`h-${depth}-${i}`);if(lg){out.push(lg.html);i=lg.next;continue}} /* UP5 */
       if(hm){ out.push(`<h${hm[1].length} id="h-${depth}-${i}">${inlineMarkdown(hm[2])}</h${hm[1].length}>`); i++; continue; }
       if(i+1<lines.length&&/^\s{0,3}=+\s*$/.test(lines[i+1])&&!isBlockStart(line)&&!line.includes('|')){ out.push(`<h1 id="h-${depth}-${i}">${inlineMarkdown(line.trim())}</h1>`); i+=2; continue; }
       const fm=line.match(/^\s*(```|~~~)\s*([^\s`]*)/);
@@ -1654,8 +1752,9 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
       if(/^\s*>/.test(line)){
         const q=[]; while(i<lines.length&&/^\s*>/.test(lines[i])){q.push(lines[i].replace(/^\s*>\s?/,'').trimEnd());i++;}
         const cm=q[0].match(/^\[!(\w+)\][+-]?\s*(.*)$/), co=cm&&CALL[cm[1].toLowerCase()];
-        {const vz=cm&&cm[1].toLowerCase()==='visual'?vizBlock(cm[2],q.slice(1)):'';if(vz){out.push(vz);continue}}
-        if(co) out.push(`<blockquote class="callout" data-ci="${co.ci}"><div class="co-t"><span class="co-i">${co.i}</span><span>${cm[2]?inlineMarkdown(cm[2]):co.t}</span></div>${renderBlocks(q.slice(1).join('\n'),depth+1)}</blockquote>`);
+        {const isV=cm&&cm[1].toLowerCase()==='visual',vz=isV?vizBlock(cm[2],q.slice(1)):'';if(vz){out.push(vz);continue}
+         if(isV){const lab=(cm[2]||'').replace(/^\s*[A-Za-z]+\s*:?\s*/,'').trim()||'\u0645\u0644\u0627\u062D\u0638\u0629';out.push(`<blockquote class="viz-fallback"><p><strong>${inlineMarkdown(lab)}</strong></p>${renderBlocks(q.slice(1).join('\n'),depth+1)}</blockquote>`);continue}} /* UP4 */
+        if(co) out.push(`<blockquote class="callout" data-ci="${co.ci}" data-kind="${cm[1].toLowerCase()}"><div class="co-t"><span class="co-i" aria-hidden="true">${co.i}</span><span>${cm[2]?inlineMarkdown(cm[2]):co.t}</span></div>${renderBlocks(q.slice(1).join('\n'),depth+1)}</blockquote>`);
         else out.push(`<blockquote>${renderBlocks(q.join('\n'),depth+1)}</blockquote>`);
         continue;
       }
@@ -1707,8 +1806,31 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
 
   let renderTimer=0, saveTimer=0, resizeTimer=0;
   const readerActive=()=>readerScreen.classList.contains('active');
+  /* UP5: MCQ study mode (screen only): one delegated listener, state in localStorage (try/catch), PDF never contains controls */
+  const MCQ_STATE_KEY=STORAGE+'-mcq-state-v1';
+  function readMcqState(){try{const o=JSON.parse(localStorage.getItem(MCQ_STATE_KEY)||'{}');return {weak:new Set(o.weak||[]),reviewed:new Set(o.reviewed||[])}}catch(_){return window.__mcqMem||(window.__mcqMem={weak:new Set(),reviewed:new Set()})}}
+  function writeMcqState(st){window.__mcqMem=st;try{localStorage.setItem(MCQ_STATE_KEY,JSON.stringify({weak:[...st.weak],reviewed:[...st.reviewed]}))}catch(_){}}
+  const mcqHead=c=>{const h=c.closest('.viz')&&c.closest('.viz').previousElementSibling;return h&&h.matches&&h.matches('h3.mcq-h')?h:null};
+  function mcqProgress(root,st){const cs=[...root.querySelectorAll('.mcq-card')];const n=cs.filter(c=>st.reviewed.has(c.dataset.qid)).length;const o=root.querySelector('[data-mcq-progress]');if(o)o.textContent='\u062A\u0645\u062A \u0645\u0631\u0627\u062C\u0639\u0629 '+n+' / '+cs.length}
+  function mcqMark(c,st){const w=st.weak.has(c.dataset.qid);c.classList.toggle('is-weak',w);c.classList.toggle('is-reviewed',st.reviewed.has(c.dataset.qid));const h=mcqHead(c);if(h)h.classList.toggle('is-weak',w);
+    const b=c.querySelector('[data-mcq-action="weak"]');if(b){b.setAttribute('aria-pressed',String(w));b.textContent=w?'\u0645\u064F\u0639\u0644\u0651\u064E\u0645 \u0643\u0636\u0639\u064A\u0641':'\u062A\u0639\u0644\u064A\u0645 \u0643\u0636\u0639\u064A\u0641'}}
+  function bindMcq(root){if(root.dataset.mcqBound==='1')return;root.dataset.mcqBound='1';
+    root.addEventListener('click',e=>{
+      const g=e.target.closest('[data-mcq-global]');
+      if(g&&root.contains(g)){const on=root.classList.toggle('mcq-weak-only');g.setAttribute('aria-pressed',String(on));g.textContent=on?'\u0639\u0631\u0636 \u0643\u0644 \u0627\u0644\u0623\u0633\u0626\u0644\u0629':'\u0639\u0631\u0636 \u0627\u0644\u0623\u0633\u0626\u0644\u0629 \u0627\u0644\u0636\u0639\u064A\u0641\u0629 \u0641\u0642\u0637';return}
+      const btn=e.target.closest('[data-mcq-action]');if(!btn||!root.contains(btn))return;
+      const card=btn.closest('.mcq-card');if(!card||!card.dataset.qid)return;
+      const st=readMcqState(),id=card.dataset.qid;
+      if(btn.dataset.mcqAction==='reveal'){const on=card.classList.toggle('is-revealed');btn.setAttribute('aria-expanded',String(on));btn.textContent=on?'\u0625\u062E\u0641\u0627\u0621 \u0627\u0644\u0625\u062C\u0627\u0628\u0629':'\u0625\u0638\u0647\u0627\u0631 \u0627\u0644\u0625\u062C\u0627\u0628\u0629';if(on)st.reviewed.add(id)}
+      else if(btn.dataset.mcqAction==='weak'){if(st.weak.has(id))st.weak.delete(id);else st.weak.add(id)}
+      writeMcqState(st);mcqMark(card,st);mcqProgress(root,st)});}
+  function syncMcqStudyUI(root){try{
+    const cards=[...root.querySelectorAll('.mcq-card')];let tb=root.querySelector(':scope>.mcq-toolbar');
+    if(!cards.length){if(tb)tb.remove();root.classList.remove('mcq-weak-only');return}
+    if(!tb){tb=document.createElement('div');tb.className='mcq-toolbar';tb.innerHTML='<span data-mcq-progress role="status" aria-live="polite"></span><button type="button" data-mcq-global="weak-filter" aria-pressed="false">\u0639\u0631\u0636 \u0627\u0644\u0623\u0633\u0626\u0644\u0629 \u0627\u0644\u0636\u0639\u064A\u0641\u0629 \u0641\u0642\u0637</button>';root.prepend(tb)}
+    const st=readMcqState();cards.forEach(c=>mcqMark(c,st));mcqProgress(root,st);bindMcq(root)}catch(e){console.error(e)}}
   function render(){
-    try{content.innerHTML=renderMarkdown(input.value); applyDir(content); recolor(); fitTables(content,0,fontPx())}
+    try{content.innerHTML=renderMarkdown(input.value); applyDir(content); recolor(); fitTables(content,0,fontPx()); syncMcqStudyUI(content)/* UP5 */}
     catch(err){console.error(err)}
   }
   let saveWarned=false;
@@ -1891,8 +2013,8 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
       prev=el;
     });
     /* B) plain text decoration: label chips, numbers, «quotes», (English terms) */
-    const NUM='[0-9\u0660-\u0669]+(?:[.,\u066B][0-9\u0660-\u0669]+)?(?:\\s?(?:%|\u066A|mg|mcg|kg|g|mL|ml|L|mmHg|mmol/L|mEq/L|IU|bpm|\u00B0C|\u00B0F|\u0633\u0645|\u0645\u0645|\u0643\u062C\u0645|\u063A\u0645|\u0645\u0644\u063A|\u0645\u0644\u062C\u0645|\u062F\u0642\u064A\u0642\u0629|\u0633\u0627\u0639\u0629|\u064A\u0648\u0645|\u0623\u064A\u0627\u0645|\u0633\u0646\u0629|\u0633\u0646\u0648\u0627\u062A))?';
-    const RX=new RegExp('(\\(([A-Za-z][^()\\n]{2,60})\\))|(\u00AB[^\u00BB\\n]{1,90}\u00BB)|('+NUM+')','g');
+    const NUM='[0-9\u0660-\u0669]+(?:[.,\u066B][0-9\u0660-\u0669]+)?(?:\\s?(?:%|\u066A|mg|mcg|kg|g|mL|ml|L|mmHg|mmol/L|mEq/L|IU|bpm|\u00B0C|\u00B0F|\u0633\u0645|\u0645\u0645|\u0643\u062C\u0645|\u063A\u0645|\u0645\u0644\u063A|\u0645\u0644\u062C\u0645|\u062F\u0642\u064A\u0642\u0629|\u0633\u0627\u0639\u0629|\u064A\u0648\u0645|\u0623\u064A\u0627\u0645|\u0633\u0646\u0629|\u0633\u0646\u0648\u0627\u062A))';
+    const RX=new RegExp('(\\(([A-Za-z][^()\\n]{2,28})\\))|(\u00AB[^\u00BB\\n]{1,90}\u00BB)|('+NUM+')','g');
     const LBL=/^(\s*)([^:\uFF1A\n.!?\u061F\u060C,;0-9\/\\]{2,28}?)([:\uFF1A])(\s+|$)/;
     let li=0;
     root.querySelectorAll('p,li').forEach(blk=>{
@@ -1919,6 +2041,7 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
       nodes.forEach(t=>{
         const txt=t.nodeValue;RX.lastIndex=0;let m,last=0,frag=null;
         while((m=RX.exec(txt))){
+          if(m[1]&&m[2].trim().split(/\s+/).length>3)continue; /* UP1: no chip for long parentheticals */
           if(m[4]){const b=txt[m.index-1];if(b&&/[A-Za-z0-9_\u0660-\u0669.]/.test(b))continue;}
           frag=frag||document.createDocumentFragment();
           if(m.index>last)frag.appendChild(document.createTextNode(txt.slice(last,m.index)));
@@ -1931,7 +2054,15 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
       });
     });
   }
-  function recolor(){if(!document.body.style.getPropertyValue('--ink-dark'))inkApply(document.body);const __pal=readPalette(document.body);colorize(content,__pal);try{ultraColor(content,__pal);ultraText(content,__pal)}catch(_){}}
+  /* UP2: fixed semantic roles survive the cyclic colour passes */
+  const SEMANTIC_SLOT={compare:0,algorithm:0,steps:0,mnemonic:4,definition:5,classification:5,anatomy:5,numbers:2,highyield:2,success:2,tip:2,hint:2,warning:3,important:3,trap:1,danger:1,caution:1,redflag:1,redflags:1,question:4,evidence:4,legend:4,example:5,note:0,info:5,summary:0,abstract:0};
+  function applySemanticColors(root,pal){try{
+    root.querySelectorAll('.viz[data-sem],.callout[data-kind]').forEach(el=>{
+      const key=(el.dataset.sem||el.dataset.kind||'note').toLowerCase();const i=SEMANTIC_SLOT[key];if(i==null)return;
+      if(!pal.colors[i]||!pal.tints[i]||!pal.heads[i]||!pal.ons[i])return;
+      el.style.setProperty('--hc',pal.colors[i]);el.style.setProperty('--hb',pal.tints[i]);el.style.setProperty('--hd',pal.heads[i]);el.style.setProperty('--hon',pal.ons[i]);
+    })}catch(_){}}
+  function recolor(){if(!document.body.style.getPropertyValue('--ink-dark'))inkApply(document.body);const __pal=readPalette(document.body);colorize(content,__pal);try{ultraColor(content,__pal);ultraText(content,__pal)}catch(_){}applySemanticColors(content,__pal)/* UP2 */}
   /* self-check: contrast ratios per theme, no UI. Usage: __inkAudit() -> {rows,failures,table}. Restores the active theme. */
   window.__inkAudit=function(){
     const body=document.body,prev=themes.find(t=>body.classList.contains('theme-'+t)),rows=[],fails=[];
@@ -2131,10 +2262,14 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
     t.style.maxHeight=Math.ceil(fs*1.55*4)+'px';t.style.overflow='hidden';
     return pg;
   }
+  function upAutoSub(){try{ /* UP6: only used while the user has not enabled a manual subtitle */
+    const n=(sel)=>content.querySelectorAll(sel).length,a=[],h=n('h2'),tb=n('.table-wrap'),q=n('.mcq-card');
+    if(h)a.push(h+' \u0623\u0642\u0633\u0627\u0645');if(tb)a.push(tb+' \u062C\u062F\u0648\u0644');if(q)a.push(q+' \u0633\u0624\u0627\u0644');
+    return a.join(' \u00B7 ')}catch(_){return ''}}
   function cvNorm(){
     const t=s=>String(s||'').trim();
     return {title:((cvO.titleAuto?headTitle:t(cvO.title))||'مذاكرتي').slice(0,120),
-      sub:cvO.subOn?t(cvO.sub).slice(0,120):'',auth:cvO.authOn?t(cvO.auth).slice(0,80):'',year:cvO.yearOn?t(cvO.year).slice(0,40):'',custom:cvO.customOn?t(cvO.custom).slice(0,300):'',
+      sub:cvO.subOn?t(cvO.sub).slice(0,120):upAutoSub(),auth:cvO.authOn?t(cvO.auth).slice(0,80):'',year:cvO.yearOn?t(cvO.year).slice(0,40):'',custom:cvO.customOn?t(cvO.custom).slice(0,300):'',
       bgTab:cvO.bgTab,preset:cvO.preset,fit:cvO.fit==='contain'?'contain':'cover',dim:Math.min(70,Math.max(0,+cvO.dim||0)),
       color:['light','dark'].includes(cvO.color)?cvO.color:'auto',align:cvO.align==='start'?'start':'center'};
   }
@@ -2530,7 +2665,7 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
       const inkMap=inkApply(probe);const pal=readPalette(probe);stage.removeChild(probe);
       const src=document.createElement('div');
       src.innerHTML=renderMarkdown(input.value);
-      applyDir(src);colorize(src,pal);try{ultraColor(src,pal);ultraText(src,pal)}catch(_){}prepPdfLists(src);
+      applyDir(src);src.querySelectorAll(".mcq-actions,.mcq-toolbar").forEach(e=>e.remove());/* UP5: no controls in the PDF */colorize(src,pal);try{ultraColor(src,pal);ultraText(src,pal)}catch(_){}applySemanticColors(src,pal)/* UP2 */;prepPdfLists(src);
       const BASE=15*pdfZoom,fs=s=>(BASE*s).toFixed(2)+'px'; // base font of the PDF page body (15px at 100%)
       fitTables(src,PB.w,BASE); // page body width (PW - 2*margin) in logical px
       src.querySelectorAll('.li-text,p,pre,tbody tr,hr,img,h1,h2,h3,h4,h5,h6').forEach((e,i)=>{e.dataset.bk=String(i)}); // stable line ids for manual page breaks
@@ -2622,12 +2757,54 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
         const table=k.querySelector('table'),thead=table&&table.querySelector('thead'),tbody=table&&table.querySelector('tbody'),cg=table&&table.querySelector('colgroup');
         if(!table||!tbody){dest().appendChild(k);return}
         const wd=shell(k,dest),td=shell(table,wd,o=>{const t=o.cloneNode(false);if(cg)t.appendChild(cg.cloneNode(true));if(thead)t.appendChild(thead.cloneNode(true));return t}),bd=shell(tbody,td);
-        Array.from(tbody.children).forEach(r=>place(r,bd));
+        const frags=[];
+        Array.from(tbody.children).forEach(r=>{place(r,bd);const b=bd();if(frags[frags.length-1]!==b)frags.push(b)});
+        /* UP3: no single orphan row at the top of a continuation */
+        if(frags.length>1){const L=frags[frags.length-1],P=frags[frags.length-2];
+          if(L.isConnected&&P.isConnected&&L.children.length===1&&P.children.length>=3){const r=P.lastElementChild;L.insertBefore(r,L.firstChild);if(!fits())P.appendChild(r)}}
       };
       const splitLI=(k,dest)=>{
         const mark=k.firstElementChild,body=k.querySelector(':scope>.li-body');
         const ld=shell(k,dest,o=>{const c=o.cloneNode(false);c.appendChild(mark.cloneNode(true));return c}),bd=shell(body,ld);
         Array.from(body.children).forEach(c=>place(c,bd));
+      };
+      /* UP3: keep-together helpers */
+      const upBodyH=()=>cur.lim-cur.bodyEl.getBoundingClientRect().top;
+      const upIsHead=e=>e&&/^H[1-6]$/.test(e.tagName);
+      const upTxt=e=>(e.textContent||'').trim();
+      const upGroup=(top,i)=>{ // heading + what must stay with it
+        const k=top[i];if(!upIsHead(k))return [k];
+        const g=[k],nx=j=>top[j];
+        if(/^(Q|S)\s*\d+|^\u0633\s*\d+/i.test(upTxt(k))&&nx(i+1)&&nx(i+1).tagName==='P'&&/^Options?\b|^\u0627\u0644\u062E\u064A\u0627\u0631\u0627\u062A/i.test(upTxt(nx(i+1)))){
+          for(let j=i+1;j<top.length&&j<=i+4;j++){const e=nx(j);if(upIsHead(e))break;g.push(e);if(/^(\*\*)?\s*(Answer|\u0627\u0644\u0625\u062C\u0627\u0628\u0629)\b/i.test(upTxt(e)))break}
+        }else if(nx(i+1)&&!upIsHead(nx(i+1)))g.push(nx(i+1));
+        if(PBRK.size){for(let j=1;j<g.length;j++){const e=g[j],fc=e.matches(CONTENT)?e:e.querySelector(CONTENT);if(fc&&PBRK.has(fc.dataset.bk)){g.length=j;break}}}
+        return g;
+      };
+      const upKeep=g=>{ // never leave a heading (or MCQ stem+options) without its follower on the same page
+        if(g.length<2||isEmpty(cur.bodyEl))return;
+        const d=cur.bodyEl,top0=d.getBoundingClientRect().top;
+        const tr=g.map((e,j)=>{if(j>0&&e.matches&&e.matches('blockquote.viz-mcq')){const c=e.cloneNode(true);c.querySelectorAll('.mcq-review').forEach(x=>x.remove());return c}return e});
+        tr.forEach(e=>d.appendChild(e));
+        const bot=lastBottom(),ok=fits(),first=tr[0].getBoundingClientRect().top,h=bot-first,over=bot-cur.lim;
+        tr.forEach(e=>{if(e.parentNode===d)d.removeChild(e)});
+        if(!ok&&over>=40&&h<=upBodyH()*.42)nextPage();
+      };
+      const upAtomic=(k,kh)=>{ // compact blocks stay whole instead of leaving a fragment
+        if(isEmpty(cur.bodyEl))return false;
+        const lim=upBodyH();
+        if(k.classList.contains('viz-mcq'))return false;
+        if(k.classList.contains('table-wrap'))return kh<=lim*.30;
+        if(k.tagName==='BLOCKQUOTE'&&k.classList.contains('callout'))return kh<=lim*.24;
+        return false;
+      };
+      const upTrial=(k,dest,rows)=>{ // would the title / header + a minimum of content fit here?
+        const tmp=k.cloneNode(false),d=dest();
+        if(rows){const t=k.querySelector('table'),tb=t&&t.querySelector('tbody');if(!tb)return true;
+          const t2=t.cloneNode(false),cg=t.querySelector('colgroup'),th=t.querySelector('thead');if(cg)t2.appendChild(cg.cloneNode(true));if(th)t2.appendChild(th.cloneNode(true));
+          const b2=tb.cloneNode(false);Array.from(tb.children).slice(0,rows).forEach(r=>b2.appendChild(r.cloneNode(true)));t2.appendChild(b2);tmp.appendChild(t2)}
+        else{const ct=k.querySelector(':scope>.co-t');if(!ct)return true;tmp.appendChild(ct.cloneNode(true));const sp=document.createElement('div');sp.style.height='3.4em';tmp.appendChild(sp)}
+        d.appendChild(tmp);const ok=fits();d.removeChild(tmp);prune(d);return ok;
       };
       function place(k,dest){
         if(PBRK.size){ // manual page breaks: a marked line always starts a new page
@@ -2641,13 +2818,23 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
         }
         const d=dest();d.appendChild(k);
         if(fits())return;
+        const kh=k.getBoundingClientRect().height; /* UP3 */
         if(lastBottom()-cur.lim<70&&shrink(k,dest))return;
         if(k.parentNode===d){d.removeChild(k);prune(d)}
+        if(upAtomic(k,kh)){nextPage();dest().appendChild(k);if(fits())return;if(shrink(k,dest))return;const d2=k.parentNode;if(d2){d2.removeChild(k);prune(d2)}} /* UP3 */
         const t=k.tagName;
         if(t==='P'||t==='PRE'||k.classList.contains('li-text'))return splitLeaf(k,dest);
-        if(k.classList.contains('table-wrap'))return splitTable(k,dest);
+        if(k.classList.contains('table-wrap')){ /* UP3: header + 2 rows must fit, else start on a fresh page */
+          if(!isEmpty(cur.bodyEl)&&k.querySelectorAll('tbody tr').length>=3&&!upTrial(k,dest,2))nextPage();
+          return splitTable(k,dest)}
         if(t==='LI')return splitLI(k,dest);
-        if(t==='UL'||t==='OL'||t==='BLOCKQUOTE'){const sd=shell(k,dest);return Array.from(k.children).forEach(c=>place(c,sd))}
+        if(t==='UL'||t==='OL'||t==='BLOCKQUOTE'){
+          if(t==='BLOCKQUOTE'&&!isEmpty(cur.bodyEl)&&!upTrial(k,dest,0))nextPage(); /* UP3: callout title never stranded */
+          const sd=shell(k,dest),ct=t==='BLOCKQUOTE'?k.querySelector(':scope>.co-t'):null;
+          /* UP3: a callout title always travels with its first content (baseline lost it when its shell was pruned) */
+          const sd2=ct?()=>{const s=sd();if(!ct.isConnected)s.insertBefore(ct,s.firstChild);return s}:sd;
+          return Array.from(k.children).filter(c=>c!==ct).forEach(c=>place(c,sd2))}
+        if(k.matches&&k.matches('.mcq-card,.mcq-review,.mcq-distractors,.mcq-options')){const sd=shell(k,dest);return Array.from(k.children).forEach(c=>place(c,sd))} /* UP3: MCQ cards split between stem and review */
         if(!isEmpty(cur.bodyEl))nextPage(); // atomic: heading, rule, row, image
         dest().appendChild(k);
         if(!fits()&&cur.bodyEl.classList.contains('hasx')&&!cur.supp){cur.supp=1;plApplyPage(cur,[])}
@@ -2655,11 +2842,20 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
       }
 
       newPage();
-      Array.from(src.children).forEach(k=>place(k,topD));
+      {const top=Array.from(src.children);for(let ti=0;ti<top.length;ti++){upKeep(upGroup(top,ti)); place(top[ti],topD)}} /* UP3 */
       if(pages.length>1&&isEmpty(cur.bodyEl)){cur.remove();pages.pop();cur=pages[pages.length-1]}
-      const seenLi=new Set();
+      try{const em=document.createElement('div');em.className='pg-end';em.textContent='\u2014 \u0646\u0647\u0627\u064A\u0629 \u0627\u0644\u0645\u0630\u0643\u0631\u0629 \u2014';cur.bodyEl.appendChild(em);if(!fits())cur.bodyEl.removeChild(em)}catch(_){} /* UP7 */
+      const seenLi=new Set();let upSec='';
       pages.forEach((p,i)=>{
         p.querySelector('.pg-num').textContent=(i+1)+' / '+pages.length;
+        try{ /* UP6: running head */
+          const h2s=p.querySelectorAll('.pg-body h2'),b0=p.querySelector('.pg-body'),first=b0.firstElementChild,prevSec=upSec;
+          if(h2s.length)upSec=(h2s[h2s.length-1].textContent||'').replace(/\s+/g,' ').trim();
+          const pr=p.getBoundingClientRect(),fr=p.querySelector('.pg-frame').getBoundingClientRect(),br=b0.getBoundingClientRect();
+          const gap=(br.top-pr.top)-(fr.top-pr.top+8);
+          if(prevSec&&gap>=12&&!(first&&/^H[12]$/.test(first.tagName))&&!(p.classList.contains('pg-cover'))){
+            const rh=document.createElement('div');rh.className='pg-rh';rh.setAttribute('dir',dirOf(prevSec));rh.textContent=prevSec.slice(0,90);p.appendChild(rh)}
+        }catch(_){}
         p.querySelectorAll('li[data-lid]').forEach(li=>{const id=li.dataset.lid;if(seenLi.has(id))li.firstElementChild.style.visibility='hidden';else seenLi.add(id)});
       });
       const mkToc=()=>{ // blank page with the same frame / strip / footer as the content pages (used by the table of contents)
@@ -2677,6 +2873,9 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
     pages.forEach((pg,pi)=>pg.querySelectorAll('.pg-body h1,.pg-body h2,.pg-body h3').forEach(h=>{
       const t=(h.textContent||'').replace(/\s+/g,' ').trim();if(t)ents.push({h,pg,pi,lv:+h.tagName.charAt(1),t})}));
     if(ents.length>1&&ents[0].lv===1&&ents.filter(e=>e.lv===1).length===1)ents.shift(); // a lone H1 is the document title, not a section
+    /* UP6: default TOC = H1/H2 only (full depth is a stored option) */
+    {let full=false;try{full=localStorage.getItem(STORAGE+'-toc-v1')==='full'}catch(_){}
+     if(!full){const top=ents.filter(e=>e.lv<=2);if(top.length)ents.splice(0,ents.length,...top)}}
     if(!ents.length)return [];
     const mn=Math.min.apply(null,ents.map(e=>e.lv)),out=[];let cur=null,first=true;
     const open=()=>{const pg=R.mkToc();pg.dataset.pg='toc'+out.length;pg.i=-1-out.length;pg.tocLinks=[];
@@ -3608,7 +3807,11 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
   confirmYes.addEventListener('click',updateCount);
   updateCount();
 
+  /* UP6: TOC depth switch */
+  {const tocUi=()=>{let k='h2';try{k=localStorage.getItem(STORAGE+'-toc-v1')==='full'?'full':'h2'}catch(_){}document.querySelectorAll('#pdfToc [data-t]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.t===k)))};
+   document.querySelectorAll('#pdfToc [data-t]').forEach(b=>b.addEventListener('click',()=>{lsSet(STORAGE+'-toc-v1',b.dataset.t);tocUi()}));tocUi()}
   loadFonts().then(()=>{if(readerActive())fitTables(content,0,fontPx())});
+  /* UP0: test hook */ window.__UP={paginateDoc,renderMarkdown,input,pfApply,loadFonts,recolor,render,tocBuild,cvNorm};
 })();
 </script>
 <style id="pe-panel-fix">
@@ -3724,101 +3927,125 @@ html.app-night .cv-scroll{background:#212836}
 (function(){try{
 var AIP_PROMPT=[
   "=== READ THIS FIRST ===",
+  "The text ABOVE this block is my real request (my topic, lecture or question bank). Fulfil it completely and accurately first. Then deliver the answer ONLY in the format defined below. The rules below describe how to format the answer; they are not the task itself.",
   "",
-  "The text ABOVE this block is my real request (my topic or task). First fulfil that request completely and accurately. Then deliver your answer ONLY in the output format defined below. The rules below describe how to format the answer; they are not the task itself.",
+  "You are writing high-yield study notes for Mudhakirati (\u0645\u0630\u0627\u0643\u0631\u062a\u064a), an offline Markdown-to-study-page renderer used by Arabic-speaking medical and nursing students.",
   "",
-  "=== OUTPUT FORMAT (MANDATORY, NO EXCEPTIONS) ===",
+  "OUTPUT CONTRACT",
+  "Return exactly ONE outer four-backtick Markdown fence that begins with ````markdown and ends with ````. Put the complete note inside it. Do not add an introduction or comments outside the fence. Inside the note use ordinary Markdown only; never raw HTML, SVG, emoji, Unicode arrows or box-drawing characters.",
   "",
-  "1. Your ENTIRE reply must be ONE single code block and nothing else. No greeting, no intro, no closing remarks, no explanations, no text before or after the block.",
-  "2. Open the block with FOUR backticks followed by the word markdown, and close it with four backticks. This lets any triple-backtick code fence you need inside stay intact. Never close the block early and never split the reply into several blocks.",
-  "3. Inside the block, write standard CommonMark / GitHub-Flavored Markdown only, restricted to the syntax listed below. Do NOT use: HTML (the only allowed tag is <br>, and any other tag is shown as plain text), LaTeX or math syntax, Mermaid, images, inline CSS, color codes, or emojis (they break the PDF fonts).",
-  "4. Write in the language I ask for. If it is Arabic, use clear Modern Standard Arabic and keep technical terms in English inside parentheses on first use, for example: دوالي المريء (Esophageal varices). If the document is not in Arabic, give EVERY callout a custom title in the document language, because the default callout titles are Arabic.",
+  "CONTENT RULES",
+  "- Use the supplied source/lecture/question bank as the authority. Preserve its terminology, distinctions, options and level of certainty. Do not silently correct or invent facts. If information is absent, say \u201cNot specified in the source\u201d only when needed.",
+  "- Explain mechanisms as cause -> effect using words, not arrow characters. Distinguish source facts from a useful clinical inference. Include a high-yield distinction only when it helps answer the stated learning goals.",
+  "- Keep the document self-contained. Use one # title, ## major sections and ### subsections. Avoid ##### headings.",
+  "- Prefer concise connected explanation over a pile of cards. Use bullets for parallel items, numbered lists for ordered steps, and tables only for genuine comparisons or structured data.",
+  "- Aim per ## section: 0\u20132 callouts, 0\u20132 visual blocks, and at most 1 table unless comparison genuinely needs a second. A 20-question bank can use one mcq block per question. Do not turn every paragraph into a callout.",
   "",
-  "=== HOW MY RENDERER WORKS (write to fit it) ===",
+  "SUPPORTED MARKDOWN",
+  "Headings: # Title, ## Section, ### Subsection, #### Minor heading.",
+  "Bold: **key phrase**. Emphasis: *term* (rendered as colored underline, not italic). Highlight: ==must-remember==. Strike: ~~incorrect claim~~ only when discussing a misconception. Inline code: `short literal token`; use it sparingly. Superscript ^value^ and subscript ~value~ are fragile: avoid unless essential; if essential, no spaces inside the token. Do not use tildes for ranges or decorative separators.",
+  "Lists: - bullet; 1. ordered; - [ ] checklist; - [x] completed. Do not insert blank lines between items in one list. Use one blank line before the next paragraph or block.",
+  "Tables: use a header, a separator with exactly one --- per column, and rows with the same number of columns, e.g.:",
+  "| Feature | Above | Below |",
+  "|:---|:---|:---|",
+  "| Sensation | Visceral | Somatic |",
+  "Do not put blank lines inside tables. Use <br> only inside a table cell when a line break is genuinely necessary. Escape a literal pipe as \\|.",
+  "Callouts: use one blank line between separate callouts. Examples:",
+  "> [!IMPORTANT] Dentate line rule",
+  "> Above the line is typically visceral and relatively painless; below is somatic and pain-sensitive.",
   "",
-  "My app converts Markdown into a colorful, paginated A4 study PDF (and a matching on-screen study view) and applies colors AUTOMATICALLY by order and structure. You never specify colors. Direction (RTL/LTR) is detected automatically per block. Your job is to use exactly the structures below so the result looks beautiful and nothing renders as stray symbols.",
+  "> [!WARNING] Do not infer a diagnosis from one finding alone",
+  "> Interpret findings in clinical context.",
+  "Available types: NOTE, INFO, ABSTRACT, SUMMARY, TIP, HINT, IMPORTANT, WARNING, CAUTION, DANGER, SUCCESS, QUESTION, EXAMPLE, HIGHYIELD, TRAP, REDFLAG, EVIDENCE. Use explicit titles and short bodies. Do not merge two callouts into one block.",
   "",
-  "--- Block elements ---",
+  "VISUAL BLOCKS",
+  "Use this form. Every line in the body must begin with > followed by one plain list item. Keep items at one level except classification. Do not place a table, nested callout or nested blockquote inside a visual block. If a visual is malformed or too long, the renderer shows a plain quote/list instead.",
   "",
-  "- # (H1): exactly ONE, as the document title. Centered title with a gold ornament. Never use the underline style (=== under a line).",
-  "- ## (H2): the main sections. Each becomes a filled colored band with a different color, so use 4-10 major sections. Number them like \"## 1. Section name\". Keep titles under 8 words.",
-  "- ### (H3): subsections. Each gets a colored dot and underline. Use them to break a section into small scannable parts.",
-  "- #### (H4): allowed sparingly for a small labeled sub-part (colored side bar). Never use ##### or ######.",
-  "- Paragraphs: write each paragraph as ONE line. Every line break inside a paragraph is kept as a visible line break, so never hard-wrap sentences. Separate all blocks with one blank line. Keep paragraphs to 1-3 short sentences.",
-  "- Unordered lists: use \"- \" markers only. Each nesting level gets a different marker style automatically.",
-  "- Ordered lists: \"1. \", \"2. \", ... Use for steps, sequences, ranked items. Nested ordered lists are allowed (they appear as letters in the study view).",
-  "- Nesting: indent each child level by exactly 2 spaces. Use at most 3 levels, and prefer 2. A nested list may be a different type from its parent (a numbered list under a bullet, and the reverse).",
-  "- Do NOT put blank lines between items of the same list (a blank line splits it into two lists). Put one blank line before and after the whole list. Keep items short (one line, ideally under 15 words). Do not stack more than 7 items in a row.",
-  "- Task lists: \"- [ ] item\" for open items and \"- [x] item\" for done items. Use them only for review checklists.",
-  "- Tables (GitHub style):",
-  "  - Header row, then a separator row with at least three dashes per cell: |---|---|---|",
-  "  - Alignment is supported with colons: |:---| (start), |:---:| (center), |---:| (end). Use center only for short symbols or numbers.",
-  "  - At most 5 columns; cell text 1-8 words; first column holds the item name.",
-  "  - Inside cells you may use **bold**, *italic*, ==highlight==, `code`, ^sup^, ~sub~ and <br> for a forced line break. No lists, headings, callouts, or code blocks inside cells.",
-  "  - Escape a literal pipe as \\|",
-  "  - Put a blank line before and after every table. Split any table longer than 12 rows into several tables under separate H3 headings.",
-  "  - Header cells are colored per column and rows are zebra-striped automatically.",
-  "- Callouts (colored boxes with a title bar). Syntax: the first line is \"> [!TYPE] Optional custom title\", followed by body lines that each start with \"> \". A line containing only \">\" makes a blank line inside the box. Allowed TYPE values (case-insensitive, no other values work): NOTE, INFO, ABSTRACT, SUMMARY, TIP, HINT, IMPORTANT, WARNING, CAUTION, DANGER, SUCCESS, QUESTION, EXAMPLE.",
-  "  - Without a custom title, the box shows an Arabic default title (ملاحظة, معلومة, خلاصة, نصيحة, مهم, تنبيه, احذر, خطر, صحيح, سؤال, مثال).",
-  "  - Types that share a color family: NOTE / ABSTRACT / SUMMARY; TIP / HINT / SUCCESS; CAUTION / DANGER; INFO / EXAMPLE. IMPORTANT and QUESTION share one color; WARNING has its own color. Choose by meaning, and vary types so neighboring boxes differ in color.",
-  "  - Use them with meaning: ABSTRACT or SUMMARY right after the title (2-4 line overview); IMPORTANT for must-know rules; TIP or HINT for mnemonics and memory tricks; WARNING or CAUTION for pitfalls and common mistakes; DANGER for emergencies and red flags; EXAMPLE for cases or worked examples; QUESTION for self-test questions (put the answer on the next line inside the same box, for example \"> **Answer:** ...\"); SUCCESS for confirmed facts or the final take-home point; NOTE or INFO for side information.",
-  "  - Inside a callout you may use paragraphs, short bullet or numbered lists, bold, highlight, and short code. Do not put tables or headings inside callouts. Keep each callout to 1-5 short lines.",
-  "  - IMPORTANT: always leave one blank line (not a \">\" line) between two callouts. Without it they merge into one box and the second header shows as plain text.",
-  "  - Use 3-8 callouts per document, spread out and mixing types.",
-  "- Plain blockquote: \"> text\" (no [!TYPE]) is also colored; use it only for definitions or quotations. Blockquotes can be nested with \"> >\".",
-  "- Horizontal rule: a line containing only --- renders as an ornamental divider. Use it rarely, only between major parts, with blank lines around it. Never put --- directly under a text line.",
-  "- Code blocks: use a triple-backtick fence with an optional language label on the opening line (shown as a small caption), for example:",
+  "Steps (2\u201312 items):",
+  "> [!VISUAL] steps: Initial assessment",
+  "> 1. Inspect the external opening and discharge",
+  "> 2. Assess complexity and recurrence",
+  "> 3. Select imaging when clinically indicated",
   "",
-  "```text",
-  "Dose = weight x 15 mg",
-  "```",
+  "Compare (2\u20134 rows; label: meaning):",
+  "> [!VISUAL] compare: Above versus below the dentate line",
+  "> - **Above**: Visceral sensation; portal drainage",
+  "> - **Below**: Somatic sensation; systemic drainage",
   "",
-  "  Use them only for real code, formulas, or protocols. Keep lines under 60 characters because the page is narrow. Content inside is shown literally and always left-to-right, so no Markdown works inside it. Never create code by indenting lines with spaces.",
-  "- Footnotes: put a marker like [^1] in the text, and define it on its own single line anywhere (usually at the end): \"[^1]: short text\". Definitions must be one line. Numbering is automatic by first appearance, and all notes are collected at the end under a divider. Every marker needs a definition and vice versa. Use them only for side references.",
+  "Algorithm (2\u20138 rows):",
+  "> [!VISUAL] algorithm: Approach to a fistula",
+  "> - Examine: Look for an opening and induration",
+  "> - Assess: Identify complex or recurrent disease",
+  "> - Image: Consider MRI or endoanal ultrasound when indicated",
   "",
-  "--- Inline formatting ---",
+  "Definition (1\u20134 rows; first row is the term):",
+  "> [!VISUAL] definition: Key term",
+  "> - Dentate line: A landmark separating regions with different anatomy and innervation",
+  "> - Clinical relevance: It helps interpret pain and drainage patterns",
   "",
-  "- **Bold**: each bold phrase gets its own color. Use ONLY for key terms, definitions, drugs, names, numbers, and high-yield facts, 1-3 phrases per paragraph at most. Never bold a whole sentence.",
-  "- *Italic*: also colored. Use it for secondary emphasis, foreign terms, or short mnemonics. (***bold italic*** also works; use it rarely.)",
-  "- ==highlight==: marker-pen highlight. Use sparingly for the 1-3 most critical facts in a section.",
-  "- ~~strikethrough~~: use only to show something wrong or outdated next to the correct version.",
-  "- `inline code`: use for drug doses, gene or protein symbols, commands, codes, and exact terms. It is always shown left-to-right in a small box.",
-  "- Superscript ^text^ and subscript ~text~: use for units, charges and chemistry, for example m^2^, 10^9^/L, Ca^2+^, H~2~O, CO~2~. No spaces are allowed inside the markers.",
-  "- Markers must touch the text: write **word**, never ** word **.",
-  "- Links: [label](https://example.com) and bare http(s) URLs work (http, https and mailto only). Use them rarely and only for real, well-known sources. Never invent URLs.",
-  "- Escaping: put a backslash before a literal special character, for example \\* \\_ \\~ \\^ \\= \\| \\# \\[ \\]",
-  "- Danger characters: a pair of ~ or ^ or == in the same line turns the text between them into subscript, superscript or highlight. Therefore NEVER use ~ to mean \"approximately\" (write \"about\" or use the word in the document language), and avoid stray * _ ^ = characters in normal text. Use the letter x or the symbol × for multiplication, never an asterisk.",
+  "Key numbers (2\u20138 rows; include units in the label):",
+  "> [!VISUAL] numbers: Recall values",
+  "> - 4 cm: Surgical canal, approximate",
+  "> - 2 cm: Anatomical canal, approximate",
+  "> - 90 degrees: Anorectal angle, approximate",
+  "Only include values supported by the source or standard required by the request; preserve qualifiers such as \u201capproximately\u201d.",
   "",
-  "--- Characters and symbols (the PDF fonts are limited) ---",
+  "MCQ (question + 2\u20136 options + valid answer + why; wrong-option notes and takeaway optional):",
+  "> [!VISUAL] mcq: Q1 review",
+  "> - Q: Which option is least appropriate as routine treatment?",
+  "> - A: Fiber and lifestyle measures",
+  "> - B: Rubber-band ligation",
+  "> - C: Hemorrhoidectomy for every second-degree case",
+  "> - D: Sclerotherapy in selected patients",
+  "> - Answer: C",
+  "> - Why: The treatment should match the grade and clinical context.",
+  "> - Wrong A: Conservative measures are appropriate in many cases.",
+  "> - Wrong B: An office procedure may be appropriate.",
+  "> - Takeaway: Match treatment intensity to disease grade.",
+  "Answer must be exactly one option letter A\u2013F first. Do not use this visual syntax for a question that has no supported answer key; say that it is unverified in normal prose instead.",
   "",
-  "- Safe: letters, digits, standard punctuation, % < > ( ) [ ] / and the symbols × ÷ ± ° ½ – —",
-  "- Avoid: arrows (→ ← ↑ ↓), ≥ ≤ ≈ ≠, µ, ✓ and ✗, Unicode superscript or subscript digits, bullets typed by hand, and all emojis. Use words instead (\"increases\", \"leads to\", \"at least\", \"about\", \"mcg\"), or the plain ASCII forms > < and -> when needed. For exponents and chemistry use the ^ and ~ markup above.",
+  "Red flags (1\u20138):",
+  "> [!VISUAL] redflags: Urgent features",
+  "> - Systemic toxicity: Urgent clinical assessment",
+  "> - Rapidly progressive pain: Assess for serious disease",
   "",
-  "--- Visual callouts (recommended, 2 to 4 per document) ---",
+  "Classification (1\u201312; indent children by two spaces):",
+  "> [!VISUAL] classification: Disease groups",
+  "> - Anorectal disease",
+  ">   - Hemorrhoidal disease",
+  ">     - Internal hemorrhoids",
+  ">   - Anorectal sepsis",
+  ">     - Abscess or fistula",
   "",
-  "- Same callout syntax with the type VISUAL, then a visual kind, a colon and a title: > [!VISUAL] steps: Title. The body is ONE plain list of 2 to 7 items (no nesting, no blank lines inside it). It renders as designed cards, and in any other Markdown viewer it still reads as a normal list.",
-  "  - steps: a numbered list (1. 2. 3.) for procedures or algorithms. Items become connected numbered cards.",
-  "  - timeline: bullets written as - **label** : text (a date, phase or stage) to show progression over time.",
-  "  - metrics: bullets written as - label : value (normal ranges, doses, cut-offs), shown as number tiles. Keep each value short.",
-  "  - mnemonic: bullets written as - **A** – Word – meaning, one letter per item, to expand an acronym.",
-  "  - Use a VISUAL block only when it clarifies a sequence, a progression, key numbers or an acronym; otherwise use a normal list or table. Never invent values, doses or dates. Leave one blank line between consecutive callouts. Do not put a table or heading inside it.",
+  "Anatomy/layers (2\u20138):",
+  "> [!VISUAL] anatomy: Wall layers (schematic)",
+  "> - Mucosa: Epithelial lining",
+  "> - Submucosa: Connective tissue and vessels",
+  "> - Muscle: Sphincter and wall muscle relationships",
+  "Add \u201cschematic, not to scale\u201d if the diagram could be confused with an exact anatomical drawing.",
   "",
-  "=== CONTENT AND LAYOUT RULES ===",
+  "Legend (2\u20138 rows):",
+  "> [!VISUAL] legend: Meaning of labels",
+  "> - HIGH-YIELD: Prioritize for recall",
+  "> - EXAM TRAP: Common misconception",
+  "> - RED FLAG: Urgent escalation cue",
   "",
-  "- Be accurate, well organized, and exam-oriented: move from simple to complex, define each term once, then build on it.",
-  "- Prefer lists and tables over long prose. Never write a wall of text.",
-  "- Make the result visually rich and colorful: every H2 section must contain at least one non-paragraph element (a table, a callout, or a VISUAL block); vary the callout types so neighboring boxes get different colors; put ==highlight== on the single most important fact of each section; use **bold** on key terms so the automatic colors have something to work with.",
-  "- Mix element types so the page looks rich: after every 1-2 paragraphs or lists, add a table, a callout, or a highlighted key point. Do not stack more than 7 bullets in a row.",
-  "- Suggested lecture skeleton: H1 title, ABSTRACT callout, then numbered H2 sections each with H3 parts, comparison tables where useful, a TIP callout for mnemonics, a WARNING for pitfalls, a final \"Summary\" H2 with a recap table, a \"Self-test\" H2 with QUESTION callouts, and a short \"Review checklist\" with task items.",
-  "- Always use tables for comparisons, classifications, differential diagnosis, drugs, and \"site / cause / feature\" style data.",
-  "- Avoid very long unbroken tables, very long lists, and very long code blocks, because the PDF paginates automatically and compact blocks break across pages more cleanly.",
-  "- Do not repeat the same information twice. Do not add filler, apologies, or meta-commentary.",
-  "- Do not use inline color words, \"[color]\" tags, or any decoration markup. The renderer handles all colors.",
+  "Existing types still supported: timeline, metrics/stats/kpi and mnemonic/mnemo. Use them only where the structure matches: timeline items are \u201c**label**: text\u201d; metrics are \u201clabel: value\u201d; mnemonic items start with a short letter/number cue, followed by a hyphen and meaning. Each legacy visual should have 2\u201312 items.",
   "",
-  "=== FINAL CHECK BEFORE YOU REPLY ===",
+  "MEDICAL QUESTION ANALYSIS",
+  "For every MCQ, preserve the exact options and the intended correct answer from the source. State the principle first; then give a short explanation; then explain each important distractor, especially the tempting error; finish with a one-sentence Takeaway. Do not repeat the stem and full answer several times. If source and answer key disagree, flag the discrepancy rather than silently resolving it.",
   "",
-  "Exactly one H1; H2 sections are numbered; no ##### headings; blank lines around every block; no blank lines between list items; blank line between consecutive callouts; every table has a separator row of at least three dashes per cell and at most 5 columns; no ~ used for \"approximately\"; no emojis, arrows or ≥ ≤ ≈ symbols; no HTML except <br> in table cells; the whole answer is ONE four-backtick markdown block with nothing outside it."
-].join("\n");
+  "DIRECTION AND FONT SAFETY",
+  "Arabic, English and mixed lines are allowed. Keep English medical terms spelled conventionally. Avoid emoji, unusual Unicode symbols, arrow glyphs, decorative characters and unsupported Greek symbols. Prefer \u201cincreases\u201d, \u201cdecreases\u201d, \u201cleads to\u201d, \u201cgreater than\u201d, \u201cless than\u201d, \u201capproximately\u201d, and ordinary hyphens. Avoid false Markdown: never use underscores in ordinary words for italics, never surround ranges in tildes, and only use ^sup^ / ~sub~ when truly necessary with no spaces inside.",
+  "",
+  "FINAL QUALITY CHECK BEFORE OUTPUT",
+  "1. One outer four-backtick `markdown` fence only, no text outside it.",
+  "2. Every table has a valid divider and consistent column counts.",
+  "3. Each blockquote line in a callout/visual starts with >; separate consecutive callouts with one blank line.",
+  "4. No blank lines inside a list; no nested lists inside visual blocks except classification.",
+  "5. No unsupported facts, raw HTML, emoji, arrow glyphs, malformed ^ or ~ markup, or color-dependent instructions.",
+  "6. Use only the components that improve understanding. End with a concise summary or revision checklist if useful."
+].join("\n");/* UP9 */
 var ta=document.getElementById('aip-prompt-text'),btn=document.getElementById('aip-copy'),
     det=document.getElementById('aip-details'),sec=document.getElementById('aip-section'),
     msg=document.getElementById('aip-msg'),scr=document.querySelector('#helpModal .cv-scroll');
@@ -6153,6 +6380,99 @@ body.theme-contrast .pdf-page:not(.pdf-light) .md blockquote{border-inline-start
 body.theme-ink .pdf-page:not(.pdf-light) .md h2,body.theme-contrast .pdf-page:not(.pdf-light) .md h2{border-inline-start-color:var(--text)}
 body.theme-rose .pdf-page:not(.pdf-light) .md h2{border-radius:20px}
 body.theme-cvd .pdf-page:not(.pdf-light) .md blockquote.callout>.co-t{text-decoration:underline;text-decoration-thickness:2px;text-underline-offset:.22em}
+
+
+/* UP1: calm typography - plain paragraphs, spacing hierarchy, logical heading anchoring */
+.reader .md>p,.pdf-page .md>p{background:none;box-shadow:none;border:0;border-radius:0;padding:0;margin-block:.6em}
+.reader .md>p::before,.reader .md>p::after,.pdf-page .md>p::before,.pdf-page .md>p::after{display:none}
+.reader .md>p.u2-lead,.pdf-page .md>p.u2-lead{padding:.55em .95em;border-radius:14px;margin-block:.7em .9em;line-height:1.95;font-size:1.04em;background:color-mix(in srgb,var(--sc,var(--accent)) 9%,var(--surface));border-inline-start:4px solid color-mix(in srgb,var(--sc,var(--accent)) 70%,transparent)}
+.reader .md h2,.pdf-page .md h2{margin-block-start:1.6em;margin-block-end:.7em}
+.reader .md h3,.pdf-page .md h3{margin-block-start:1.25em;margin-block-end:.45em}
+.reader .md h4,.pdf-page .md h4{margin-block-start:1em;margin-block-end:.35em}
+.reader .md li,.pdf-page .md li{margin-block:.3em}
+.reader .md h2[data-d="ltr"],.reader .md h3[data-d="ltr"],.pdf-page .md h2[data-d="ltr"],.pdf-page .md h3[data-d="ltr"]{margin-left:0;margin-right:auto;text-align:left}
+.reader .md h2[data-d="rtl"],.reader .md h3[data-d="rtl"],.pdf-page .md h2[data-d="rtl"],.pdf-page .md h3[data-d="rtl"]{margin-right:0;margin-left:auto;text-align:right}
+
+/* UP2: consistent ASCII badge for callout glyphs */
+.reader .md .co-i,.pdf-page .md .co-i{display:inline-block;min-width:1.8em;height:1.8em;padding:0 .2em;box-sizing:border-box;line-height:1.55;text-align:center;border:1.5px solid currentColor;border-radius:5px;margin-inline-end:.5em;font:700 .72em/1.55 var(--font-body);vertical-align:middle;font-style:normal}
+.reader .md .callout[data-kind="trap"],.pdf-page .md .callout[data-kind="trap"]{border-style:dashed}
+.reader .md .callout[data-kind="highyield"],.pdf-page .md .callout[data-kind="highyield"]{border-width:2px}
+
+
+/* UP4: compact legacy MCQ cards (keeps the 19-question section from growing) */
+.reader .md .viz[data-legacy],.pdf-page .md .viz[data-legacy]{margin:.2em 0 .9em;border:0;border-radius:0;border-inline-start:3px solid var(--hc,var(--accent));background:none}
+.reader .md .viz[data-legacy] .mcq-card,.pdf-page .md .viz[data-legacy] .mcq-card{margin:0;border:0;border-radius:0;background:none}
+.reader .md .viz[data-legacy] .mcq-options,.pdf-page .md .viz[data-legacy] .mcq-options{margin:.1em .5em}
+.reader .md .viz[data-legacy] .mcq-option,.pdf-page .md .viz[data-legacy] .mcq-option{margin:0;padding:.12em .4em;border-bottom:0}
+.reader .md .viz[data-legacy] .mcq-answer,.pdf-page .md .viz[data-legacy] .mcq-answer{margin:.3em .5em!important;padding:.3em .6em!important}
+.reader .md .viz[data-legacy] .mcq-review,.pdf-page .md .viz[data-legacy] .mcq-review{padding:0 .5em .3em}
+.reader .md .viz[data-legacy] .mcq-takeaway,.pdf-page .md .viz[data-legacy] .mcq-takeaway{padding:.2em .6em!important}
+.reader .md .viz[data-legacy] .mcq-distractors,.pdf-page .md .viz[data-legacy] .mcq-distractors{border-top:0;padding-top:0}
+.reader .md .viz[data-legacy] .mcq-distractors p,.pdf-page .md .viz[data-legacy] .mcq-distractors p{margin:.05em 0}
+/* UP4/UP5: components (screen may use grid; PDF layer is stacked normal flow) */
+.reader .md blockquote.viz,.pdf-page .md blockquote.viz{margin:1em 0;padding:0;border:1px solid var(--line);border-inline-start:4px solid var(--hc,var(--accent));border-radius:8px;background:var(--surface);background-image:none;box-shadow:none;color:var(--text)}
+.reader .md .viz>.co-t,.pdf-page .md .viz>.co-t{margin:0;padding:.5em .8em;background:var(--hc,var(--accent));color:var(--hon,var(--on-c));font:700 .8em/1.4 var(--font-body)}
+.reader .md .viz-mcq>.co-t,.pdf-page .md .viz-mcq>.co-t{display:none}
+.reader .md .viz p,.pdf-page .md .viz p{margin:.2em 0;padding:0;background:none;border:0;box-shadow:none;border-radius:0}
+.reader .md .viz-compare-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:.65em;padding:.7em}
+.pdf-page .md .viz-compare-list,.pdf-page .md .viz-number-list,.pdf-page .md .viz-legend{display:block;padding:.5em .7em}
+.reader .md .vc-side,.pdf-page .md .vc-side,.reader .md .vn-card,.pdf-page .md .vn-card,.reader .md .vleg-row,.pdf-page .md .vleg-row{padding:.55em .7em;border:1px solid var(--line);border-radius:6px;background:var(--surface-2);min-width:0;margin:.35em 0}
+.reader .md .viz-compare-list .vc-side,.reader .md .viz-number-list .vn-card,.reader .md .viz-legend .vleg-row{margin:0}
+.reader .md .vc-label,.pdf-page .md .vc-label,.reader .md .viz b,.pdf-page .md .viz b{color:var(--hd,var(--heading));font-family:var(--font-head);font-weight:700}
+.reader .md .vc-label,.pdf-page .md .vc-label{display:block}
+.reader .md .viz-algorithm-list,.pdf-page .md .viz-algorithm-list{padding:.5em .8em}
+.reader .md .va-row,.pdf-page .md .va-row{display:block;position:relative;margin:.4em 0;padding:.4em .7em;padding-inline-start:2.6em;border:1px solid var(--line);border-radius:6px;background:var(--surface-2)}
+.reader .md .va-n,.pdf-page .md .va-n{position:absolute;inset-inline-start:.6em;top:.45em;width:1.6em;height:1.6em;line-height:1.6em;text-align:center;border-radius:50%;background:var(--hc,var(--accent));color:var(--hon,var(--on-c));font:700 .85em/1.6em var(--font-body)}
+.reader .md .viz-definition,.pdf-page .md .viz-definition{padding:.7em .9em;background:var(--hb,var(--accent-soft))}
+.reader .md .vd-term,.pdf-page .md .vd-term{font:700 1.1em/1.4 var(--font-head);color:var(--hd,var(--heading))}
+.reader .md .viz-number-list{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:.45em;padding:.7em}
+.reader .md .vn-value,.pdf-page .md .vn-value{display:inline-block;font:700 1.2em/1.3 var(--font-head)}
+.reader .md .vn-label,.pdf-page .md .vn-label{display:block}
+.reader .md .viz-redflag-list,.pdf-page .md .viz-redflag-list{margin:.6em;border:2px solid var(--hc,var(--accent));border-radius:6px}
+.reader .md .vr-row,.pdf-page .md .vr-row{padding:.4em .65em;border-bottom:1px dashed var(--line)}
+.reader .md .vr-row:last-child,.pdf-page .md .vr-row:last-child{border-bottom:0}
+.reader .md .vr-tag,.pdf-page .md .vr-tag{display:inline-block;margin-inline-end:.5em;padding:0 .4em;border:1.5px solid var(--hd,currentColor);border-radius:4px;color:var(--hd,inherit);font:700 .68em/1.6 var(--font-body);direction:ltr}
+.reader .md .viz-tree,.pdf-page .md .viz-tree{padding:.6em .9em}
+.reader .md .vt-row,.pdf-page .md .vt-row{margin:.25em 0;padding:.2em .55em;border-inline-start:2px solid var(--hc,var(--accent))}
+.reader .md .vt-row.level-1,.pdf-page .md .vt-row.level-1{margin-inline-start:1.2em;border-inline-start-style:dashed}
+.reader .md .vt-row.level-2,.pdf-page .md .vt-row.level-2{margin-inline-start:2.4em;border-inline-start-style:dotted}
+.reader .md .viz-layers,.pdf-page .md .viz-layers{margin:.65em;border:1px solid var(--line);border-radius:5px}
+.reader .md .vl-row,.pdf-page .md .vl-row{padding:.45em .7em;border-bottom:1px solid var(--line);background:var(--surface-2)}
+.reader .md .vl-row:nth-child(odd),.pdf-page .md .vl-row:nth-child(odd){background:var(--hb,var(--accent-soft))}
+.reader .md .vl-row:last-child,.pdf-page .md .vl-row:last-child{border-bottom:0}
+.reader .md .viz-legend{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:.4em;padding:.7em}
+.reader .md .mcq-card,.pdf-page .md .mcq-card{margin:.5em;border:1px solid var(--line);border-radius:7px;background:var(--surface)}
+.reader .md .mcq-question,.pdf-page .md .mcq-question{margin:.3em .5em .5em;padding:.5em .7em;background:var(--surface-2);border-inline-start:4px solid var(--hc,var(--accent));color:var(--hd,var(--heading))}
+.reader .md .viz[data-legacy] .mcq-question,.pdf-page .md .viz[data-legacy] .mcq-question{display:none}
+.reader .md .mcq-options,.pdf-page .md .mcq-options{margin:.4em .7em}
+.reader .md .mcq-option,.pdf-page .md .mcq-option{display:block;margin:.25em 0;padding:.35em .5em;border-bottom:1px solid var(--line)}
+.reader .md .mcq-letter,.pdf-page .md .mcq-letter{display:inline-block;min-width:1.6em;text-align:center;border:1px solid var(--line);border-radius:4px;font-weight:700;margin-inline-end:.4em}
+.reader .md .mcq-text,.pdf-page .md .mcq-text{display:inline;margin:0}
+.reader .md .mcq-answer,.pdf-page .md .mcq-answer{margin:.5em!important;padding:.55em .75em!important;border:1px solid var(--hc,var(--accent))!important;background:var(--hb,var(--accent-soft))!important;color:var(--hd,var(--heading))}
+.reader .md .mcq-card:not(.is-revealed) .mcq-answer{display:none}
+.reader .md .mcq-card.is-revealed .mcq-option[data-correct="true"],.pdf-page .md .mcq-option[data-correct="true"]{border:2px solid var(--hc,var(--accent));background:var(--hb,var(--accent-soft));font-weight:700}
+.reader .md .mcq-review,.pdf-page .md .mcq-review{padding:.1em .7em .6em}
+.reader .md .mcq-distractors,.pdf-page .md .mcq-distractors{border-top:1px solid var(--line);padding-top:.35em}
+.reader .md .mcq-takeaway,.pdf-page .md .mcq-takeaway{padding:.4em .65em!important;border-inline-start:4px solid var(--c4,var(--accent))!important;background:var(--surface-2)!important}
+.reader .md .mcq-actions{margin:.2em .6em .5em}
+.reader .md .mcq-action{margin:.2em .3em;padding:.45em .8em;border:1px solid var(--hc,var(--accent));border-radius:6px;background:var(--surface);color:var(--hd,var(--heading));font:700 .85em var(--font-body);cursor:pointer;min-height:40px}
+.reader .md .mcq-action:focus-visible,.reader .md .mcq-toolbar button:focus-visible{outline:3px solid var(--hc,var(--accent));outline-offset:2px}
+.pdf-page .md .mcq-action,.pdf-page .md .mcq-actions,.pdf-page .md .mcq-toolbar{display:none!important}
+.reader .md .mcq-toolbar{display:flex;flex-wrap:wrap;gap:.6em;align-items:center;margin:.5em 0;padding:.5em;border-bottom:1px solid var(--line);font-size:.85em}
+.reader .md .mcq-toolbar button{min-height:40px;padding:.3em .8em;border:1px solid var(--line);border-radius:6px;background:var(--surface);color:var(--text);font:inherit;cursor:pointer}
+.reader .md.mcq-weak-only .mcq-card:not(.is-weak){display:none}
+.reader .md.mcq-weak-only .viz-mcq:not(:has(.is-weak)),.reader .md.mcq-weak-only h3.mcq-h:not(.is-weak){display:none}
+.reader .md .mcq-card.is-weak{border:2px dashed var(--c2,var(--accent))}
+.reader .md .viz-fallback,.pdf-page .md .viz-fallback{background:var(--surface);border:1px solid var(--line);border-inline-start:3px solid var(--muted);padding:.55em .75em;box-shadow:none;border-radius:6px}
+@media(max-width:560px){.reader .md .viz-compare-list,.reader .md .viz-legend{grid-template-columns:1fr}.reader .md .viz-number-list{grid-template-columns:repeat(2,minmax(0,1fr))}}
+
+/* UP6: running head sits between the colour strip and the body, never over either */
+.pdf-page .pg-rh{position:absolute;left:calc(var(--fr,16px) + 22px);right:calc(var(--fr,16px) + 22px);top:calc(var(--fr,16px) + 10px);height:11px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;font:700 8px/11px var(--font-body);color:var(--muted)}
+/* UP7: end mark */
+.pdf-page .pg-end{margin-top:1.2em;text-align:center;font:700 .8em/1.6 var(--font-body);color:var(--muted)}
+
+/* UP10: answer text keeps full text contrast; only its label uses the heading colour */
+.reader .md .mcq-answer,.pdf-page .md .mcq-answer{color:var(--text)}
 </style>
 </body>
 </html>
