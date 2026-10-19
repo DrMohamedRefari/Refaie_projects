@@ -6573,5 +6573,118 @@ body.theme-cvd .pdf-page:not(.pdf-light) .md blockquote.callout>.co-t{text-decor
 .u2h{padding:.04em .24em;border-radius:.4em;background:color-mix(in srgb,var(--sc,var(--accent)) 16%,transparent);-webkit-box-decoration-break:clone;box-decoration-break:clone}
 @media(max-width:700px){.reader .md>p:not(.u2-lead){padding:.5em .85em}}
 </style>
+<!-- MK-SEARCH:START (find-in-page bar + compact mnemonic chips) -->
+<style id="mk-patch-css">
+/* ===== compact mnemonic chips: fit the text, wrap with long lines ===== */
+.reader .md blockquote.viz-mnemonic ul{display:flex;flex-direction:column;align-items:flex-start;gap:.7em;margin-block:.9em}
+.reader .md blockquote.viz-mnemonic li{display:flex;align-items:center;width:fit-content;max-width:100%;margin:0;padding:.45em 1.1em .45em .9em;border-radius:1.4em;gap:1.1em;line-height:1.9}
+.reader .md blockquote.viz-mnemonic li>.li-mark{display:none}
+.reader .md blockquote.viz-mnemonic li>.li-body{display:flex;align-items:center;gap:1.1em;min-width:0;flex:1 1 auto}
+.reader .md blockquote.viz-mnemonic li .vl{flex:none;margin:0;min-width:2.1em;padding:.05em .55em;border-radius:999px;text-align:center}
+.reader .md blockquote.viz-mnemonic li .vt{min-width:0;flex:1 1 auto;overflow-wrap:anywhere}
+/* ===== find bar ===== */
+#mkFind{position:fixed;inset-inline-end:10px;top:70px;z-index:60;display:flex;align-items:center;gap:4px;padding:5px;direction:rtl;
+  background:var(--surface,#fff);color:var(--text,#222);border:1px solid var(--line,#ccc);border-radius:14px;box-shadow:0 8px 24px rgba(0,0,0,.18);max-width:calc(100vw - 20px);font-family:var(--font-body,inherit)}
+#mkFind input{width:min(46vw,170px);min-width:0;height:34px;border:1px solid var(--line,#ccc);border-radius:10px;padding:0 10px;background:var(--surface-2,#f7f7f7);color:inherit;font:inherit;font-size:14px;outline:none}
+#mkFind input:focus{border-color:var(--accent,#0f6b5a)}
+#mkFind button{width:34px;height:34px;flex:none;border:0;border-radius:10px;background:transparent;color:inherit;display:grid;place-items:center;padding:0}
+#mkFind button:active{background:var(--accent-soft,rgba(0,0,0,.08))}
+#mkFind button:disabled{opacity:.35}
+#mkFind svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round}
+#mkFind .mkc{min-width:44px;text-align:center;font-size:12.5px;font-weight:800;direction:ltr;color:var(--muted,#666);font-variant-numeric:tabular-nums}
+#mkFind.mini input,#mkFind.mini .mkc,#mkFind.mini .mkn{display:none}
+#mkFind.mini{padding:3px}
+#mkFind.none input{border-color:#c0392b}
+::highlight(mk-find){background:#ffe066;color:#000}
+::highlight(mk-find-cur){background:#ff9f1c;color:#000}
+@media print{#mkFind{display:none!important}}
+</style>
+<div id="mkFind" role="search" aria-label="بحث في الصفحة">
+  <button type="button" id="mkTog" aria-label="بحث"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg></button>
+  <input id="mkQ" type="search" dir="auto" enterkeyhint="search" placeholder="ابحث عن كلمة…" autocomplete="off" spellcheck="false" aria-label="كلمة البحث">
+  <span class="mkc" id="mkCnt" aria-live="polite">0/0</span>
+  <button type="button" id="mkUp" class="mkn" aria-label="النتيجة السابقة (أعلى)"><svg viewBox="0 0 24 24"><path d="M6 15l6-6 6 6"/></svg></button>
+  <button type="button" id="mkDn" class="mkn" aria-label="النتيجة التالية (أسفل)"><svg viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg></button>
+</div>
+<script id="mk-find-js">
+(function(){try{
+var $=function(i){return document.getElementById(i)};
+var bar=$('mkFind'),q=$('mkQ'),cnt=$('mkCnt'),up=$('mkUp'),dn=$('mkDn'),tog=$('mkTog');
+var ta=$('markdownInput'),content=$('content'),rs=$('readerScreen'),top=document.querySelector('.topbar');
+if(!bar||!q||!ta||!content)return;
+var hasHL=!!(window.CSS&&CSS.highlights&&window.Highlight);
+var hits=[],cur=-1,mode='',mini=false;
+/* normalise Arabic so diacritics / alef / ya variants don't block a match; keep a map back to original indices */
+function norm(s){var out='',map=[];for(var i=0;i<s.length;i++){var c=s.charCodeAt(i);
+  if((c>=0x64B&&c<=0x65F)||c===0x670||c===0x640||c===0x200C||c===0x200D||c===0x200F||c===0x200E)continue;
+  var ch=s[i];
+  if(c===0x623||c===0x625||c===0x622||c===0x671)ch='\u0627';else if(c===0x649)ch='\u064A';else ch=ch.toLowerCase();
+  out+=ch;map.push(i)}return{s:out,m:map}}
+function isReader(){return rs&&rs.classList.contains('active')}
+function findAll(h,n){var r=[],i=0;if(!n)return r;while((i=h.indexOf(n,i))>-1){r.push(i);i+=Math.max(1,n.length)}return r}
+/* ---------- reader: text nodes -> ranges ---------- */
+function collect(){var w=document.createTreeWalker(content,NodeFilter.SHOW_TEXT,{acceptNode:function(n){
+  var p=n.parentNode;if(!p||/^(SCRIPT|STYLE|NOSCRIPT)$/.test(p.nodeName))return NodeFilter.FILTER_REJECT;
+  if(!n.nodeValue)return NodeFilter.FILTER_REJECT;
+  if(p.closest&&p.closest('.mcq-review[hidden],[hidden]'))return NodeFilter.FILTER_REJECT;
+  return NodeFilter.FILTER_ACCEPT}});
+  var nodes=[],full='',starts=[],n;while((n=w.nextNode())){nodes.push(n);starts.push(full.length);full+=n.nodeValue}
+  return{nodes:nodes,starts:starts,full:full}}
+function locate(c,idx){var lo=0,hi=c.starts.length-1;while(lo<hi){var mid=(lo+hi+1)>>1;if(c.starts[mid]<=idx)lo=mid;else hi=mid-1}return{node:c.nodes[lo],off:idx-c.starts[lo]}}
+function buildReader(qs){var c=collect(),nf=norm(c.full),nq=norm(qs).s,res=[];
+  findAll(nf.s,nq).forEach(function(p){var a=nf.m[p],b=nf.m[p+nq.length-1]+1;
+    var A=locate(c,a),B=locate(c,b-1);var r=document.createRange();
+    try{r.setStart(A.node,A.off);r.setEnd(B.node,Math.min(B.node.nodeValue.length,B.off+1));res.push({range:r})}catch(e){}});
+  return res}
+/* ---------- editor: textarea ---------- */
+var mirror=null;
+function mirrorTop(pos){
+  if(!mirror){mirror=document.createElement('div');mirror.setAttribute('aria-hidden','true');document.body.appendChild(mirror)}
+  var cs=getComputedStyle(ta),st=mirror.style;
+  ['fontFamily','fontSize','fontWeight','fontStyle','letterSpacing','lineHeight','textTransform','wordSpacing','textIndent','paddingTop','paddingRight','paddingBottom','paddingLeft','borderTopWidth','borderRightWidth','borderBottomWidth','borderLeftWidth','boxSizing','direction','textAlign','tabSize'].forEach(function(k){st[k]=cs[k]});
+  st.position='absolute';st.visibility='hidden';st.top='0';st.left='-9999px';st.whiteSpace='pre-wrap';st.wordWrap='break-word';st.overflowWrap='break-word';st.width=ta.clientWidth+parseFloat(cs.borderLeftWidth)+parseFloat(cs.borderRightWidth)+'px';st.height='auto';
+  mirror.textContent=ta.value.slice(0,pos);var s=document.createElement('span');s.textContent='\u200b';mirror.appendChild(s);
+  var y=s.offsetTop;mirror.textContent='';return y}
+function buildEditor(qs){var nf=norm(ta.value),nq=norm(qs).s,res=[];
+  findAll(nf.s,nq).forEach(function(p){var a=nf.m[p],b=nf.m[p+nq.length-1]+1;res.push({a:a,b:b})});return res}
+/* ---------- highlight + go ---------- */
+function paint(){
+  if(hasHL){CSS.highlights.delete('mk-find');CSS.highlights.delete('mk-find-cur');
+    if(mode==='reader'&&hits.length){var all=new Highlight();hits.forEach(function(h){all.add(h.range)});CSS.highlights.set('mk-find',all);
+      if(cur>=0){var one=new Highlight(hits[cur].range);CSS.highlights.set('mk-find-cur',one)}}}}
+function centerY(y){var vh=window.innerHeight,t=top?Math.max(0,top.getBoundingClientRect().bottom):0;
+  if(y<t+60||y>vh-90)window.scrollBy({top:y-(t+(vh-t)/2),behavior:'smooth'})}
+function go(i,quiet){if(!hits.length)return;cur=(i+hits.length)%hits.length;paint();count();
+  if(mode==='reader'){var r=hits[cur].range,rc=r.getClientRects()[0]||r.getBoundingClientRect();
+    if(!hasHL){var sel=getSelection();sel.removeAllRanges();sel.addRange(r)}
+    if(rc)centerY(rc.top+rc.height/2)}
+  else{var h=hits[cur];var y=mirrorTop(h.a);
+    try{ta.setSelectionRange(h.a,h.b)}catch(e){}
+    if(ta.scrollHeight>ta.clientHeight+4){ta.scrollTop=Math.max(0,y-ta.clientHeight/2)}
+    var rc2=ta.getBoundingClientRect();centerY(rc2.top+(y-ta.scrollTop)+10)}}
+function count(){cnt.textContent=(hits.length?(cur+1):0)+'/'+hits.length;
+  bar.classList.toggle('none',!!q.value.trim()&&!hits.length);up.disabled=dn.disabled=hits.length<2&&!hits.length}
+function run(keep){var qs=q.value;mode=isReader()?'reader':'editor';var old=cur;hits=[];cur=-1;
+  if(qs.trim()){hits=mode==='reader'?buildReader(qs):buildEditor(qs)}
+  if(hits.length){cur=keep&&old>=0?Math.min(old,hits.length-1):0;paint();count();if(!keep)go(cur);}
+  else{paint();count()}}
+function step(d){if(!hits.length){run(false);return}go(cur+d)}
+/* ---------- events ---------- */
+var t0=0;q.addEventListener('input',function(){clearTimeout(t0);t0=setTimeout(function(){run(false)},120)});
+q.addEventListener('keydown',function(e){if(e.key==='Enter'){e.preventDefault();step(e.shiftKey?-1:1)}else if(e.key==='Escape'){q.value='';run(false);q.blur()}});
+up.addEventListener('click',function(){step(-1)});dn.addEventListener('click',function(){step(1)});
+tog.addEventListener('click',function(){mini=!mini;bar.classList.toggle('mini',mini);if(!mini){q.focus()}});
+/* keep results valid when text or screen changes */
+var rt=0;function later(){clearTimeout(rt);rt=setTimeout(function(){if(q.value.trim())run(true)},250)}
+ta.addEventListener('input',later);
+try{new MutationObserver(later).observe(content,{childList:true,subtree:true,characterData:true})}catch(e){}
+try{new MutationObserver(function(){if(q.value.trim())run(false)}).observe(rs,{attributes:true,attributeFilter:['class']})}catch(e){}
+/* sit just under the sticky top bar */
+function place(){var b=top?top.getBoundingClientRect().bottom:0;bar.style.top=(Math.max(0,b)+8)+'px'}
+place();addEventListener('resize',place);addEventListener('scroll',function(){requestAnimationFrame(place)},{passive:true});setInterval(place,1500);
+document.addEventListener('keydown',function(e){if((e.ctrlKey||e.metaKey)&&(e.key==='f'||e.key==='F')){e.preventDefault();mini=false;bar.classList.remove('mini');q.focus();q.select()}});
+}catch(err){console.error('mk-find',err)}})();
+</script>
+<!-- MK-SEARCH:END -->
 </body>
 </html>
