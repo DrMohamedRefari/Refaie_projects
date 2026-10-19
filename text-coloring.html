@@ -6582,6 +6582,9 @@ body.theme-cvd .pdf-page:not(.pdf-light) .md blockquote.callout>.co-t{text-decor
 .reader .md blockquote.viz-mnemonic li>.li-body{display:flex;align-items:center;gap:1.1em;min-width:0;flex:1 1 auto}
 .reader .md blockquote.viz-mnemonic li .vl{flex:none;margin:0;min-width:2.1em;padding:.05em .55em;border-radius:999px;text-align:center}
 .reader .md blockquote.viz-mnemonic li .vt{min-width:0;flex:1 1 auto;overflow-wrap:anywhere}
+/* ===== tables: centre all cell text ===== */
+.md table th,.md table td,.reader .md table th,.reader .md table td,.pdf-page .md table th,.pdf-page .md table td{text-align:center!important;vertical-align:middle}
+.md table th>*,.md table td>*{text-align:center!important}
 /* ===== find bar ===== */
 #mkFind{position:fixed;inset-inline-end:10px;top:70px;z-index:60;display:flex;align-items:center;gap:4px;padding:5px;direction:rtl;
   background:var(--surface,#fff);color:var(--text,#222);border:1px solid var(--line,#ccc);border-radius:14px;box-shadow:0 8px 24px rgba(0,0,0,.18);max-width:calc(100vw - 20px);font-family:var(--font-body,inherit)}
@@ -6641,8 +6644,10 @@ var mirror=null;
 function mirrorTop(pos){
   if(!mirror){mirror=document.createElement('div');mirror.setAttribute('aria-hidden','true');document.body.appendChild(mirror)}
   var cs=getComputedStyle(ta),st=mirror.style;
-  ['fontFamily','fontSize','fontWeight','fontStyle','letterSpacing','lineHeight','textTransform','wordSpacing','textIndent','paddingTop','paddingRight','paddingBottom','paddingLeft','borderTopWidth','borderRightWidth','borderBottomWidth','borderLeftWidth','boxSizing','direction','textAlign','tabSize'].forEach(function(k){st[k]=cs[k]});
-  st.position='absolute';st.visibility='hidden';st.top='0';st.left='-9999px';st.whiteSpace='pre-wrap';st.wordWrap='break-word';st.overflowWrap='break-word';st.width=ta.clientWidth+parseFloat(cs.borderLeftWidth)+parseFloat(cs.borderRightWidth)+'px';st.height='auto';
+  for(var i=0;i<cs.length;i++){var pn=cs[i];if(/^(width|height|min-|max-|inset|top|left|right|bottom|position|transform|transition|animation|background|box-shadow|outline|resize|overflow|display|-webkit-text-fill|caret|scroll|cursor|appearance|-webkit-appearance|block-size|inline-size|perspective|will-change|contain)/.test(pn))continue;try{st.setProperty(pn,cs.getPropertyValue(pn))}catch(e){}}
+  st.display='block';st.overflow='hidden';st.height='auto';st.position='fixed';st.visibility='hidden';st.pointerEvents='none';st.zIndex='-1';st.top='0';st.left='0';st.right='auto';st.margin='0';st.whiteSpace='pre-wrap';st.overflowWrap='break-word';st.wordWrap='break-word';st.boxSizing='border-box';st.width=ta.offsetWidth+'px';st.contain='layout style';
+  /* match the scrollbar the textarea may reserve */
+  st.paddingInlineEnd=(parseFloat(cs.paddingRight)+(ta.offsetWidth-ta.clientWidth-parseFloat(cs.borderLeftWidth)-parseFloat(cs.borderRightWidth)))+'px';
   mirror.textContent=ta.value.slice(0,pos);var s=document.createElement('span');s.textContent='\u200b';mirror.appendChild(s);
   var y=s.offsetTop;mirror.textContent='';return y}
 function buildEditor(qs){var nf=norm(ta.value),nq=norm(qs).s,res=[];
