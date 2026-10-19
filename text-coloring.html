@@ -1259,6 +1259,9 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
             <div id="cvImgInfo" class="cv-info2"></div>
             <div class="cv-seg" style="margin-top:10px" role="group" aria-label="وضع الصورة"><button type="button" data-k="fit" data-v="cover">ملء الصفحة (cover)</button><button type="button" data-k="fit" data-v="contain">احتواء (contain)</button></div>
             <div class="cv-row"><label for="cvDim" style="font-weight:800;font-size:14px">تعتيم الصورة</label><input id="cvDim" type="range" min="0" max="70" step="5" data-f="dim"><b id="cvDimV" style="min-width:42px;text-align:center"></b></div>
+            <div class="cv-row"><label for="cvRnd" style="font-weight:800;font-size:14px">تدوير الزوايا</label><input id="cvRnd" type="range" min="0" max="100" step="1" data-f="rnd"><b id="cvRndV" style="min-width:42px;text-align:center"></b></div>
+            <div class="cv-row"><label for="cvSoft" style="font-weight:800;font-size:14px">نعومة الحواف</label><input id="cvSoft" type="range" min="0" max="100" step="1" data-f="soft"><b id="cvSoftV" style="min-width:42px;text-align:center"></b></div>
+            <div id="cvEdgeHint" class="cv-info2 hidden">مع تدوير الزوايا أو نعومة الحواف تُدمج الصورة في PDF بصيغة PNG شفافة بدقة الصفحة بدل الملف الأصلي. اجعل القيمتين 0 لدمج الأصلية كما هي.</div>
           </div>
         </div>
         <div class="cv-h">النصوص</div>
@@ -1403,6 +1406,8 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
             <div id="peMode" class="cv-seg" role="group" aria-label="سلوك الكائن"><button type="button" data-mode="flow">النص يلتف حوله</button><button type="button" data-mode="overlay">طبقة فوق النص</button></div>
             <label data-for="size"><span>الحجم</span><input type="range" data-k="size" min="28" max="686" step="1"></label>
             <label data-for="radius"><span>الزوايا</span><input type="range" data-k="radius" min="0" max="50" step="1"></label>
+            <label data-for="rnd"><span>تدوير الزوايا</span><b class="mg-v" data-edv="rnd">30%</b><input type="range" data-k="rnd" min="0" max="100" step="1"></label>
+            <label data-for="soft"><span>نعومة الحواف</span><b class="mg-v" data-edv="soft">30%</b><input type="range" data-k="soft" min="0" max="100" step="1"></label>
             <label data-for="rot"><span>الدوران</span><input type="range" data-k="rot" min="-180" max="180" step="1"></label>
             <label data-for="op"><span>الشفافية</span><input type="range" data-k="op" min="0.1" max="1" step="0.05"></label>
             <label data-for="fill"><span>اللون</span><input type="color" data-k="fill"></label>
@@ -2290,11 +2295,72 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
 
   /* ---------- PDF cover (modal + renderer) ---------- */
   const CV_KEY=STORAGE+'-cover';
-  const CV_DEF={on:1,bgTab:'colors',preset:'paper',fit:'cover',dim:30,titleAuto:1,title:'',subOn:0,sub:'',authOn:0,auth:'',yearOn:0,year:'',customOn:0,custom:'',color:'auto',align:'center'};
+  const CV_DEF={on:1,bgTab:'colors',preset:'paper',fit:'cover',dim:30,titleAuto:1,title:'',subOn:0,sub:'',authOn:0,auth:'',yearOn:0,year:'',customOn:0,custom:'',color:'auto',align:'center',rnd:30,soft:30};
   const cvO=Object.assign({},CV_DEF);
   try{const s=JSON.parse(lsGet(CV_KEY)||'null');if(s&&typeof s==='object')for(const k in CV_DEF)if(typeof s[k]===typeof CV_DEF[k])cvO[k]=s[k]}catch(_){}
   let cvImg=null, headTitle='', noiseURL='', cvTimer=0, cvLastFocus=null, cvPrevOv='';
   const cvEl=(t,c)=>{const e=document.createElement(t);if(c)e.className=c;return e};
+  /* MK-EDGES: rounded corners + feathered edges via a blurred alpha mask (destination-in). Output is always PNG (alpha kept). */
+  const EDGE_MAXPX=2400, edgeCache=new Map();
+  function edgeClamp(v,d){v=+v;return isFinite(v)?Math.min(100,Math.max(0,Math.round(v))):d}
+  function edgeRRect(g,x,y,w,h,r){
+    r=Math.max(0,Math.min(r,w/2,h/2));
+    if(g.roundRect){g.roundRect(x,y,w,h,r);return}
+    if(r<=0){g.rect(x,y,w,h);return}
+    g.moveTo(x+r,y);g.arcTo(x+w,y,x+w,y+h,r);g.arcTo(x+w,y+h,x,y+h,r);g.arcTo(x,y+h,x,y,r);g.arcTo(x,y,x+w,y,r);g.closePath();
+  }
+  function edgeBlurOk(g){try{g.filter='blur(1px)';const ok=g.filter==='blur(1px)';g.filter='none';return ok}catch(_){return false}}
+  /* img: HTMLImageElement | ImageBitmap | canvas. w,h = target box (CSS px); scale = export factor; fit = how the image fills the box. */
+  function applyImageEdges(img,w,h,scale,roundness,softness,fit){
+    let cw=Math.max(1,Math.round(w*(scale||1))),ch=Math.max(1,Math.round(h*(scale||1)));
+    const lim=Math.min(1,EDGE_MAXPX/Math.max(cw,ch));cw=Math.max(1,Math.round(cw*lim));ch=Math.max(1,Math.round(ch*lim));
+    const c=document.createElement('canvas');c.width=cw;c.height=ch;const g=c.getContext('2d');
+    const iw=img.naturalWidth||img.videoWidth||img.width,ih=img.naturalHeight||img.videoHeight||img.height;
+    if(iw&&ih){const r=fit==='contain'?Math.min(cw/iw,ch/ih):Math.max(cw/iw,ch/ih),dw=iw*r,dh=ih*r;g.imageSmoothingQuality='high';g.drawImage(img,(cw-dw)/2,(ch-dh)/2,dw,dh)}
+    const rd=edgeClamp(roundness,0),sf=edgeClamp(softness,0);
+    if(!(rd>0||sf>0))return c;
+    const mn=Math.min(cw,ch),fe=sf/100*mn*.22,ins=fe*1.3,rad=Math.max(0,rd/100*(mn/2-ins));
+    const m=document.createElement('canvas');m.width=cw;m.height=ch;const mg=m.getContext('2d');mg.fillStyle='#000';
+    if(fe>0&&edgeBlurOk(mg)){
+      mg.filter='blur('+(fe/2)+'px)';mg.beginPath();edgeRRect(mg,ins,ins,cw-2*ins,ch-2*ins,rad);mg.fill();mg.filter='none';
+    }else if(fe>0){ // fallback (no ctx.filter): stacked concentric shapes with alpha 1/(N-j) = a linear fade over the feather width
+      const N=12;for(let j=0;j<N;j++){const d=Math.max(0,ins-fe)+2*fe*j/(N-1),rr=Math.max(0,rad+(ins-d));
+        mg.globalAlpha=1/(N-j);mg.beginPath();edgeRRect(mg,d,d,cw-2*d,ch-2*d,rr);mg.fill()}mg.globalAlpha=1;
+    }else{mg.beginPath();edgeRRect(mg,0,0,cw,ch,rad);mg.fill()}
+    g.globalCompositeOperation='destination-in';g.drawImage(m,0,0);g.globalCompositeOperation='source-over';
+    m.width=m.height=0;return c;
+  }
+  function edgeURL(key,make){
+    if(edgeCache.has(key))return edgeCache.get(key);
+    let out='';try{const c=make();out=c.toDataURL('image/png');c.width=c.height=0}catch(e){console.error(e);out=''}
+    if(edgeCache.size>=14)edgeCache.delete(edgeCache.keys().next().value);
+    edgeCache.set(key,out);return out||null;
+  }
+  let cvEdgeSeq=0;
+  function cvEdgeUrl(o,fitK){ // masked PNG of the cover photo at page size (null = use the untouched photo)
+    if(!cvImg||!cvImg.el||!(o.rnd>0||o.soft>0))return null;
+    const iw=cvImg.el.naturalWidth,ih=cvImg.el.naturalHeight;if(!iw||!ih)return null;
+    let w=PW,h=PGH;if(fitK==='contain'){const k=Math.min(PW/iw,PGH/ih);w=iw*k;h=ih*k}
+    w=Math.max(1,Math.round(w));h=Math.max(1,Math.round(h));
+    return edgeURL(['c',cvImg.id,w,h,o.rnd,o.soft,fitK].join('|'),()=>applyImageEdges(cvImg.el,w,h,Math.min(3,EDGE_MAXPX/Math.max(w,h)),o.rnd,o.soft,fitK));
+  }
+  /* page images (PL objects): decoded element cache so the mask can be built synchronously inside plApplyPage */
+  const plEls=new Map();let plElSeq=0;
+  function plEnsureEl(o){
+    if(!o.src)return null;let e=plEls.get(o.id);
+    if(e&&e.s===o.src)return e.ok?e:null;
+    const el=new Image();e={s:o.src,el,ok:false,n:++plElSeq,p:null};plEls.set(o.id,e);
+    e.p=(async()=>{try{el.src=o.src;await el.decode();e.ok=true}catch(_){}
+      try{if(e.ok&&typeof pe!=='undefined'&&pe.on)peLive()}catch(_){}})();
+    return null;
+  }
+  async function plEdgeReady(o){plEnsureEl(o);const e=plEls.get(o.id);if(e&&e.p)await e.p}
+  function plEdgeUrl(o,W,H){
+    if(o.type!=='img'||!(o.rnd>0||o.soft>0))return null;
+    const e=plEnsureEl(o);if(!e)return null;
+    const fit=(o.fit==='contain'&&!o.nar)?'contain':'cover',w=Math.max(1,Math.round(W)),h=Math.max(1,Math.round(H));
+    return edgeURL(['p',o.id,e.n,w,h,o.rnd,o.soft,fit].join('|'),()=>applyImageEdges(e.el,w,h,Math.min(3,EDGE_MAXPX/Math.max(w,h)),o.rnd,o.soft,fit));
+  }
   function noiseCss(){ // tiny procedural grain tile (plain background-image, html2canvas-safe)
     if(!noiseURL){try{const c=document.createElement('canvas');c.width=c.height=96;const x=c.getContext('2d'),d=x.createImageData(96,96);
       for(let i=0;i<d.data.length;i+=4){d.data[i]=d.data[i+1]=d.data[i+2]=Math.random()*255|0;d.data[i+3]=Math.random()*26|0}
@@ -2325,7 +2391,7 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
   function cvOrigOn(){if(!cvImg||!cvImg.file||!window.PDFV||!PDFV.origs)return false;if(!cvImg.origUrl)cvImg.origUrl=URL.createObjectURL(cvImg.file);PDFV.origs.set(cvImg.origUrl,{file:cvImg.file,fb:cvImg.mid});return true}
   function cvOrigOff(){if(cvImg&&cvImg.origUrl){try{PDFV.origs.delete(cvImg.origUrl)}catch(_){}try{URL.revokeObjectURL(cvImg.origUrl)}catch(_){}cvImg.origUrl=''}}
   function cvBg(o,pal,opt){
-    if(o.bgTab==='image'&&cvImg){const u=(opt&&opt.orig&&cvImg.origUrl)||cvImg.mid;
+    if(o.bgTab==='image'&&cvImg){let u=(opt&&opt.orig&&cvImg.origUrl)||cvImg.mid;{const eu=cvEdgeUrl(o,o.fit==='contain'?'contain':'cover');if(eu)u=eu}
       return {photo:true,base:mixHex('#000000',cvImg.avg,Math.min(.9,o.dim/100)),css:'url("'+u+'") center/'+(o.fit==='contain'?'contain':'cover')+' no-repeat '+cvImg.avg}}
     const p=cvPreset(o.preset,pal);return {photo:false,base:p.base,css:p.css};
   }
@@ -2364,7 +2430,8 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
     return {title:((cvO.titleAuto?headTitle:t(cvO.title))||'مذاكرتي').slice(0,120),
       sub:cvO.subOn?t(cvO.sub).slice(0,120):upAutoSub(),auth:cvO.authOn?t(cvO.auth).slice(0,80):'',year:cvO.yearOn?t(cvO.year).slice(0,40):'',custom:cvO.customOn?t(cvO.custom).slice(0,300):'',
       bgTab:cvO.bgTab,preset:cvO.preset,fit:cvO.fit==='contain'?'contain':'cover',dim:Math.min(70,Math.max(0,+cvO.dim||0)),
-      color:['light','dark'].includes(cvO.color)?cvO.color:'auto',align:cvO.align==='start'?'start':'center'};
+      color:['light','dark'].includes(cvO.color)?cvO.color:'auto',align:cvO.align==='start'?'start':'center',
+      rnd:edgeClamp(cvO.rnd,30),soft:edgeClamp(cvO.soft,30)};
   }
   const cvM=$('#coverModal'), cvQ=s=>cvM.querySelector(s), cvA=s=>cvM.querySelectorAll(s);
   let pfWarnMsg='';
@@ -2441,6 +2508,7 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
     const ti=cvQ('#cvTitleIn'),tv=cvO.titleAuto?headTitle:cvO.title;ti.readOnly=!!cvO.titleAuto;if(ti.value!==tv)ti.value=tv;
     cvQ('#cvTitleHint').classList.toggle('hidden',!(cvO.titleAuto&&!headTitle));
     cvQ('#cvDimV').textContent=cvO.dim+'%';
+    {const rv=cvQ('#cvRndV'),sv=cvQ('#cvSoftV'),eh=cvQ('#cvEdgeHint');if(rv)rv.textContent=edgeClamp(cvO.rnd,30)+'%';if(sv)sv.textContent=edgeClamp(cvO.soft,30)+'%';if(eh)eh.classList.toggle('hidden',!(cvImg&&(edgeClamp(cvO.rnd,30)>0||edgeClamp(cvO.soft,30)>0)))}
   }
   function cvChanged(){cvSync();clearTimeout(cvTimer);cvTimer=setTimeout(cvPreview,80);lsSet(CV_KEY,JSON.stringify(cvO))}
   function cvBuildCards(){
@@ -2486,8 +2554,9 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
       const c=document.createElement('canvas');c.width=cw;c.height=ch;const x=c.getContext('2d');x.fillStyle='#fff';x.fillRect(0,0,cw,ch);x.imageSmoothingQuality='high';x.drawImage(src,0,0,cw,ch);
       const s16=document.createElement('canvas');s16.width=s16.height=16;const sx=s16.getContext('2d');sx.drawImage(c,0,0,16,16);const d=sx.getImageData(0,0,16,16).data;let r=0,g=0,b=0;for(let i=0;i<d.length;i+=4){r+=d[i];g+=d[i+1];b+=d[i+2]}const n=d.length/4;s16.width=s16.height=0;
       const blob=await new Promise(res=>c.toBlob(res,'image/jpeg',.92));c.width=c.height=0;if(!blob)throw new Error('toBlob');
+      const midUrl=URL.createObjectURL(blob);let midEl=null;try{midEl=new Image();midEl.src=midUrl;await midEl.decode()}catch(_){midEl=null}
       cvImgClear();
-      cvImg={file:f,mid:URL.createObjectURL(blob),avg:rgbToHex([r/n,g/n,b/n]),ow,oh,origUrl:''};cvImg.data=cvImg.mid;
+      cvImg={file:f,mid:midUrl,el:midEl,id:(++cvEdgeSeq),avg:rgbToHex([r/n,g/n,b/n]),ow,oh,origUrl:''};cvImg.data=cvImg.mid;
       cvO.bgTab='image';cvThumb();cvChanged();
     }catch(e){console.error(e);fail('تعذّر فتح الصورة: قد تكون كبيرة جدًا أو بصيغة غير مدعومة. جرّب JPEG أو PNG أصغر')}
     finally{goBtn.disabled=false;try{if(bmp&&bmp.close)bmp.close()}catch(_){}if(tmpUrl)URL.revokeObjectURL(tmpUrl)}
@@ -2554,7 +2623,7 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
         const type=r.type==='shape'||r.type==='emoji'||r.type==='link'?r.type:'img';
         const o={id:String(r.id||('i'+(++plSeq))).slice(0,40),type,pg:Math.max(0,(+r.pg)|0),x:numOr(r.x,0),y:numOr(r.y,0),w:numOr(r.w,200),h:0,
           ar:PL_NUM(r.ar,1,.25,4),fit:r.fit==='contain'?'contain':'cover',src:type==='img'&&typeof r.src==='string'&&/^data:image\//.test(r.src)?r.src:'',
-          radius:PL_NUM(r.radius,0,0,50),rot:PL_NUM(r.rot,0,-180,180),op:PL_NUM(r.op,1,.1,1),fill:/^#[0-9a-f]{6}$/i.test(r.fill)?r.fill:'#0f6b5a',
+          radius:PL_NUM(r.radius,0,0,50),rnd:r.rnd==null?PL_NUM((+r.radius||0)*2,0,0,100):PL_NUM(r.rnd,30,0,100),soft:r.rnd==null&&r.soft==null?0:PL_NUM(r.soft,30,0,100),rot:PL_NUM(r.rot,0,-180,180),op:PL_NUM(r.op,1,.1,1),fill:/^#[0-9a-f]{6}$/i.test(r.fill)?r.fill:'#0f6b5a',
           shape:r.shape==='circle'||r.shape==='arrow'?r.shape:'rect',emo:typeof r.emo==='string'?r.emo.slice(0,32):'',mode:r.mode==='overlay'?'overlay':'flow',nar:PL_NUM(r.nar,0,0,20),_p:0,
           text:typeof r.text==='string'?r.text.slice(0,80):'',url:typeof r.url==='string'?r.url.slice(0,2000):'',lstyle:LK.some(q=>q.k===r.lstyle)?r.lstyle:'chain'};
         plFit(o);PL.push(o)});
@@ -2575,6 +2644,7 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
       if(!o.src){try{const v=await idbDo('readonly',st=>st.get(o.id));if(typeof v==='string'&&/^data:image\//.test(v)){o.src=v;o._p=1}}catch(_){}}
       if(!o.src){try{const v=lsGet(IMG_LS(o.id));if(v&&/^data:image\//.test(v)){o.src=v;o._p=1}}catch(_){}}
       if(o.src&&!o.nar){try{const im=new Image();im.src=o.src;await im.decode();o.nar=Math.min(20,Math.max(.05,im.naturalWidth/im.naturalHeight))}catch(_){}}
+      if(o.src){try{await plEdgeReady(o)}catch(_){}}
     }
     if(PL.some(o=>o.src&&!o._p))plSave();
   })();
@@ -2582,7 +2652,7 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
     clearTimeout(plSaveT);
     plSaveT=setTimeout(()=>{
       PL.forEach(plPersistImg);
-      const meta=PL.map(o=>({id:o.id,type:o.type,pg:o.pg,x:o.x,y:o.y,w:o.w,ar:o.ar,fit:o.fit,radius:o.radius,rot:o.rot,op:o.op,fill:o.fill,shape:o.shape,emo:o.emo,mode:o.mode,nar:o.nar,text:o.text,url:o.url,lstyle:o.lstyle}));
+      const meta=PL.map(o=>({id:o.id,type:o.type,pg:o.pg,x:o.x,y:o.y,w:o.w,ar:o.ar,fit:o.fit,radius:o.radius,rnd:o.rnd,soft:o.soft,rot:o.rot,op:o.op,fill:o.fill,shape:o.shape,emo:o.emo,mode:o.mode,nar:o.nar,text:o.text,url:o.url,lstyle:o.lstyle}));
       try{localStorage.setItem(PL_KEY,JSON.stringify({v:3,fmt:{w:PB.w,h:PB.h},pf:PF.id,imgs:meta}))}catch(_){say('تعذّر حفظ تخطيط الصفحات (التخزين ممتلئ)',5000)}
     },300);
   }
@@ -2687,8 +2757,9 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
       let L=o.x,T=o.y,W=o.w,H=o.h,bs=o.type==='img'&&o.fit!=='contain'?'cover':'100% 100%';
       if(o.type==='img'&&o.fit==='contain'){ // clip to the fitted image rectangle so the radius hits the real picture
         if(o.nar){const k=Math.min(o.w/o.nar,o.h);W=k*o.nar;H=k;L=o.x+(o.w-W)/2;T=o.y+(o.h-H)/2}else bs='contain'}
-      const rp=o.type==='img'?o.radius/100*Math.min(W,H):0,d=document.createElement('div');d.className='pg-img';d.dataset.id=o.id;
-      d.style.cssText='left:'+(PB.x+L)+'px;top:'+(PB.y+T)+'px;width:'+W+'px;height:'+H+'px;background-image:url("'+src+'");background-size:'+bs+
+      let eSrc=src,eBs=bs,eRp=o.type==='img'?o.radius/100*Math.min(W,H):0;if(o.type==='img'){const eu=plEdgeUrl(o,W,H);if(eu){eSrc=eu;eBs='100% 100%';eRp=0}else if(o.rnd>0)eRp=o.rnd/200*Math.min(W,H)} /* until the mask is ready: plain rounded corners */
+      const rp=eRp,d=document.createElement('div');d.className='pg-img';d.dataset.id=o.id;
+      d.style.cssText='left:'+(PB.x+L)+'px;top:'+(PB.y+T)+'px;width:'+W+'px;height:'+H+'px;background-image:url("'+eSrc+'");background-size:'+eBs+
         ';border-radius:'+rp+'px;opacity:'+o.op+';z-index:'+(o.mode==='overlay'?4:2)+(o.rot?';transform:rotate('+o.rot+'deg)':'');
       pg.appendChild(d)});
   }
@@ -3333,10 +3404,11 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
       peQ('#peFit').querySelectorAll('button').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.fit===o.fit)));
       peQ('#peMode').querySelectorAll('button').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.mode===o.mode)));
       if(lk){const T=peQ('#peLkText'),U=peQ('#peLkUrl');if(document.activeElement!==T)T.value=o.text;if(document.activeElement!==U)U.value=o.url;peQ('#peLkStyles').querySelectorAll('button').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.lsw===o.lstyle)))}
-      const P=peQ('#peProps'),v={size:o.w,radius:o.radius,rot:o.rot,op:o.op,fill:o.fill};
+      const P=peQ('#peProps'),v={size:o.w,radius:o.radius,rnd:o.rnd,soft:o.soft,rot:o.rot,op:o.op,fill:o.fill};
       {const L=plLim(o),S=P.querySelector('[data-k=size]');S.min=L.minW;S.max=L.maxW}
       P.querySelectorAll('input').forEach(i=>{i.value=v[i.dataset.k]});
-      P.querySelector('[data-for=radius]').classList.toggle('hidden',!(o.type==='img'||(o.type==='shape'&&o.shape==='rect')));
+      P.querySelector('[data-for=radius]').classList.toggle('hidden',!(o.type==='shape'&&o.shape==='rect'));
+      ['rnd','soft'].forEach(k=>{P.querySelector('[data-for='+k+']').classList.toggle('hidden',o.type!=='img');const b=P.querySelector('[data-edv='+k+']');if(b)b.textContent=Math.round(v[k])+'%'});
       P.querySelector('[data-for=fill]').classList.toggle('hidden',!(o.type==='shape'||lk));
     }
     peHintSet();try{pgfixUi()}catch(_){}peDock();
@@ -3457,7 +3529,7 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
   /* ----- history ----- */
   const HIST={u:[],r:[],last:null,sig:'',t:0,busy:false,MAX:80};
   const hSnap=()=>({brk:Array.from(PBRK),psc:Array.from(PSC),pes:Array.from(PES),pdel:Array.from(PDEL),z:pdfZoom,pl:PL.map(o=>({...o})),cur:pe.cur});
-  const hSig=x=>JSON.stringify([x.brk,x.psc,x.pes,x.pdel,x.z,x.pl.map(o=>[o.id,o.type,o.pg,o.x,o.y,o.w,o.h,o.ar,o.fit,o.radius,o.rot,o.op,o.fill,o.shape,o.emo,o.mode,o.text,o.url,o.lstyle,o.src?o.src.length:0])]);
+  const hSig=x=>JSON.stringify([x.brk,x.psc,x.pes,x.pdel,x.z,x.pl.map(o=>[o.id,o.type,o.pg,o.x,o.y,o.w,o.h,o.ar,o.fit,o.radius,o.rnd,o.soft,o.rot,o.op,o.fill,o.shape,o.emo,o.mode,o.text,o.url,o.lstyle,o.src?o.src.length:0])]);
   function hUi(){const u=peQ('#peUndo'),r=peQ('#peRedo');if(!u)return;u.disabled=!HIST.u.length;r.disabled=!HIST.r.length;u.title='تراجع'+(HIST.u.length?' ('+HIST.u.length+')':'');r.title='إعادة'+(HIST.r.length?' ('+HIST.r.length+')':'')}
   function hReset(){clearTimeout(HIST.t);HIST.u=[];HIST.r=[];HIST.last=hSnap();HIST.sig=hSig(HIST.last);hUi()}
   function hCheck(){clearTimeout(HIST.t);if(HIST.busy||!pe.on||!HIST.last)return;const x=hSnap(),g=hSig(x);if(g===HIST.sig)return;
@@ -3533,7 +3605,7 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
     if(peIsCover())pe.cur=pe.off;
     if(!pe.pages.length)return;
     const pg=peIdx(),n=plForPage(pg).length;
-    const o=Object.assign({id:'i'+Date.now().toString(36)+(++plSeq),type:'img',pg,x:0,y:0,w:210,h:0,ar:1,fit:'cover',src:'',radius:0,rot:0,op:1,fill:'#0f6b5a',shape:'rect',emo:'',mode:'flow',nar:0,_p:0,text:'',url:'',lstyle:'chain'},extra||{});
+    const o=Object.assign({id:'i'+Date.now().toString(36)+(++plSeq),type:'img',pg,x:0,y:0,w:210,h:0,ar:1,fit:'cover',src:'',radius:0,rnd:30,soft:30,rot:0,op:1,fill:'#0f6b5a',shape:'rect',emo:'',mode:'flow',nar:0,_p:0,text:'',url:'',lstyle:'chain'},extra||{});
     o.x=PB.w-o.w-(n%4)*26;o.y=90+(n%4)*30;plFit(o);PL.push(o);pe.sel=o.id;plSave();
     peSheet(null);
     peRender();peLive();peCommit();
@@ -3577,6 +3649,7 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
     for(const o of PL){if(o.pg>=pe.pages.length||plEmpty(o))continue;const s=plSrc(o);
       if(!s){bad.push(o);continue}
       try{const im=new Image();im.src=s;await im.decode()}catch(_){bad.push(o)}
+      if(o.type==='img'){try{await plEdgeReady(o)}catch(_){}}
       if(o.mode==='overlay'&&plHits(pe.pages[o.pg],o))hits++}
     const nl=PL.filter(o=>o.type==='link'&&o.pg<pe.pages.length&&!plUrl(o.url)).length;
     if(nl&&!confirm('يوجد '+nl+' رابط بدون عنوان URL صالح (http / https / mailto) ولن يكون قابلًا للنقر في PDF. هل تريد التصدير رغم ذلك؟'))return false;
@@ -3638,6 +3711,7 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
         let A=pe.szA;if(!A||A.id!==o.id||A.x!==o.x||A.y!==o.y)A=pe.szA={id:o.id,cx:o.x+o.w/2,cy:o.y+o.h/2,x:o.x,y:o.y};
         const L=plLim(o),w=Math.round(Math.min(L.maxW,Math.max(L.minW,+t.value||L.minW)));
         o.w=w;o.h=Math.round(w/o.ar);o.x=A.cx-o.w/2;o.y=A.cy-o.h/2;plFit(o);A.x=o.x;A.y=o.y;t.value=o.w}
+      else if(k==='rnd'||k==='soft'){o[k]=PL_NUM(t.value,30,0,100);const b=P.querySelector('[data-edv='+k+']');if(b)b.textContent=Math.round(o[k])+'%';plSave();clearTimeout(pe._edT);pe._edT=setTimeout(peLive,60);return}
       else o[k]=+t.value;
       if(k!=='size')plFit(o);plSave();peOverlay();peLive()});
     P.addEventListener('change',()=>{pe.szA=null;peCommit()});
@@ -3650,7 +3724,7 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
   })();
   peQ('#peFile').addEventListener('change',e=>{
     const f=e.target.files&&e.target.files[0];e.target.value='';
-    plLoadImage(f,(data,nar)=>{const o=PL.find(x=>x.id===pe.upId);if(!o||!pe.on)return;o.src=data;o.nar=nar;o._p=0;plSave();peOverlay();peTools();peLive();peCommit()});
+    plLoadImage(f,async(data,nar)=>{const o=PL.find(x=>x.id===pe.upId);if(!o||!pe.on)return;o.src=data;o.nar=nar;o._p=0;try{await plEdgeReady(o)}catch(_){}plSave();peOverlay();peTools();peLive();peCommit()});
   });
   /* ----- touch / mouse: move + resize the selected image (Pointer Events) ----- */
   peM.addEventListener('pointerdown',e=>{
