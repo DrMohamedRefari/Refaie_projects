@@ -1622,7 +1622,7 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
     const html=`<div class="table-wrap"><table data-cols="${n}" data-dem="${dem}"><colgroup>${pct.map(p=>`<col style="width:${p}%">`).join('')}</colgroup><thead><tr>${th.join('')}</tr></thead><tbody>${body.join('')}</tbody></table></div>`;
     return {html,next:j};
   }
-  const CALL={note:{t:'ملاحظة',i:'N',ci:0},info:{t:'معلومة',i:'I',ci:5},abstract:{t:'خلاصة',i:'S',ci:0},summary:{t:'خلاصة',i:'S',ci:0},tip:{t:'نصيحة',i:'T',ci:2},hint:{t:'نصيحة',i:'H',ci:2},important:{t:'مهم',i:'!',ci:4},warning:{t:'تنبيه',i:'W',ci:3},caution:{t:'احذر',i:'C',ci:1},danger:{t:'خطر',i:'D',ci:1},success:{t:'صحيح',i:'OK',ci:2},question:{t:'سؤال',i:'Q',ci:4},example:{t:'مثال',i:'E',ci:5},highyield:{t:'نقطة عالية الأهمية',i:'H',ci:2},trap:{t:'فخ امتحاني',i:'T',ci:1},redflag:{t:'علامة خطر',i:'!',ci:1},evidence:{t:'دليل',i:'E',ci:4}};/* UP2 */
+  const CALL={note:{t:'ملاحظة',i:'N',ci:0},info:{t:'معلومة',i:'I',ci:5},abstract:{t:'خلاصة',i:'S',ci:0},summary:{t:'خلاصة',i:'S',ci:0},tip:{t:'نصيحة',i:'T',ci:2},hint:{t:'نصيحة',i:'H',ci:2},important:{t:'مهم',i:'!',ci:4},warning:{t:'تنبيه',i:'W',ci:3},caution:{t:'احذر',i:'C',ci:1},danger:{t:'خطر',i:'D',ci:1},success:{t:'صحيح',i:'OK',ci:2},question:{t:'سؤال',i:'Q',ci:4},example:{t:'مثال',i:'E',ci:5},highyield:{t:'نقطة عالية الأهمية',i:'H',ci:2},trap:{t:'فخ امتحاني',i:'T',ci:1},redflag:{t:'علامة خطر',i:'RF',ci:1},evidence:{t:'دليل',i:'E',ci:4}};/* UP2 */
   const HR=/^\s*([-*_])(?:\s*\1){2,}\s*$/;
   /* ---------- Visual callouts: > [!VISUAL] steps|timeline|metrics|mnemonic: Title  (plain list body, degrades to a normal list) ---------- */
   const VIZ={steps:{k:'steps',tag:'ol',ci:0,t:'خطوات'},process:{k:'steps',tag:'ol',ci:0,t:'خطوات'},timeline:{k:'timeline',tag:'ul',ci:5,t:'تسلسل زمني'},metrics:{k:'metrics',tag:'ul',ci:2,t:'أرقام مهمة'},stats:{k:'metrics',tag:'ul',ci:2,t:'أرقام مهمة'},kpi:{k:'metrics',tag:'ul',ci:2,t:'أرقام مهمة'},mnemonic:{k:'mnemonic',tag:'ul',ci:4,t:'حيلة للحفظ'},mnemo:{k:'mnemonic',tag:'ul',ci:4,t:'حيلة للحفظ'},compare:{k:'compare',tag:'ul',ci:5,t:'مقارنة'},algorithm:{k:'algorithm',tag:'ol',ci:0,t:'مسار قرار'},definition:{k:'definition',tag:'ul',ci:5,t:'تعريف'},numbers:{k:'numbers',tag:'ul',ci:2,t:'أرقام مهمة'},mcq:{k:'mcq',tag:'ul',ci:4,t:'سؤال للمراجعة'},redflags:{k:'redflags',tag:'ul',ci:1,t:'علامات خطر'},classification:{k:'classification',tag:'ul',ci:5,t:'تصنيف'},anatomy:{k:'anatomy',tag:'ul',ci:5,t:'طبقات'},legend:{k:'legend',tag:'ul',ci:4,t:'دليل الرموز'}};/* UP4 */
@@ -1866,9 +1866,40 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
   }
 
   /* ---------- Direction: each block follows its own language ---------- */
+  /* mk-fix-v1 (A): direction = majority of letters per block, list/table-consistent, Latin runs isolated */
+  function mkCnt(t){let a=0,l=0;for(let i=0;i<t.length;i++){const c=t.charCodeAt(i);if((c>=0x590&&c<=0x8FF)||(c>=0xFB1D&&c<=0xFDFF)||(c>=0xFE70&&c<=0xFEFF))a++;else if((c>=65&&c<=90)||(c>=97&&c<=122)||(c>=0xC0&&c<=0x24F))l++}return[a,l]}
+  function mkMaj(t,fb){const r=mkCnt(String(t)),tot=r[0]+r[1];if(!tot)return fb||'rtl';const ar=r[0]/tot;if(fb==='rtl')return ar<0.3?'ltr':'rtl';if(fb==='ltr')return ar>0.7?'rtl':'ltr';return ar>=0.5?'rtl':'ltr'}
+  const MK_LAT='A-Za-z\\u00C0-\\u024F',MK_TOK='['+MK_LAT+'0-9][' +MK_LAT+'0-9.,\\-+\\/%\\u00B0\\u00B5\\u03BC\'\\u2019\\u00B2\\u00B3\\u00B9\\u2070-\\u2079\\u2080-\\u2089]*';
+  const MK_RUN=new RegExp(MK_TOK+'(?:[ \\u00A0]+'+MK_TOK+')*','g'),MK_HASLAT=new RegExp('['+MK_LAT+']');
+  function mkIsolate(root){
+    try{
+      const skip='code,pre,bdi,script,style,textarea,input,.co-i,.mcq-letter,.va-n,.vn-value,[dir="ltr"],.ln';
+      const w=document.createTreeWalker(root,NodeFilter.SHOW_TEXT,{acceptNode:n=>{const p=n.parentElement;return(p&&!p.closest(skip)&&/[A-Za-z\u00C0-\u024F]/.test(n.nodeValue))?NodeFilter.FILTER_ACCEPT:NodeFilter.FILTER_REJECT}});
+      const nodes=[];while(w.nextNode())nodes.push(w.currentNode);
+      nodes.forEach(n=>{
+        const s=n.nodeValue;MK_RUN.lastIndex=0;let m,last=0,frag=null;
+        while((m=MK_RUN.exec(s))){
+          let t=m[0];const tr=t.match(/[.,\-+\/'\u2019]+$/);if(tr)t=t.slice(0,t.length-tr[0].length);
+          if(!t||!MK_HASLAT.test(t))continue;
+          if(!frag)frag=document.createDocumentFragment();
+          if(m.index>last)frag.appendChild(document.createTextNode(s.slice(last,m.index)));
+          const b=document.createElement('bdi');b.setAttribute('dir','ltr');b.className='mk-lt';b.textContent=t;frag.appendChild(b);last=m.index+t.length;MK_RUN.lastIndex=last;
+        }
+        if(frag){if(last<s.length)frag.appendChild(document.createTextNode(s.slice(last)));n.parentNode.replaceChild(frag,n)}
+      });
+    }catch(e){/* never block rendering */}
+  }
   function applyDir(root){
-    root.querySelectorAll('.ln,li,th,td').forEach(e=>e.setAttribute('dir','auto'));
-    root.querySelectorAll('p,h1,h2,h3,h4,h5,h6,ul,ol,blockquote,table').forEach(e=>e.setAttribute('dir',dirOf(dirText(e))));
+    const doc=mkMaj(root.textContent||'','rtl');
+    const near=(e,fb)=>{const p=e.parentElement&&e.parentElement.closest('[dir=rtl],[dir=ltr]');return p?p.getAttribute('dir'):fb};
+    root.querySelectorAll('table').forEach(e=>e.setAttribute('dir',mkMaj(e.textContent,doc)));
+    root.querySelectorAll('th,td').forEach(e=>e.setAttribute('dir',e.closest('table').getAttribute('dir')));
+    root.querySelectorAll('blockquote').forEach(e=>e.setAttribute('dir',mkMaj(dirText(e),near(e,doc))));
+    root.querySelectorAll('ul,ol').forEach(e=>{const pl=e.parentElement&&e.parentElement.closest('ul,ol');const d=(pl&&root.contains(pl))?pl.getAttribute('dir'):mkMaj(e.textContent,near(e,doc));e.setAttribute('dir',d)});
+    root.querySelectorAll('li').forEach(e=>e.setAttribute('dir',e.parentElement.getAttribute('dir')||doc));
+    root.querySelectorAll('p,h1,h2,h3,h4,h5,h6').forEach(e=>{const c=e.closest('li,td,th');e.setAttribute('dir',c?c.getAttribute('dir'):mkMaj(e.textContent,near(e,doc)))});
+    root.querySelectorAll('[dir=auto]:not(textarea):not(input):not(.ln)').forEach(e=>e.setAttribute('dir',mkMaj(e.textContent,near(e,doc))));
+    mkIsolate(root);
   }
   /* callout direction follows its real text: the Latin badge letter (H, N, I...) and the default Arabic title must not decide it */
   function dirText(e){
@@ -2153,7 +2184,7 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
     });
   }
   /* UP2: fixed semantic roles survive the cyclic colour passes */
-  const SEMANTIC_SLOT={compare:0,algorithm:0,steps:0,mnemonic:4,definition:5,classification:5,anatomy:5,numbers:2,highyield:2,success:2,tip:2,hint:2,warning:3,important:3,trap:1,danger:1,caution:1,redflag:1,redflags:1,question:4,evidence:4,legend:4,example:5,note:0,info:5,summary:0,abstract:0};
+  const SEMANTIC_SLOT={compare:0,algorithm:0,steps:0,mnemonic:4,definition:5,classification:5,anatomy:5,numbers:2,highyield:2,success:2,tip:2,hint:2,warning:3,important:4,trap:1,danger:1,caution:3,redflag:1,redflags:1,question:4,evidence:4,legend:4,example:5,note:0,info:5,summary:0,abstract:0};
   function applySemanticColors(root,pal){try{
     root.querySelectorAll('.viz[data-sem],.callout[data-kind]').forEach(el=>{
       const key=(el.dataset.sem||el.dataset.kind||'note').toLowerCase();const i=SEMANTIC_SLOT[key];if(i==null)return;
@@ -2214,7 +2245,7 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
       const idx=Array.prototype.indexOf.call(list.children,li)+(parseInt(list.getAttribute('start'),10)||1);
       const body=document.createElement('div');body.className='li-body';
       while(li.firstChild)body.appendChild(li.firstChild);
-      const txt=body.textContent||''; const d=dirOf(txt);
+      const txt=body.textContent||''; const d=li.getAttribute('dir')||list.getAttribute('dir')||dirOf(txt);
       li.setAttribute('dir',d);body.setAttribute('dir',d);
       const cbEl=body.querySelector(':scope>.cb');
       const mark=cbEl||document.createElement('span');
@@ -2227,7 +2258,7 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
         mark.textContent=ordered?(depth===0?String(idx):ltr(idx)):'';}}
       let run=null;Array.from(body.childNodes).forEach(nd=>{
         if(nd.nodeType===1&&/^(UL|OL)$/.test(nd.tagName)){run=null;return}
-        if(!run){run=document.createElement('div');run.className='li-text';run.setAttribute('dir','auto');body.insertBefore(run,nd)}
+        if(!run){run=document.createElement('div');run.className='li-text';run.setAttribute('dir',d);body.insertBefore(run,nd)}
         run.appendChild(nd);
       });
       li.dataset.lid=String(++lidN);
@@ -3162,38 +3193,57 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
   /* v10: TRUE VECTOR PDF, downloaded directly (no print dialog). Layout = the already paginated .pdf-page DOM; see PDFV (pdfv-core / pdfv-paint). */
   let pdfvP=null;
   function pdfvLoad(){if(!pdfvP)pdfvP=(async()=>{if(!window.PDFV)throw new Error('PDFV missing');const n=document.getElementById('pdfv-data');if(!n)throw new Error('pdfv-data missing');await window.PDFV.load(JSON.parse(n.textContent))})().catch(e=>{pdfvP=null;throw e});return pdfvP}
-  async function exportPDFDirect(opts){
-    const cover=opts&&opts.cover||null,brand=_s();if(!brand){say('تعذّر التصدير: الملف تم تعديله',4500);return true}
-    busy=true;pdfBtn.disabled=true;document.body.classList.add('pdf-busy');clearTimeout(window.__pbT);say('جاري تجهيز الصفحات…');persist();
+  /* mk-fix-v1 (F): staged diagnostics, one lighter retry, visible fallback reason, reliable filename */
+  const PDF_STAGES={fonts:'الخطوط',pagination:'ترقيم الصفحات',cover:'الغلاف',image:'الصور',paint:'الرسم',save:'الحفظ'};
+  const PDFDIAG=window.__pdfDiag=window.__pdfDiag||{runs:[],last:null};
+  PDFDIAG.copy=function(){const t=JSON.stringify(PDFDIAG.last,null,2);try{navigator.clipboard&&navigator.clipboard.writeText(t)}catch(_){}return t};
+  function pdfDiagNew(opts){const d={t0:Date.now(),stage:'init',attempts:[],events:[],ua:navigator.userAgent,mem:navigator.deviceMemory||null,cover:!!(opts&&opts.cover),error:null,fellBack:false,ok:false};PDFDIAG.runs.push(d);if(PDFDIAG.runs.length>5)PDFDIAG.runs.shift();PDFDIAG.last=d;return d}
+  function pdfSafeName(t){const s=String(t||'').replace(/[\\\/:*?"<>|\u0000-\u001f\u200c-\u200f\u202a-\u202e\u2066-\u2069\ufeff]+/g,' ').replace(/\s+/g,' ').trim().replace(/^[. ]+|[. ]+$/g,'').slice(0,80);return s||'مذاكرتي'}
+  function pdfSave(blob,name){const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download=pdfSafeName(name)+'.pdf';a.rel='noopener';a.style.display='none';document.body.appendChild(a);a.click();setTimeout(()=>{try{a.remove()}catch(_){}},1000);setTimeout(()=>{try{URL.revokeObjectURL(url)}catch(_){}},180000);return url}
+  async function pdfvAttempt(opts,brand,lite,D){
+    const cover=opts&&opts.cover||null;const at={lite,t0:Date.now()};D.attempts.push(at);
+    busy=true;pdfBtn.disabled=true;document.body.classList.add('pdf-busy');clearTimeout(window.__pbT);say(lite?'إعادة المحاولة بإعدادات أخف…':'جاري تجهيز الصفحات…');persist();
     const stage=document.createElement('div');stage.id='pdfStage';document.body.appendChild(stage);
-    let url='',ok=false;
+    let ok=false;
     try{
       pfApply();
-      await pdfvLoad();await loadFonts();await frame();
-      const R=paginateDoc(stage,brand),pages=R.pages;let title=R.title;
+      D.stage='fonts';await pdfvLoad();await loadFonts();await frame();
+      D.stage='pagination';const R=paginateDoc(stage,brand),pages=R.pages;let title=R.title;
       if(cover&&cover.title)title=cover.title.replace(/[\\\/:*?"<>|\n\r]+/g,' ').trim().slice(0,60)||title;
       await frame();if(document.fonts&&document.fonts.ready)await document.fonts.ready;
       pfGeom();window.PDFV.onStatus=m=>say(m,60000);const pdf=new window.PDFV.Doc(title),items=[],tocs=tocBuild(R),total=pages.length+tocs.length+(cover?1:0);let n=0;
-      if(cover){cvOrigOn();const cpg=buildCoverPage(cover,stage,{orig:true});cpg.dataset.pg='cover';items.push(cpg)}
+      at.pages=pages.length;
+      if(cover){D.stage='cover';if(!lite)cvOrigOn();const cpg=buildCoverPage(cover,stage,{orig:!lite});cpg.dataset.pg='cover';items.push(cpg)}
       tocs.forEach(pg=>items.push(pg));
       pages.forEach(pg=>items.push(pg));
       const sheets=pfImpose(items,PF.up,PF_MODE,PF_RTL,PF_CVSOLO),sheetOf=new Map();
       sheets.forEach((sh,k)=>sh.forEach(e=>{if(e)sheetOf.set(e,k)}));
+      D.stage='paint';
       for(const sh of sheets){
         for(let pos=0;pos<sh.length;pos++){
           const pg=sh[pos];if(!pg)continue;
-          say('جاري إنشاء PDF… '+(++n)+' / '+total);await frame();
-          if(pg.dataset.pg==='cover'){await pdf.paintPage(pg,[],pos);pg.remove();continue}
+          say((lite?'(أخف) ':'')+'جاري إنشاء PDF… '+(++n)+' / '+total);await frame();
+          at.page=n;
+          if(pg.dataset.pg==='cover'){D.stage='cover';await pdf.paintPage(pg,[],pos);pg.remove();D.stage='paint';continue}
           await pdf.paintPage(pg,pageLinks(pg,brand).concat((pg.tocLinks||[]).map(k=>({x:k.x,y:k.y,w:k.w,h:k.h,d:sheetOf.get(k.tgt),dy:k.ty})).filter(k=>k.d!==undefined)),pos);pg.remove()}
         await pdf.endSheet()}
-      const blob=await pdf.finish();url=URL.createObjectURL(blob);
-      const a=document.createElement('a');a.href=url;a.download=title+'.pdf';a.rel='noopener';document.body.appendChild(a);a.click();a.remove();
-      window.__pdfvStats=Object.assign({size:blob.size,sheets:pdf.pages.length,fmt:PF.id,mode:PF_MODE},pdf.stats);
-      if(pdf.stats.coverFallback)say('✓ تم إنشاء PDF، لكن تعذّر دمج صورة الغلاف الأصلية (الذاكرة أو الصيغة) فاستُخدمت نسخة مصغّرة منها',7000);
+      D.stage='save';const blob=await pdf.finish();pdfSave(blob,title);
+      window.__pdfvStats=Object.assign({size:blob.size,sheets:pdf.pages.length,fmt:PF.id,mode:PF_MODE,lite},pdf.stats);
+      D.ok=true;D.stage='done';D.stats=window.__pdfvStats;
+      if(pdf.stats.coverFallback){D.events.push('cover-fallback');say('✓ تم إنشاء PDF، لكن تعذّر دمج صورة الغلاف الأصلية (الذاكرة أو الصيغة) فاستُخدمت نسخة مصغّرة منها',7000)}
+      else if(lite){D.events.push('lite-ok');say('✓ تم إنشاء PDF بإعدادات أخف (الغلاف بنسخة مصغّرة) بعد تعذّر المحاولة الأولى',7000)}
       else say('✓ تم إنشاء ملف PDF وحفظه في التنزيلات',4000);
       ok=true;
-    }catch(err){console.error('vector PDF failed',err)}
-    finally{cvOrigOff();stage.remove();if(url)setTimeout(()=>{try{URL.revokeObjectURL(url)}catch(_){}},60000);busy=false;pdfBtn.disabled=false;clearTimeout(window.__pbT);window.__pbT=setTimeout(()=>document.body.classList.remove('pdf-busy'),4200)}
+    }catch(err){
+      at.error={stage:D.stage,msg:String(err&&err.message||err).slice(0,300),stack:String(err&&err.stack||'').split('\n').slice(0,6).join('\n')};D.error=at.error;
+      console.warn('vector PDF failed @'+D.stage+(lite?' (lite)':''),err)}
+    finally{cvOrigOff();stage.remove();busy=false;pdfBtn.disabled=false;clearTimeout(window.__pbT);window.__pbT=setTimeout(()=>document.body.classList.remove('pdf-busy'),4200)}
+    return ok}
+  async function exportPDFDirect(opts){
+    const brand=_s();if(!brand){say('تعذّر التصدير: الملف تم تعديله',4500);return true}
+    const D=pdfDiagNew(opts);
+    let ok=await pdfvAttempt(opts,brand,false,D);
+    if(!ok){const st=PDF_STAGES[D.stage]||D.stage;D.events.push('retry-after:'+D.stage);say('تعذّر إنشاء PDF في مرحلة «'+st+'» — إعادة المحاولة بإعدادات أخف…',4000);await frame();await new Promise(r=>setTimeout(r,250));ok=await pdfvAttempt(opts,brand,true,D)}
     return ok}
   function warmPdfLibs(){try{if(pdfM()!=='img')return}catch(_){} const go=()=>{try{ensurePdfLibs()}catch(_){}}; if(window.requestIdleCallback) requestIdleCallback(go,{timeout:4000}); else setTimeout(go,1500)}
   async function exportPDF(opts){
@@ -3201,7 +3251,7 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
     if(busy)return;
     if(!input.value.trim()){say('لا يوجد محتوى للتصدير',2500);return}
     if(pdfM()==='vec'&&typeof window.print==='function')return exportPDFVec(opts);
-    if(pdfM()==='dir'){if(await exportPDFDirect(opts))return;say('تعذّر PDF المتجهي — جاري استخدام الوضع الاحتياطي (صور)…',2500);await frame()}
+    if(pdfM()==='dir'){if(await exportPDFDirect(opts))return;const D=window.__pdfDiag&&window.__pdfDiag.last||{},st=PDF_STAGES[D.stage]||D.stage||'?';D.fellBack=true;say('تعذّر PDF المتجهي في مرحلة «'+st+'»'+(D.error?': '+D.error.msg.slice(0,70):'')+' — سيتم إنشاء نسخة احتياطية بالصور (جودة أقل، النص غير قابل للتحديد). التفاصيل: __pdfDiag.copy()',9000);await frame()}
     await ensurePdfLibs();
     if(typeof html2canvas!=='function'||!window.jspdf){say('تعذّر تحميل مكتبة PDF',3500);return}
     const brand=_s();if(!brand){say('تعذّر التصدير: الملف تم تعديله',4500);return}
@@ -3281,9 +3331,9 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
       tocDef.forEach(k=>{try{pdf.setPage(k.s+1);pdf.link(k.x,k.y,k.w,k.h,{pageNumber:k.t+1})}catch(e){console.error(e)}});
       const blob=pdf.output('blob');
       url=URL.createObjectURL(blob);
-      const a=document.createElement('a');a.href=url;a.download=title+'.pdf';a.rel='noopener';
-      document.body.appendChild(a);a.click();a.remove();
-      say(coverFailed?'✓ تم إنشاء PDF بدون الغلاف (تعذّر رسمه)':'✓ تم إنشاء ملف PDF وحفظه في التنزيلات',4000);
+      const a=document.createElement('a');a.href=url;a.download=pdfSafeName(title)+'.pdf';a.rel='noopener';
+      document.body.appendChild(a);a.click();setTimeout(()=>a.remove(),1000);
+      say((window.__pdfDiag&&window.__pdfDiag.last&&window.__pdfDiag.last.fellBack?'⚠ تم إنشاء PDF بالوضع الاحتياطي (صور) — ':'')+(coverFailed?'✓ تم إنشاء PDF بدون الغلاف (تعذّر رسمه)':'✓ تم إنشاء ملف PDF وحفظه في التنزيلات'),6000);
     }catch(err){
       console.error(err);say((err&&err.userMsg)||'حدث خطأ أثناء إنشاء PDF',4500);
     }finally{
@@ -4941,7 +4991,7 @@ body.theme-cvd .reader .md blockquote.callout>.co-t{letter-spacing:0;text-decora
   var LS={get:function(k){try{return localStorage.getItem(k)}catch(_){return null}},set:function(k,v){try{localStorage.setItem(k,v)}catch(_){}}};
   var day=new Date().toISOString().slice(0,10),ck='vc:'+ns+'/'+key;
   function call(kind){
-    var c=window.AbortController?new AbortController():null,tm=c&&setTimeout(function(){c.abort()},7000);
+    if(navigator.onLine===false)return Promise.reject(0);var c=window.AbortController?new AbortController():null,tm=c&&setTimeout(function(){c.abort()},4000);
     return fetch(API+'/'+kind+'/'+encodeURIComponent(ns)+'/'+encodeURIComponent(key),{cache:'no-store',signal:c?c.signal:undefined})
       .then(function(r){if(tm)clearTimeout(tm);if(!r.ok)throw 0;return r.json()})
       .then(function(j){var v=Number(j&&j.value);if(!isFinite(v)||v<0)throw 0;return Math.floor(v)});
@@ -4960,8 +5010,10 @@ body.theme-cvd .reader .md blockquote.callout>.co-t{letter-spacing:0;text-decora
   var cached=parseInt(LS.get(ck)||'',10);
   if(isFinite(cached)&&cached>0){shown=cached;num.textContent=fmt(cached);box.hidden=false;box.classList.add('vc-stale')}
   var wantHit=web&&LS.get(ck+':day')!==day;
-  (wantHit?call('hit'):call('get')).then(function(v){if(wantHit)LS.set(ck+':day',day);return v},function(){
-    if(wantHit)return call('get');throw 0}).then(function(v){LS.set(ck,String(v));show(v,false)},function(){if(isFinite(cached)&&cached>0)show(cached,true)});
+  function mkGo(){(wantHit?call('hit'):call('get')).then(function(v){if(wantHit)LS.set(ck+':day',day);return v},function(){
+    if(wantHit)return call('get');throw 0}).then(function(v){LS.set(ck,String(v));show(v,false)},function(){if(isFinite(cached)&&cached>0)show(cached,true)}).catch(function(){})}
+  /* mk-fix-v1 (H): after load, idle, never blocks startup */
+  (function(){var go=function(){setTimeout(function(){try{mkGo()}catch(_){}},1200)};if(document.readyState==='complete')go();else addEventListener('load',go,{once:true})})();
 })();
 </script>
 <style id="study-v3-css">
@@ -5925,7 +5977,8 @@ class Doc{
     await this.obj(id,'<</Type/Font/Subtype/Type0/BaseFont/'+Fz.name+'/Encoding/Identity-H/DescendantFonts['+this.cidfs[Fz.base.k]+' 0 R]/ToUnicode '+tu+' 0 R>>')}
   async writeFont(F,id){
     const desc=this.alloc(),cidf=this.alloc(),tu=this.alloc(),ff=this.alloc();(this.cidfs||(this.cidfs={}))[F.k]=cidf;
-    const t=F.tb,fb=F.cff?F.bytes.subarray(t['CFF '].off,t['CFF '].off+t['CFF '].len):F.bytes;
+    const t=F.tb,used=(this.gsets&&this.gsets[F.k])||new Set();let fb=F.cff?F.bytes.subarray(t['CFF '].off,t['CFF '].off+t['CFF '].len):F.bytes;
+    if(used.size){fb=F.cff?cffPrune(fb,used):ttPrune(F.bytes,t,used);F.name=subTag(F.k,used)+'+'+NAMES[F.k];this.stats.subset=(this.stats.subset||0)+1;this.stats.fontBytes=(this.stats.fontBytes||0)+fb.length}
     await this.obj(ff,F.cff?'<</Subtype/CIDFontType0C>>':'<</Length1 '+fb.length+'>>',fb);
     await this.obj(desc,'<</Type/FontDescriptor/FontName/'+F.name+'/Flags 4/FontBBox['+F.bbox.join(' ')+']/ItalicAngle 0/Ascent '+F.asc+'/Descent '+F.desc+'/CapHeight '+Math.round(F.asc*.7)+'/StemV 80/'+(F.cff?'FontFile3 ':'FontFile2 ')+ff+' 0 R>>');
     let w='';for(let g=0;g<F.n;g++)w+=Math.round(F.adv(g)*1000/F.upem)+' ';
@@ -5936,6 +5989,35 @@ class Doc{
     await this.obj(id,'<</Type/Font/Subtype/Type0/BaseFont/'+F.name+'/Encoding/Identity-H/DescendantFonts['+cidf+' 0 R]/ToUnicode '+tu+' 0 R>>');
     this.stats.conf+=F.conf}
 }
+/* mk-fix-v1 (F): gid-stable font subsetting. Unused glyph outlines are blanked in place (CFF charstring -> endchar, glyf -> empty), so shaping,
+   ligatures, CIDs, widths and ToUnicode stay valid while the Flate stream shrinks ~10-20x. Composite TrueType components are kept. */
+function cffPrune(cff,keep){
+  try{const b=cff.slice(),u16=o=>(b[o]<<8)|b[o+1];
+  const idx=o=>{const c=u16(o);if(!c)return{c:0,end:o+2};const os=b[o+2];const off=i=>{let v=0;for(let k=0;k<os;k++)v=v*256+b[o+3+i*os+k];return v};const base=o+3+(c+1)*os-1;return{c,off,base,end:base+off(c)}};
+  const nm=idx(b[2]),top=idx(nm.end);if(!top.c)return cff;
+  const ds=top.base+top.off(0),de=top.base+top.off(1);let i=ds,st=[],cs=null;
+  while(i<de){const v=b[i];
+    if(v<=21){let op=v;i++;if(v===12){op=1200+b[i];i++}if(op===17)cs=st[st.length-1];st=[]}
+    else if(v===28){st.push(((b[i+1]<<8|b[i+2])<<16)>>16);i+=3}
+    else if(v===29){st.push((b[i+1]<<24)|(b[i+2]<<16)|(b[i+3]<<8)|b[i+4]);i+=5}
+    else if(v===30){i++;while(i<de){const n=b[i++];if((n&15)===15||(n>>4)===15)break}st.push(0)}
+    else if(v>=32&&v<=246){st.push(v-139);i++}
+    else if(v>=247&&v<=250){st.push((v-247)*256+b[i+1]+108);i+=2}
+    else if(v>=251&&v<=254){st.push(-(v-251)*256-b[i+1]-108);i+=2}
+    else i++}
+  if(cs==null||cs<=0||cs>=b.length)return cff;
+  const ch=idx(cs);if(ch.c<2)return cff;
+  for(let g=1;g<ch.c;g++){if(keep.has(g))continue;const a=ch.base+ch.off(g),e=ch.base+ch.off(g+1);if(e>a){b[a]=14;b.fill(0,a+1,e)}}
+  return b}catch(_){return cff}}
+function ttPrune(bytes,t,keep){
+  try{if(!t.loca||!t.glyf)return bytes;const b=bytes.slice(),dv=new DataView(b.buffer,b.byteOffset,b.byteLength);
+  const fmt=dv.getInt16(t.head.off+50),n=dv.getUint16(t.maxp.off+4),lo=g=>fmt?dv.getUint32(t.loca.off+g*4):dv.getUint16(t.loca.off+g*2)*2;
+  const need=new Set(keep);need.add(0);const q=[...need];
+  while(q.length){const g=q.pop(),a=t.glyf.off+lo(g),e=t.glyf.off+lo(g+1);if(e-a<10||dv.getInt16(a)>=0)continue;let p=a+10;
+    for(;;){const fl=dv.getUint16(p),gi=dv.getUint16(p+2);if(!need.has(gi)){need.add(gi);q.push(gi)}p+=4+((fl&1)?4:2);if(fl&8)p+=2;else if(fl&0x40)p+=4;else if(fl&0x80)p+=8;if(!(fl&0x20))break}}
+  for(let g=1;g<n;g++){if(need.has(g))continue;const a=t.glyf.off+lo(g),e=t.glyf.off+lo(g+1);if(e>a)b.fill(0,a,e)}
+  return b}catch(_){return bytes}}
+function subTag(k,set){let h=2166136261;for(const c of k)h=Math.imul(h^c.charCodeAt(0),16777619);[...set].sort((a,b)=>a-b).forEach(g=>{h=Math.imul(h^g,16777619)});h>>>=0;let o='';for(let i=0;i<6;i++){o+=String.fromCharCode(65+h%26);h=Math.floor(h/26)+((i*7919)|0)}return o}
 const shadowFace=F=>F.zf||(F.zf=Object.assign(Object.create(F),{k:F.k+'z',uni:new Map(),conf:0,used:0,base:F}));
 W.PDFV={shadowFace,ORDER:'visual',load,Doc,G,setGeom,nf,lat1,deflate,faces:()=>FACES,hb:()=>HB,faceFor,inR,EN_R,AR_R,ready:()=>!!HB};
 })();
@@ -6206,6 +6288,7 @@ class Painter{
     const close=()=>{if(open){flush();if(rise){out+='0 Ts ';rise=0}out+='ET ';open=false}};
     for(const g of gl){
       if(!g.g){this.doc.stats.missing++;continue}
+      {const _b=F.base||F,_d=this.doc,_g=_d.gsets||(_d.gsets={});(_g[_b.k]||(_g[_b.k]=new Set())).add(g.g)}
       if(g.uni!==undefined&&g.uni!==null){const ex=F.uni.get(g.g);if(ex===undefined)F.uni.set(g.g,g.uni);else if(ex!==g.uni&&!/^\s$/.test(g.uni)&&!/^\s$/.test(ex))F.conf++}
       const hx='<'+g.g.toString(16).padStart(4,'0')+'>',adv=F.adv(g.g)*fs/F.upem,y=Math.round((g.y||0)*100)/100;
       if(g.act){close();out+='/Span<</ActualText<FEFF'+u16h(g.act)+'>>>BDC '}
@@ -6798,5 +6881,26 @@ document.addEventListener('keydown',function(e){if((e.ctrlKey||e.metaKey)&&(e.ke
 }catch(err){console.error('mk-find',err)}})();
 </script>
 <!-- MK-SEARCH:END -->
+<style id="mk-fix-v1-css">
+/* mk-fix-v1 ----------------------------------------------------------------
+   C: clean headings (no ghost/double text-shadow, no faux bold, room for diacritics)
+   A: inline code / Latin runs are LTR-isolated
+   B: callouts: no grid behind body text, hue + glyph + border style per kind */
+.md,.pdf-page .md,.reader .md{font-synthesis:none}
+.reader .md h1,.pdf-page .md h1,.reader .md h2,.pdf-page .md h2,.md h1,.md h2{text-shadow:none!important;line-height:1.55;padding-top:.1em;overflow:visible}
+.md h3,.md h4{line-height:1.55;overflow:visible}
+.md :not(pre)>code{direction:ltr;unicode-bidi:isolate;white-space:normal;overflow-wrap:break-word;word-break:normal;font-synthesis:none}
+.md bdi.mk-lt{unicode-bidi:isolate;direction:ltr}
+.reader .md blockquote.callout,.pdf-page .md blockquote.callout{background-image:none!important}
+.md blockquote.callout[data-kind=danger]{border-inline-start-width:6px;border-inline-start-style:solid}
+.md blockquote.callout[data-kind=redflag]{border-inline-start-width:7px;border-inline-start-style:double}
+.md blockquote.callout[data-kind=trap]{border-inline-start-width:5px;border-inline-start-style:dotted}
+.md blockquote.callout[data-kind=caution]{border-inline-start-width:5px;border-inline-start-style:dashed}
+.md blockquote.callout[data-kind=warning]{border-inline-start-width:5px;border-inline-start-style:solid}
+.md blockquote.callout[data-kind=important]{border-inline-start-width:5px;border-inline-start-style:solid}
+.md blockquote.callout[data-kind=important]>.co-t .co-i{border-radius:2px}
+.md blockquote.callout[data-kind=danger]>.co-t .co-i,.md blockquote.callout[data-kind=redflag]>.co-t .co-i{border-radius:2px}
+.md blockquote.callout[data-kind=warning]>.co-t .co-i,.md blockquote.callout[data-kind=caution]>.co-t .co-i{border-radius:50% 50% 3px 3px}
+</style>
 </body>
 </html>
