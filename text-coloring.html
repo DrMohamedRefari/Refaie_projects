@@ -5507,14 +5507,100 @@ function clearAll(){if(!S.strokes.length)return;snap();S.strokes=[];upd();req();
 /* ---------- pointer handling ---------- */
 var drag=null;
 function inside(e,R){return e.clientX>=R.left&&e.clientX<=R.right&&e.clientY>=R.top&&e.clientY<=R.bottom}
+/* ---------- v12: scroll while a drawing tool is active ----------
+   touch : 1 finger / pen = draw  |  2 fingers = scroll the page (with momentum)
+   mouse : left button = draw     |  right button drag = scroll the page         */
+var touches={},pan=null,flingRaf=0;
+function scroller(){
+  try{var cs=getComputedStyle(rs);if(/(auto|scroll)/.test(cs.overflowY)&&rs.scrollHeight>rs.clientHeight+1)return rs}catch(_){}
+  return null;
+}
+function panBy(dx,dy){
+  var el=scroller();
+  if(el){el.scrollLeft+=dx;el.scrollTop+=dy;return}
+  try{window.scrollBy({left:dx,top:dy,behavior:'instant'})}catch(_){window.scrollBy(dx,dy)}
+}
+function scrollPos(){var el=scroller();return el?[el.scrollLeft,el.scrollTop]:[window.pageXOffset,window.pageYOffset]}
+function centroid(){
+  var x=0,y=0,n=0;
+  for(var k in touches){x+=touches[k].x;y+=touches[k].y;n++}
+  return n?{x:x/n,y:y/n}:null;
+}
+function stopFling(){if(flingRaf){cancelAnimationFrame(flingRaf);flingRaf=0}}
+function fling(vx,vy){
+  stopFling();
+  var last=performance.now();
+  function step(t){
+    flingRaf=0;
+    if(!readerOn())return;
+    var dt=Math.min(40,t-last);last=t;
+    if(dt<=0){flingRaf=requestAnimationFrame(step);return}
+    var f=Math.pow(.9975,dt);vx*=f;vy*=f;
+    if(Math.hypot(vx,vy)<.03)return;
+    var a=scrollPos();panBy(-vx*dt,-vy*dt);var b=scrollPos();
+    if(a[0]===b[0]&&a[1]===b[1])return;
+    flingRaf=requestAnimationFrame(step);
+  }
+  flingRaf=requestAnimationFrame(step);
+}
+function touchPanStart(){
+  var c=centroid();stopFling();
+  pan={kind:'touch',x:c.x,y:c.y,s:[]};
+}
+function touchPanMove(){
+  var c=centroid();if(!c||!pan)return;
+  var dx=c.x-pan.x,dy=c.y-pan.y;pan.x=c.x;pan.y=c.y;
+  if(!dx&&!dy)return;
+  panBy(-dx,-dy);
+  var t=performance.now();pan.s.push([t,dx,dy]);
+  while(pan.s.length&&t-pan.s[0][0]>150)pan.s.shift();
+}
+function touchPanUp(canceled){
+  var c=centroid();
+  if(c){pan.x=c.x;pan.y=c.y;return}              /* a finger is still down: keep scrolling, never draw */
+  var p=pan;pan=null;if(canceled)return;
+  var now=performance.now(),vx=0,vy=0;
+  for(var i=0;i<p.s.length;i++)if(now-p.s[i][0]<=100){vx+=p.s[i][1];vy+=p.s[i][2]}
+  vx/=100;vy/=100;
+  var sp=Math.hypot(vx,vy);
+  if(sp>.15){if(sp>6){vx*=6/sp;vy*=6/sp}fling(vx,vy)}
+}
+function mousePanStart(e){
+  stopFling();
+  pan={kind:'mouse',id:e.pointerId,x:e.clientX,y:e.clientY};
+  try{cv.setPointerCapture(e.pointerId)}catch(_){}
+  cv.style.cursor='grabbing';
+}
+function mousePanEnd(){
+  if(pan&&pan.kind==='mouse'){try{cv.releasePointerCapture(pan.id)}catch(_){}}
+  pan=null;cv.style.cursor='';
+}
+function resetPan(){touches={};if(pan&&pan.kind==='mouse')mousePanEnd();pan=null;stopFling()}
+cv.addEventListener('gesturestart',function(e){e.preventDefault()},{passive:false});
+addEventListener('blur',resetPan);
+
 cv.addEventListener('pointerdown',function(e){
-  if(S.tool==='hand'||!readerOn()||(e.pointerType==='mouse'&&e.button!==0))return;
+  if(S.tool==='hand'||!readerOn())return;
+  stopFling();
+  if(e.pointerType==='mouse'){
+    if(e.button===2){if(!drag&&!pan){e.preventDefault();mousePanStart(e)}return}
+    if(e.button!==0)return;
+  }else if(e.pointerType==='touch'){
+    if(drag&&drag.type==='pen')return;                      /* palm rejection while the pen is writing */
+    if(e.isPrimary){touches={};if(pan&&pan.kind==='touch')pan=null}   /* first finger of a new gesture: drop stale state */
+    touches[e.pointerId]={x:e.clientX,y:e.clientY};
+    if(Object.keys(touches).length>=2||(pan&&pan.kind==='touch')){    /* two fingers = scroll, never draw */
+      if(drag)cancelStroke();
+      if(pan&&pan.kind==='touch'){var c0=centroid();pan.x=c0.x;pan.y=c0.y}else touchPanStart();
+      e.preventDefault();return;
+    }
+  }
   if(drag&&drag.id!==e.pointerId){cancelStroke();return}
   if(window.__czBusy&&window.__czBusy())return;
   KK=window.__czS?window.__czS():1;
   var R=reader.getBoundingClientRect();if(!inside(e,R))return;
   e.preventDefault();try{cv.setPointerCapture(e.pointerId)}catch(_){}
-  var q=pt(e,R);drag={id:e.pointerId,del:false,pre:S.strokes.slice()};
+  var q=pt(e,R);drag={id:e.pointerId,type:e.pointerType,del:false,pre:S.strokes.slice()};
   if(S.tool==='e'&&S.eras==='stroke'){
     S.ring={x:e.clientX,y:e.clientY,r:width()/2};eraseAt(e,R);
   }else if(S.tool==='e'){
@@ -5528,7 +5614,7 @@ cv.addEventListener('pointerdown',function(e){
 function cancelStroke(){
   if(!drag)return;var d=drag;drag=null;S.ring=null;S.cur=null;
   try{cv.releasePointerCapture(d.id)}catch(_){}
-  if(d.del){S.strokes=d.pre;save()}
+  if(d.del){S.strokes=d.pre;S.hist.pop();save()}
   upd();req();
 }
 window.__ntCancel=cancelStroke;
@@ -5539,7 +5625,21 @@ function eraseAt(e,R){
     if(s.t!=='e'&&hit(s,e.clientX,e.clientY,R,rad)){gone=true}else keep.push(s)}
   if(gone){if(!drag.del){S.hist.push(drag.pre);if(S.hist.length>80)S.hist.shift();drag.del=true}S.strokes=keep;upd();save()}
 }
+function panMoveEvt(e){
+  if(e.pointerType==='touch'&&touches[e.pointerId]){
+    touches[e.pointerId].x=e.clientX;touches[e.pointerId].y=e.clientY;
+    if(pan&&pan.kind==='touch'){touchPanMove();return true}
+  }else if(pan&&pan.kind==='mouse'&&e.pointerId===pan.id){
+    if(e.buttons&2){
+      var dx=e.clientX-pan.x,dy=e.clientY-pan.y;pan.x=e.clientX;pan.y=e.clientY;
+      if(dx||dy)panBy(-dx,-dy);
+    }else mousePanEnd();
+    return true;
+  }
+  return false;
+}
 cv.addEventListener('pointermove',function(e){
+  if(panMoveEvt(e))return;
   if(!drag||e.pointerId!==drag.id)return;
   var R=reader.getBoundingClientRect(),evs=(e.getCoalescedEvents&&e.getCoalescedEvents())||[];if(!evs.length)evs=[e];
   for(var k=0;k<evs.length;k++){var ev=evs[k];
@@ -5566,7 +5666,14 @@ function finish(e){
   }
   upd();req();
 }
-cv.addEventListener('pointerup',finish);cv.addEventListener('pointercancel',finish);
+function onUp(e){
+  if(e.pointerType==='touch'&&touches[e.pointerId]){
+    delete touches[e.pointerId];
+    if(pan&&pan.kind==='touch'){touchPanUp(e.type==='pointercancel');return}
+  }else if(pan&&pan.kind==='mouse'&&e.pointerId===pan.id){mousePanEnd();return}
+  finish(e);
+}
+cv.addEventListener('pointerup',onUp);cv.addEventListener('pointercancel',onUp);
 cv.addEventListener('contextmenu',function(e){if(S.tool!=='hand')e.preventDefault()});
 
 /* ---------- UI ---------- */
@@ -5583,6 +5690,7 @@ function upd(){
   B.classList.toggle('nt-focus',on&&S.focus);
   B.classList.toggle('nt-era',S.tool==='e');
   cv.classList.toggle('on',on&&S.open&&!S.focus&&S.tool!=='hand');
+  if(!(on&&S.open&&!S.focus&&S.tool!=='hand'))resetPan();
   bar.querySelectorAll('.nt-tool').forEach(function(b){b.setAttribute('aria-pressed',String(b.dataset.t===S.tool))});
   bar.querySelectorAll('.nt-sw').forEach(function(b){b.setAttribute('aria-pressed',String(b.dataset.c===S.color))});
   bar.querySelectorAll('.nt-sz').forEach(function(b){b.setAttribute('aria-pressed',String(+b.dataset.s===S.size))});
