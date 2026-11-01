@@ -738,7 +738,7 @@ html.app-night .pe-sh{box-shadow:0 -10px 30px rgba(0,0,0,.5)}
           <span id="edCount" class="ed-count" aria-live="off">0 كلمة · 0 حرف</span>
         </div>
         <!-- MK-LASTMOD:START (AI agents: update LAST_MODIFIED_DATE and LAST_MODIFIED_TIME below on EVERY edit of this file) -->
-        <div id="mkLastMod" class="mk-lastmod" dir="rtl"><span>آخر تعديل:</span> <b id="mkLastModDate" data-var="LAST_MODIFIED_DATE">2026-11-01</b> <span>الساعة</span> <b id="mkLastModTime" data-var="LAST_MODIFIED_TIME">13:12</b></div>
+        <div id="mkLastMod" class="mk-lastmod" dir="rtl"><span>آخر تعديل:</span> <b id="mkLastModDate" data-var="LAST_MODIFIED_DATE">2026-11-01</b> <span>الساعة</span> <b id="mkLastModTime" data-var="LAST_MODIFIED_TIME">14:55</b></div>
         <style id="mk-lastmod-css">.mk-lastmod{margin:8px 0 0;padding:7px 12px;border:1px solid var(--line,#ccc);border-radius:10px;background:var(--surface-2,transparent);color:var(--muted,inherit);font:inherit;font-size:13px;text-align:center}.mk-lastmod b{color:var(--text,inherit);font-weight:700;unicode-bidi:isolate;direction:ltr;display:inline-block;white-space:nowrap}</style>
         <!-- MK-LASTMOD:END -->
         <div id="confirmBox" class="confirm-box hidden" role="alertdialog" aria-modal="true" aria-labelledby="confirmTxt">
@@ -8753,6 +8753,123 @@ mountSwitch();
 }catch(err){try{console.error('mk-sheetspdf',err)}catch(_){}}})();
 </script>
 <!-- MK-SHEETSPDF:END -->
+<!-- MK-TITLE:START (sheet name display-only; rename from the ⋯ menu; slimmer strip) -->
+<style id="mk-title-css">
+/* ===== MK-TITLE: sheet name is display-only (no keyboard on stray touch), edited from the ⋯ menu; slimmer top strip ===== */
+.mk-hd{height:30px}
+.mk-no{width:20px;height:20px}
+.mk-no svg{width:16px;height:16px}
+.mk-hd .mk-ab{height:30px;width:32px;border-radius:8px}
+.mk-hd .mk-ab.mk-more{width:34px}
+.mk-hd .mk-grip{width:44px;min-width:44px}
+.mk-hd .mk-ab::before{content:"";position:absolute;inset:-2px 0}
+.mk-hd .mk-grip::before{inset:-3px 0}
+.mk-sheet-wrap.is-sel .mk-hd{overflow:visible}
+.mk-tt{pointer-events:none;-webkit-user-select:none;user-select:none;cursor:default;height:24px;font-size:12.5px;border-color:transparent!important;background:transparent!important;outline:none!important;caret-color:transparent}
+.mk-tt::selection{background:transparent}
+.mk-qtt-b{flex:1 1 100%;display:flex;align-items:center;justify-content:space-between;gap:10px;text-align:start}
+.mk-qtt-v{min-width:0;max-width:58%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--muted);font-weight:700}
+.mk-ttd .mk-ttd-r{display:flex;align-items:center;gap:6px}
+.mk-ttd input{flex:1 1 auto;min-width:0;height:40px;padding:0 10px;border:1px solid var(--line);border-radius:10px;background:var(--surface-2);color:var(--text);font:800 15px/1 var(--font-body);-webkit-user-select:text;user-select:text}
+.mk-ttd input:focus{outline:3px solid var(--accent);outline-offset:1px;border-color:var(--accent)}
+.mk-ttd .mk-qa{min-height:40px}
+</style>
+<script id="mk-title-script">
+(function(){try{
+var D=document;
+function X(){return window.MKSheets&&window.MKSheets.api&&window.MKSheets.api.x}
+/* 1) every sheet title field becomes read-only text: no caret, no keyboard, taps fall through to the strip */
+function lock(root){
+  var a=(root||D).querySelectorAll('.mk-tt');
+  for(var i=0;i<a.length;i++){var t=a[i];if(t.__mkTL)continue;t.__mkTL=1;
+    t.readOnly=true;t.setAttribute('readonly','');t.tabIndex=-1;
+    t.setAttribute('inputmode','none');t.setAttribute('aria-readonly','true');
+    t.setAttribute('aria-label','اسم القصاصة (للعرض فقط — يُعدَّل من قائمة ⋯)');
+  }
+}
+var content=D.getElementById('content');
+lock(D);
+if(content&&window.MutationObserver){new MutationObserver(function(){lock(content)}).observe(content,{childList:true})}
+D.addEventListener('focusin',function(e){var t=e.target;if(t&&t.matches&&t.matches('.mk-tt')){lock(D);try{t.blur()}catch(_){}}},true);
+
+/* 2) rename dialog (fixed at the top of the VISIBLE viewport, so the keyboard never hides it) */
+var DLG=null,INP=null,DID=null;
+function curSheet(){var b=D.querySelector('.mk-more[aria-expanded="true"]');var w=b&&b.closest&&b.closest('.mk-sheet-wrap');var x=X();return(w&&x)?x.byId(w.dataset.id):null}
+function vv(){return window.visualViewport}
+function dlgBuild(){
+  DLG=D.createElement('div');DLG.className='mk-qm mk-ttd';DLG.id='mkTTD';DLG.hidden=true;
+  DLG.setAttribute('role','dialog');DLG.setAttribute('aria-label','تسمية القصاصة');DLG.setAttribute('data-mk-ui','1');
+  DLG.innerHTML='<div class="mk-qm-hd"><b>اسم القصاصة</b><button type="button" class="mk-qm-x" data-tt="x" aria-label="إغلاق">✕</button></div>'+
+    '<div class="mk-ttd-r"><input id="mkTTI" type="text" maxlength="60" dir="auto" autocomplete="off" autocapitalize="off" enterkeyhint="done" aria-label="اسم القصاصة"><button type="button" class="mk-qa" data-tt="ok">تم</button></div>';
+  DLG.style.zIndex='53';
+  D.body.appendChild(DLG);INP=DLG.querySelector('input');
+  DLG.addEventListener('mousedown',function(e){if(!e.target.closest('input'))e.preventDefault()});
+  DLG.addEventListener('click',function(e){var b=e.target.closest('[data-tt]');if(!b)return;dlgClose()});
+  INP.addEventListener('input',function(){
+    var x=X(),sh=x&&DID?x.byId(DID):null;if(!sh)return;
+    sh.tt=INP.value.slice(0,60);x.applyProps(sh);x.save();
+  });
+  INP.addEventListener('keydown',function(e){e.stopPropagation();if(e.key==='Enter'||e.key==='Escape'){e.preventDefault();dlgClose()}});
+}
+function dlgPlace(){
+  if(!DLG||DLG.hidden)return;
+  var v=vv(),vw=v?v.width:innerWidth,ox=v?v.offsetLeft:0,oy=v?v.offsetTop:0,w=Math.min(330,vw-16);
+  DLG.style.width=w+'px';DLG.style.maxHeight='none';
+  DLG.style.left=Math.round(ox+(vw-w)/2)+'px';DLG.style.top=Math.round(oy+8)+'px';
+}
+function dlgOpen(sh){
+  if(!DLG)dlgBuild();
+  DID=sh.id;INP.value=sh.tt||'';
+  var x=X(),i=x?x.SH().list.indexOf(sh)+1:0;INP.placeholder='قصاصة '+(i||'');
+  DLG.hidden=false;dlgPlace();
+  try{INP.focus({preventScroll:true});INP.select()}catch(_){}
+  if(window.MKINK&&MKINK.announce)MKINK.announce('تسمية القصاصة');
+}
+function dlgClose(){
+  if(!DLG||DLG.hidden)return;
+  var x=X(),sh=x&&DID?x.byId(DID):null;
+  if(sh){var v=String(sh.tt||'').replace(/\s+/g,' ').trim();if(v!==sh.tt){sh.tt=v;x.applyProps(sh);x.save()}}
+  DLG.hidden=true;DID=null;try{INP.blur()}catch(_){}
+}
+D.addEventListener('pointerdown',function(e){
+  var t=e.target;if(!t||!t.closest||!DLG||DLG.hidden)return;
+  if(!t.closest('#mkTTD')){dlgClose();var cv=D.getElementById('nt-cv');if(t===cv){e.stopPropagation();e.preventDefault()}}
+},true);
+D.addEventListener('keydown',function(e){if(e.key==='Escape'&&DLG&&!DLG.hidden){e.preventDefault();dlgClose()}},true);
+addEventListener('resize',dlgPlace);
+if(vv()){vv().addEventListener('resize',dlgPlace);vv().addEventListener('scroll',dlgPlace)}
+
+/* 3) "اسم القصاصة" row at the top of the ⋯ quick menu (#mkQM is created lazily by the sheets add-on) */
+var QM=null,QV=null;
+function qmSyncName(){
+  var sh=curSheet();if(!QV)return;var n=sh&&sh.tt?sh.tt:'';
+  QV.textContent=n||'بدون اسم';
+}
+function qmEnsure(){
+  var q=D.getElementById('mkQM');if(!q||q.__mkTT)return;
+  var sc=q.querySelector('.mk-qm-sc');if(!sc)return;
+  q.__mkTT=1;QM=q;
+  var g=D.createElement('div');g.className='mk-qg';g.setAttribute('role','group');g.setAttribute('aria-label','اسم القصاصة');
+  g.innerHTML='<b>الاسم</b><button type="button" class="mk-qa mk-qtt-b" data-tt="open" aria-haspopup="dialog"><span>تسمية القصاصة…</span><span class="mk-qtt-v"></span></button>';
+  sc.insertBefore(g,sc.firstChild);QV=g.querySelector('.mk-qtt-v');
+  g.addEventListener('click',function(e){
+    var b=e.target.closest('[data-tt=open]');if(!b)return;
+    var sh=curSheet();if(!sh)return;
+    var cl=q.querySelector('[data-mm=close]');if(cl)cl.click();
+    dlgOpen(sh);
+  });
+  new MutationObserver(function(){if(!q.hidden)qmSyncName()}).observe(q,{attributes:true,attributeFilter:['hidden']});
+  qmSyncName();
+}
+qmEnsure();
+if(!D.getElementById('mkQM')&&window.MutationObserver){
+  var mo=new MutationObserver(function(){if(D.getElementById('mkQM')){qmEnsure();mo.disconnect()}});
+  mo.observe(D.body,{childList:true});
+}
+window.MKTITLE={open:dlgOpen,close:dlgClose,lock:lock};
+}catch(err){try{console.error('MK-TITLE',err)}catch(_){}}})();
+</script>
+<!-- MK-TITLE:END -->
 <!-- MK-SEARCH:START (find-in-page bar + compact mnemonic chips) -->
 <style id="mk-patch-css">
 /* ===== compact mnemonic chips: fit the text, wrap with long lines ===== */
