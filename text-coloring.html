@@ -738,7 +738,7 @@ html.app-night .pe-sh{box-shadow:0 -10px 30px rgba(0,0,0,.5)}
           <span id="edCount" class="ed-count" aria-live="off">0 كلمة · 0 حرف</span>
         </div>
         <!-- MK-LASTMOD:START (AI agents: update LAST_MODIFIED_DATE and LAST_MODIFIED_TIME below on EVERY edit of this file) -->
-        <div id="mkLastMod" class="mk-lastmod" dir="rtl"><span>آخر تعديل:</span> <b id="mkLastModDate" data-var="LAST_MODIFIED_DATE">2026-11-02</b> <span>الساعة</span> <b id="mkLastModTime" data-var="LAST_MODIFIED_TIME">08:28</b></div>
+        <div id="mkLastMod" class="mk-lastmod" dir="rtl"><span>آخر تعديل:</span> <b id="mkLastModDate" data-var="LAST_MODIFIED_DATE">2026-11-02</b> <span>الساعة</span> <b id="mkLastModTime" data-var="LAST_MODIFIED_TIME">20:50</b></div>
         <style id="mk-lastmod-css">.mk-lastmod{margin:8px 0 0;padding:7px 12px;border:1px solid var(--line,#ccc);border-radius:10px;background:var(--surface-2,transparent);color:var(--muted,inherit);font:inherit;font-size:13px;text-align:center}.mk-lastmod b{color:var(--text,inherit);font-weight:700;unicode-bidi:isolate;direction:ltr;display:inline-block;white-space:nowrap}</style>
         <!-- MK-LASTMOD:END -->
         <div id="confirmBox" class="confirm-box hidden" role="alertdialog" aria-modal="true" aria-labelledby="confirmTxt">
@@ -9772,5 +9772,274 @@ document.addEventListener('keydown',function(e){if((e.ctrlKey||e.metaKey)&&(e.ke
 .md blockquote.callout[data-kind=danger]>.co-t .co-i,.md blockquote.callout[data-kind=redflag]>.co-t .co-i{border-radius:2px}
 .md blockquote.callout[data-kind=warning]>.co-t .co-i,.md blockquote.callout[data-kind=caution]>.co-t .co-i{border-radius:50% 50% 3px 3px}
 </style>
+<!-- MK-TIMER:START (study timer: fixed child of <body>, outside #content, visible only while #readerScreen.active) -->
+<style id="mk-timer-css">
+/* MK-TIMER — study timer. Fixed child of <body> (outside #content), reader screen only. Theme-aware via CSS variables only. */
+#mkTm{position:fixed;inset-inline:0;top:calc(var(--mk-tm-top,62px) + 6px);z-index:18;display:none;justify-content:center;box-sizing:border-box;padding-inline:8px;pointer-events:none;font-family:var(--font-body);color:var(--text);-webkit-tap-highlight-color:transparent}
+body:has(#readerScreen.active):not(.nt-focus) #mkTm{display:flex}
+#mkTm .mk-tm-box{pointer-events:auto;box-sizing:border-box;width:136px;max-width:100%;border:1px solid var(--line);border-radius:22px;background:color-mix(in srgb,var(--surface) 95%,transparent);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);box-shadow:var(--shadow,0 6px 22px rgba(0,0,0,.18));overflow:hidden;transition:width .3s cubic-bezier(.22,.9,.3,1),opacity .25s ease,border-color .2s,background-color .2s}
+/* keep clear of the find button (#mkFind, fixed at the physical left, 10..56px) so the open card never sits under it */
+#mkTm.exp .mk-tm-box{width:min(296px,calc(100vw - 120px))}
+body.sv3-fab-hide #mkTm:not(.exp) .mk-tm-box:not([data-st=done]):not(:focus-within){opacity:.42}
+#mkTm button,#mkTm input{font-family:inherit;touch-action:manipulation}
+#mkTm button{cursor:pointer;-webkit-appearance:none;appearance:none}
+#mkTm button:disabled{cursor:default}
+#mkTm button:focus-visible,#mkTm input:focus-visible{outline:3px solid var(--accent);outline-offset:1px}
+#mkTm .mk-tm-hd{display:flex;align-items:center;gap:4px;padding:3px 4px;padding-inline-start:6px}
+#mkTm .mk-tm-tg{flex:1;min-width:0;height:36px;padding:0 4px;border:0;border-radius:18px;background:transparent;color:inherit;font-size:16px;font-weight:850;line-height:1}
+#mkTm .mk-tm-t,#mkTm .mk-tm-big{unicode-bidi:plaintext;font-variant-numeric:tabular-nums;white-space:nowrap}
+#mkTm .mk-tm-pp{position:relative;flex:none;width:36px;height:36px;padding:0;border:0;border-radius:50%;background:transparent;color:var(--on-c)}
+#mkTm .mk-tm-pp .rg{position:absolute;inset:0;width:36px;height:36px;transform:rotate(-90deg);overflow:visible}
+#mkTm .rg circle{fill:none;stroke-width:2.5}
+#mkTm .rg .tr{stroke:var(--line)}
+#mkTm .rg .pr{stroke:var(--accent);stroke-linecap:round;stroke-dasharray:100.53px;stroke-dashoffset:calc(100.53px * (1 - var(--mk-tm-p,1)))}
+#mkTm .mk-tm-pp .bg{position:absolute;inset:5px;display:grid;place-items:center;border-radius:50%;background:var(--accent);color:var(--on-c)}
+#mkTm .mk-tm-pp .ic{display:none;width:15px;height:15px}
+#mkTm .mk-tm-box[data-st=idle] .ic-play,#mkTm .mk-tm-box[data-st=pause] .ic-play,#mkTm .mk-tm-box[data-st=run] .ic-pause,#mkTm .mk-tm-box[data-st=done] .ic-redo{display:block}
+#mkTm .mk-tm-pp:disabled{opacity:.4}
+#mkTm .mk-tm-box[data-st=done]{border-color:var(--accent);background:color-mix(in srgb,var(--accent) 14%,var(--surface));animation:mkTmPulse 1.6s ease-out 3}
+#mkTm .mk-tm-box[data-st=done] .mk-tm-t{color:var(--accent);font-weight:900}
+@keyframes mkTmPulse{0%,100%{box-shadow:0 0 0 0 color-mix(in srgb,var(--accent) 45%,transparent)}50%{box-shadow:0 0 0 7px transparent}}
+#mkTm .mk-tm-bd{display:grid;grid-template-rows:0fr;opacity:0;visibility:hidden;transition:grid-template-rows .3s cubic-bezier(.22,.9,.3,1),opacity .2s ease,visibility 0s linear .3s}
+#mkTm.exp .mk-tm-bd{grid-template-rows:1fr;opacity:1;visibility:visible;transition:grid-template-rows .3s cubic-bezier(.22,.9,.3,1),opacity .25s ease .05s,visibility 0s}
+#mkTm .mk-tm-in{min-height:0;overflow:hidden}
+#mkTm.exp .mk-tm-in{overflow-y:auto;overscroll-behavior:contain;max-height:calc(100vh - var(--mk-tm-top,62px) - 76px);max-height:calc(100dvh - var(--mk-tm-top,62px) - 76px)}
+#mkTm .mk-tm-pad{padding:4px 12px 12px;border-top:1px solid var(--line)}
+#mkTm .mk-tm-row{display:flex;align-items:center;gap:8px;margin-top:8px}
+#mkTm .mk-tm-seg{display:flex;flex:1;gap:3px;padding:3px;border:1px solid var(--line);border-radius:12px;background:var(--surface-2)}
+#mkTm .mk-tm-seg button{flex:1;min-width:0;min-height:34px;padding:0 6px;border:0;border-radius:9px;background:transparent;color:var(--muted);font-size:13px;font-weight:800}
+#mkTm .mk-tm-seg button[aria-pressed=true]{background:var(--accent);color:var(--on-c)}
+#mkTm .mk-tm-seg button:disabled:not([aria-pressed=true]){opacity:.5}
+#mkTm .mk-tm-x{flex:none;width:36px;height:36px;padding:0;display:grid;place-items:center;border:1px solid var(--line);border-radius:50%;background:var(--surface-2);color:var(--text)}
+#mkTm .mk-tm-x svg{width:16px;height:16px}
+#mkTm .mk-tm-big{display:block;margin-top:6px;text-align:center;font-family:var(--font-head);font-size:40px;line-height:1.25;font-weight:900;color:var(--text)}
+#mkTm .mk-tm-lbl{text-align:center;font-size:12.5px;line-height:1.5;color:var(--muted)}
+#mkTm .mk-tm-box[data-st=done] .mk-tm-lbl{color:var(--accent);font-weight:800}
+#mkTm .mk-tm-bar{height:5px;margin:8px 2px 2px;border-radius:5px;background:var(--line);overflow:hidden}
+#mkTm .mk-tm-bar i{display:block;height:100%;border-radius:5px;background:var(--accent);transform-origin:right center;transform:scaleX(var(--mk-tm-p,1))}
+#mkTm .mk-tm-box[data-mode=sw] .mk-tm-bar,#mkTm .mk-tm-box[data-mode=sw] .mk-tm-cfg{display:none}
+#mkTm .mk-tm-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}
+#mkTm .mk-tm-fl{display:block;margin-bottom:3px;font-size:12px;font-weight:800;color:var(--muted);text-align:center}
+#mkTm .mk-tm-sp{display:flex;direction:ltr;align-items:center;border:1px solid var(--line);border-radius:12px;background:var(--surface-2);overflow:hidden}
+#mkTm .mk-tm-sp button{flex:none;width:34px;min-height:40px;padding:0;border:0;background:transparent;color:var(--text);font-size:20px;font-weight:900;line-height:1}
+#mkTm .mk-tm-sp button:active:not(:disabled){background:var(--accent-soft)}
+#mkTm .mk-tm-sp button:disabled{opacity:.35}
+#mkTm .mk-tm-sp input{flex:1;min-width:0;width:100%;min-height:40px;padding:0;border:0;border-radius:0;background:transparent;color:var(--text);text-align:center;font-size:18px;font-weight:850;font-variant-numeric:tabular-nums}
+#mkTm .mk-tm-sp input:disabled{opacity:.6}
+#mkTm .mk-tm-pre{display:flex;gap:6px;margin-top:8px}
+#mkTm .mk-tm-pre button{flex:1;min-width:0;min-height:36px;padding:0 4px;border:1px solid var(--line);border-radius:10px;background:var(--surface-2);color:var(--text);font-size:13px;font-weight:800}
+#mkTm .mk-tm-pre button[aria-pressed=true]{background:var(--accent-soft);border-color:var(--accent);color:var(--accent)}
+#mkTm .mk-tm-pre button:disabled{opacity:.45}
+#mkTm .mk-tm-act{display:flex;gap:8px;margin-top:12px}
+#mkTm .mk-tm-go{flex:1.7;min-height:44px;padding:0 8px;border:0;border-radius:12px;background:var(--accent);color:var(--on-c);font-size:15px;font-weight:900}
+#mkTm .mk-tm-rs{flex:1;min-height:44px;padding:0 8px;border:1px solid var(--line);border-radius:12px;background:var(--surface-2);color:var(--text);font-size:14px;font-weight:800}
+#mkTm .mk-tm-go:disabled,#mkTm .mk-tm-rs:disabled{opacity:.45}
+#mkTm .mk-tm-wl{display:flex;align-items:center;justify-content:space-between;gap:10px;width:100%;min-height:38px;margin-top:8px;padding:0 4px;border:0;background:transparent;color:var(--muted);font-size:12.5px;font-weight:800;text-align:start}
+#mkTm .mk-tm-wl .sw{position:relative;flex:none;width:38px;height:22px;border-radius:11px;background:var(--line);transition:background-color .2s}
+#mkTm .mk-tm-wl .sw::after{content:"";position:absolute;top:3px;inset-inline-start:3px;width:16px;height:16px;border-radius:50%;background:var(--surface);transition:inset-inline-start .2s}
+#mkTm .mk-tm-wl[aria-checked=true] .sw{background:var(--accent)}
+#mkTm .mk-tm-wl[aria-checked=true] .sw::after{inset-inline-start:19px;background:var(--on-c)}
+#mkTm .mk-tm-sr{position:absolute;width:1px;height:1px;margin:-1px;padding:0;border:0;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+@media (max-width:360px){#mkTm .mk-tm-big{font-size:36px}#mkTm .mk-tm-seg button{font-size:12.5px}}
+@media (prefers-reduced-motion:reduce){#mkTm .mk-tm-box,#mkTm .mk-tm-bd,#mkTm.exp .mk-tm-bd,#mkTm .mk-tm-wl .sw,#mkTm .mk-tm-wl .sw::after{transition:none!important}#mkTm .mk-tm-box[data-st=done]{animation:none}}
+@media (forced-colors:active){#mkTm .mk-tm-box{border-color:CanvasText}#mkTm button,#mkTm input{border:1px solid ButtonText}#mkTm .rg .pr{stroke:Highlight}}
+/* app-night dresses only the tool UI (same tokens as .topbar/.nt-bar) */
+html.app-night #mkTm{--surface:#212836;--surface-2:#2a3243;--text:#e3e8f1;--muted:#9eaabd;--line:#3b455a;--accent:#86b6d2;--accent-soft:#2b3a4e;--on-c:#101823;--shadow:0 12px 32px rgba(0,0,0,.32);color:var(--text)}
+/* PDF / cover / page-setup isolation (the PDF is built from renderMarkdown(), never from the live DOM; this is belt and braces) */
+body:has(#pageModal:not(.hidden)) #mkTm,body:has(#coverModal:not(.hidden)) #mkTm,body.pdf-busy #mkTm,.pdf-page #mkTm{visibility:hidden!important}
+@media print{#mkTm{display:none!important}}
+</style>
+<script id="mk-timer-script">
+/* MK-TIMER: accurate study timer. Truth = absolute wall-clock timestamps (Date.now); the ticker only repaints. */
+(function(){try{
+var D=document,KEY='refaie-minimal-study-v1-timer',MIN=60000,MAXMIN=23*60+59,MAXDUR=MAXMIN*MIN,MAXSW=359999000;/* stopwatch display caps at 99:59:59 */
+var rs=D.getElementById('readerScreen');if(!rs||!D.body)return;
+function noop(){}
+function num(v,d){return(typeof v==='number'&&isFinite(v))?v:d}
+function clamp(v,a,b){return Math.min(b,Math.max(a,v))}
+function p2(n){return(n<10?'0':'')+n}
+function fmt(s){var h=Math.floor(s/3600),m=Math.floor(s%3600/60),r=s%60;return(h?h+':'+p2(m):p2(m))+':'+p2(r)}
+function dflt(){return{v:1,mode:'cd',st:'idle',dur:25*MIN,endAt:0,startedAt:0,acc:0,remMs:25*MIN,exp:false,nt:false,seen:0,wl:false}}
+/* validate anything read from storage: corrupt/foreign JSON can never crash the app */
+function norm(o){var d=dflt();if(!o||typeof o!=='object')return d;
+  d.mode=o.mode==='sw'?'sw':'cd';
+  d.dur=(typeof o.dur==='number'&&o.dur>=0)?Math.round(clamp(num(o.dur,d.dur),0,MAXDUR)/MIN)*MIN:d.dur;
+  d.st=(o.st==='run'||o.st==='pause'||o.st==='done')?o.st:'idle';
+  d.endAt=Math.max(0,num(o.endAt,0));d.startedAt=Math.max(0,num(o.startedAt,0));
+  d.acc=clamp(num(o.acc,0),0,MAXSW);d.remMs=clamp(num(o.remMs,d.dur),0,d.dur);
+  d.exp=!!o.exp;d.nt=!!o.nt;d.seen=Math.max(0,num(o.seen,0));d.wl=!!o.wl;
+  if(d.mode==='sw'&&d.st==='done')d.st='idle';
+  var n=Date.now();/* a running timestamp must be plausible: a countdown ends within 24 h from now, a stopwatch cannot start in the future */
+  if(d.st==='run'&&((d.mode==='cd'&&!(d.endAt>0&&d.endAt<=n+MAXDUR+36e5))||(d.mode==='sw'&&!(d.startedAt>0&&d.startedAt<=n+36e5))))d.st='idle';
+  if(d.st==='idle'){d.remMs=d.dur;d.acc=0}
+  if(d.st==='done')d.remMs=0;
+  return d}
+function read(){try{var r=localStorage.getItem(KEY);if(!r)return null;return norm(JSON.parse(r))}catch(e){return null}}
+var T=read()||dflt(),lastW=0,timer=0,ctx=null,WL=null,wlBusy=false,P={sec:-1,st:'',mode:'',p:-1},firstRender=true;
+function persist(){lastW=Date.now();try{localStorage.setItem(KEY,JSON.stringify(T))}catch(e){}}
+
+/* ---------- time maths: pure functions of (state, now) ---------- */
+function rem(t){return T.st==='run'?Math.max(0,T.endAt-t):T.st==='pause'?T.remMs:T.st==='done'?0:T.dur}
+function el(t){return T.st==='run'?T.acc+Math.max(0,t-T.startedAt):T.st==='pause'?T.acc:0}
+/* wall clock stepped backwards: never gain time, re-anchor so the value stays where it was */
+function backGuard(t){if(T.st==='run'&&T.seen&&t<T.seen-1500){var d=T.seen-t;T.endAt-=d;T.startedAt-=d;persist()}}
+
+/* ---------- DOM ---------- */
+var host=D.createElement('div');host.id='mkTm';host.className='mk-tm';host.setAttribute('dir','rtl');host.setAttribute('role','group');host.setAttribute('aria-label','مؤقّت المذاكرة');
+var wlOK=!!(navigator&&navigator.wakeLock&&navigator.wakeLock.request);
+host.innerHTML=
+'<div class="mk-tm-box" data-st="idle" data-mode="cd">'
++'<div class="mk-tm-hd">'
++'<button type="button" class="mk-tm-tg" data-tma="tg" aria-expanded="false" aria-controls="mkTmBd" aria-label="المؤقّت، اضغط لفتح الإعدادات"><span class="mk-tm-t" id="mkTmT">25:00</span></button>'
++'<button type="button" class="mk-tm-pp" data-tma="pp" aria-label="ابدأ المؤقّت"><svg class="rg" viewBox="0 0 36 36" aria-hidden="true"><circle class="tr" cx="18" cy="18" r="16"/><circle class="pr" cx="18" cy="18" r="16"/></svg><span class="bg">'
++'<svg class="ic ic-play" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5.5v13a1 1 0 0 0 1.55.83l10-6.5a1 1 0 0 0 0-1.66l-10-6.5A1 1 0 0 0 8 5.5z" fill="currentColor"/></svg>'
++'<svg class="ic ic-pause" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 5h3.5v14H7zM13.5 5H17v14h-3.5z" fill="currentColor"/></svg>'
++'<svg class="ic ic-redo" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12a7 7 0 1 0 2.2-5.1M5 4.5V8h3.5" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>'
++'</span></button>'
++'</div>'
++'<div class="mk-tm-bd" id="mkTmBd" role="region" aria-label="إعدادات المؤقّت"><div class="mk-tm-in"><div class="mk-tm-pad">'
++'<div class="mk-tm-row"><div class="mk-tm-seg" role="group" aria-label="نوع المؤقّت">'
++'<button type="button" data-tma="mode" data-tmv="cd" aria-pressed="true">عدّ تنازلي</button>'
++'<button type="button" data-tma="mode" data-tmv="sw" aria-pressed="false">ساعة إيقاف</button></div>'
++'<button type="button" class="mk-tm-x" data-tma="x" aria-label="طيّ المؤقّت"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 15l6-6 6 6" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button></div>'
++'<span class="mk-tm-big" id="mkTmBig" aria-hidden="true">25:00</span>'
++'<div class="mk-tm-lbl" id="mkTmLbl">جاهز</div>'
++'<div class="mk-tm-bar" aria-hidden="true"><i></i></div>'
++'<div class="mk-tm-cfg">'
++'<div class="mk-tm-grid">'
++'<div><span class="mk-tm-fl" id="mkTmHL">ساعات</span><div class="mk-tm-sp"><button type="button" data-tma="hm" data-tmv="-60" aria-label="إنقاص ساعة">−</button><input id="mkTmH" type="text" inputmode="numeric" autocomplete="off" maxlength="2" aria-labelledby="mkTmHL" value="0"><button type="button" data-tma="hm" data-tmv="60" aria-label="زيادة ساعة">+</button></div></div>'
++'<div><span class="mk-tm-fl" id="mkTmML">دقائق</span><div class="mk-tm-sp"><button type="button" data-tma="hm" data-tmv="-5" aria-label="إنقاص ٥ دقائق">−</button><input id="mkTmM" type="text" inputmode="numeric" autocomplete="off" maxlength="2" aria-labelledby="mkTmML" value="25"><button type="button" data-tma="hm" data-tmv="5" aria-label="زيادة ٥ دقائق">+</button></div></div>'
++'</div>'
++'<div class="mk-tm-pre" role="group" aria-label="مدد جاهزة">'
++'<button type="button" data-tma="pre" data-tmv="15" aria-pressed="false">15 د</button><button type="button" data-tma="pre" data-tmv="25" aria-pressed="true">25 د</button><button type="button" data-tma="pre" data-tmv="45" aria-pressed="false">45 د</button><button type="button" data-tma="pre" data-tmv="60" aria-pressed="false">60 د</button>'
++'</div></div>'
++'<div class="mk-tm-act"><button type="button" class="mk-tm-go" data-tma="go">ابدأ</button><button type="button" class="mk-tm-rs" data-tma="rs">إعادة ضبط</button></div>'
++(wlOK?'<button type="button" class="mk-tm-wl" data-tma="wl" role="switch" aria-checked="false"><span>إبقاء الشاشة مضاءة أثناء العدّ</span><span class="sw" aria-hidden="true"></span></button>':'')
++'</div></div></div>'
++'<div class="mk-tm-sr" role="status" aria-live="polite"></div>'
++'</div>';
+D.body.appendChild(host);
+function $(s){return host.querySelector(s)}
+var box=$('.mk-tm-box'),tg=$('.mk-tm-tg'),pp=$('.mk-tm-pp'),bd=$('#mkTmBd'),tEl=$('#mkTmT'),big=$('#mkTmBig'),lbl=$('#mkTmLbl'),
+    hIn=$('#mkTmH'),mIn=$('#mkTmM'),go=$('.mk-tm-go'),rsB=$('.mk-tm-rs'),wlB=$('.mk-tm-wl'),sr=$('.mk-tm-sr'),
+    modeB=[].slice.call(host.querySelectorAll('[data-tma=mode]')),preB=[].slice.call(host.querySelectorAll('[data-tma=pre]')),
+    hmB=[].slice.call(host.querySelectorAll('[data-tma=hm]'));
+function say2(m){try{sr.textContent='';sr.textContent=m}catch(e){}}
+
+/* ---------- paint (cheap, only touches DOM when a visible value changed) ---------- */
+function paintTime(t){
+  var cd=T.mode==='cd',ms=cd?rem(t):el(t),sec=Math.min(359999,cd?Math.ceil(ms/1000):Math.floor(ms/1000)),frac;
+  if(cd)frac=T.dur>0?clamp(ms/T.dur,0,1):0;else frac=(T.st==='run'||T.st==='pause')?(ms%60000)/60000:0;
+  if(sec!==P.sec||T.st!==P.st||T.mode!==P.mode){P.sec=sec;P.st=T.st;P.mode=T.mode;var s=fmt(sec);big.textContent=s;tEl.textContent=T.st==='done'?'انتهى':s}
+  if(Math.abs(frac-P.p)>0.0015||(frac===0&&P.p!==0)||(frac===1&&P.p!==1)){P.p=frac;box.style.setProperty('--mk-tm-p',frac.toFixed(4))}
+}
+function goLabel(){return T.st==='run'?'إيقاف مؤقت':T.st==='pause'?'متابعة':T.st==='done'?'ابدأ من جديد':'ابدأ'}
+function stLabel(){return T.st==='run'?(T.mode==='cd'?'جارٍ العدّ التنازلي':'جارٍ القياس'):T.st==='pause'?'متوقف مؤقتًا':T.st==='done'?'انتهى الوقت':'جاهز'}
+function render(){
+  var st=T.st,cd=T.mode==='cd',busy=(st==='run'||st==='pause'),total=Math.round(T.dur/MIN),noDur=cd&&T.dur<=0&&(st==='idle'||st==='done');
+  box.setAttribute('data-st',st);box.setAttribute('data-mode',T.mode);
+  host.classList.toggle('exp',!!T.exp);tg.setAttribute('aria-expanded',String(!!T.exp));bd.setAttribute('aria-hidden',String(!T.exp));
+  modeB.forEach(function(b){b.setAttribute('aria-pressed',String(b.getAttribute('data-tmv')===T.mode));b.disabled=busy});
+  if(D.activeElement!==hIn)hIn.value=String(Math.floor(total/60));
+  if(D.activeElement!==mIn)mIn.value=String(total%60);
+  hIn.disabled=mIn.disabled=busy;hmB.forEach(function(b){b.disabled=busy});
+  preB.forEach(function(b){b.setAttribute('aria-pressed',String(+b.getAttribute('data-tmv')===total));b.disabled=busy});
+  var gl=goLabel();go.textContent=gl;go.disabled=noDur;pp.disabled=noDur;pp.setAttribute('aria-label',gl+' المؤقّت');pp.title=gl;
+  rsB.disabled=(st==='idle');lbl.textContent=stLabel();
+  if(wlB)wlB.setAttribute('aria-checked',String(!!T.wl));
+  P.st='';paintTime(Date.now());
+  if(st==='run'){if(!timer)schedule(Date.now())}else{clearTimeout(timer);timer=0}
+  wlSync();firstRender=false;
+}
+
+/* ---------- ticker: repaint only; the value always comes from timestamps ---------- */
+function schedule(t){clearTimeout(timer);timer=0;if(T.st!=='run')return;
+  var ms=T.mode==='cd'?Math.max(0,T.endAt-t):T.acc+Math.max(0,t-T.startedAt);
+  var d=T.mode==='cd'?(ms%1000||1000):(1000-ms%1000);timer=setTimeout(tick,Math.min(250,Math.max(15,d+8)))}
+function tick(){clearTimeout(timer);timer=0;var t=Date.now();
+  if(T.st==='run'){backGuard(t);T.seen=t;
+    if(T.mode==='cd'&&t>=T.endAt){finish(t);return}
+    if(t-lastW>5000)persist()}
+  paintTime(t);schedule(t)}
+
+/* ---------- finish: exactly once (persisted flag is written BEFORE notifying; storage re-checked for other tabs) ---------- */
+function finish(t){
+  var over=t-T.endAt,s=read(),dup=!!(s&&s.mode==='cd'&&s.st==='done'&&s.nt&&s.endAt===T.endAt);
+  T.st='done';T.remMs=0;T.seen=t;T.nt=true;persist();
+  if(!dup&&over<15000)notify();
+  render();say2('انتهى الوقت');
+}
+function unlockAudio(){try{var AC=window.AudioContext||window.webkitAudioContext;if(!AC)return;if(!ctx)ctx=new AC();
+  if(ctx.state==='suspended'){var p=ctx.resume();if(p&&p.catch)p.catch(noop)}
+  var b=ctx.createBuffer(1,1,22050),s=ctx.createBufferSource();s.buffer=b;s.connect(ctx.destination);s.start(0)}catch(e){}}
+function chime(){try{if(!ctx)return;
+  var play=function(){try{var t0=ctx.currentTime;[[784,0],[988,.2],[1175,.4]].forEach(function(n){var o=ctx.createOscillator(),g=ctx.createGain(),a=t0+n[1];
+    o.type='sine';o.frequency.value=n[0];g.gain.setValueAtTime(.0001,a);g.gain.exponentialRampToValueAtTime(.15,a+.03);g.gain.exponentialRampToValueAtTime(.0001,a+.8);
+    o.connect(g);g.connect(ctx.destination);o.start(a);o.stop(a+.85)})}catch(e){}};
+  if(ctx.state==='running')play();else{var p=ctx.resume();if(p&&p.then)p.then(play,noop)}}catch(e){}}
+function notify(){chime();try{if(navigator.vibrate)navigator.vibrate([220,120,220,120,380])}catch(e){}}
+
+/* ---------- optional screen wake lock (feature-detected, never required) ---------- */
+function wlWant(){return wlOK&&T.wl&&T.st==='run'&&!D.hidden}
+function wlSync(){if(!wlOK)return;try{
+  if(wlWant()){if(!WL&&!wlBusy){wlBusy=true;navigator.wakeLock.request('screen').then(function(l){wlBusy=false;WL=l;l.addEventListener('release',function(){if(WL===l)WL=null});if(!wlWant()){WL=null;l.release().catch(noop)}},function(){wlBusy=false})}}
+  else if(WL){var l=WL;WL=null;l.release().catch(noop)}}catch(e){wlBusy=false}}
+
+/* ---------- actions ---------- */
+function start(){unlockAudio();var t=Date.now();
+  if(T.mode==='cd'){if(T.dur<=0)return;var base=T.st==='pause'?T.remMs:T.dur;T.remMs=base;T.endAt=t+base}
+  else{if(T.st!=='pause')T.acc=0;T.startedAt=t}
+  var resumed=T.st==='pause';T.st='run';T.nt=false;T.seen=t;persist();render();say2(resumed?'تمت المتابعة':'بدأ المؤقّت')}
+function pause(){var t=Date.now();
+  if(T.mode==='cd'){T.remMs=Math.max(0,T.endAt-t);if(T.remMs<=0){finish(t);return}}else T.acc+=Math.max(0,t-T.startedAt);
+  T.st='pause';T.seen=t;persist();render();say2('تم الإيقاف مؤقتًا')}
+function reset(){T.st='idle';T.remMs=T.dur;T.acc=0;T.endAt=0;T.startedAt=0;T.nt=false;T.seen=0;persist();render();say2('أُعيد الضبط')}
+function primary(){if(T.st==='run')pause();else start()}
+function setMode(m){if(T.st==='run'||T.st==='pause'||(m!=='cd'&&m!=='sw')||m===T.mode)return;T.mode=m;reset();say2(m==='cd'?'عدّ تنازلي':'ساعة إيقاف')}
+function setTotal(min){if(T.st==='run'||T.st==='pause')return;T.dur=clamp(Math.round(min),0,MAXMIN)*MIN;if(T.st==='done'){reset();return}T.remMs=T.dur;persist();render()}
+function setExp(b){T.exp=!!b;persist();render()}
+function digits(s){return String(s).replace(/[\u0660-\u0669]/g,function(c){return c.charCodeAt(0)-1632}).replace(/[\u06F0-\u06F9]/g,function(c){return c.charCodeAt(0)-1776}).replace(/\D/g,'')}
+function fromInputs(){var h=clamp(parseInt(digits(hIn.value),10)||0,0,23),m=clamp(parseInt(digits(mIn.value),10)||0,0,59);setTotal(h*60+m)}
+
+host.addEventListener('click',function(e){var b=e.target.closest?e.target.closest('button[data-tma]'):null;if(!b||b.disabled||!host.contains(b))return;
+  switch(b.getAttribute('data-tma')){
+    case 'tg':setExp(!T.exp);break;
+    case 'x':setExp(false);try{tg.focus()}catch(x){}break;
+    case 'pp':case 'go':primary();break;
+    case 'rs':reset();break;
+    case 'mode':setMode(b.getAttribute('data-tmv'));break;
+    case 'pre':setTotal(+b.getAttribute('data-tmv'));break;
+    case 'hm':setTotal(Math.round(T.dur/MIN)+(+b.getAttribute('data-tmv')));break;
+    case 'wl':T.wl=!T.wl;persist();render();break}});
+[hIn,mIn].forEach(function(i){i.addEventListener('input',fromInputs);i.addEventListener('focus',function(){try{i.select()}catch(e){}});
+  i.addEventListener('blur',render);i.addEventListener('keydown',function(e){if(e.key==='Enter'){e.preventDefault();i.blur()}})});
+host.addEventListener('keydown',function(e){if(e.key==='Escape'&&T.exp){e.stopPropagation();setExp(false);try{tg.focus()}catch(x){}}});
+/* tap outside the open card closes it (capture + passive: never blocks drawing/scrolling) */
+D.addEventListener('pointerdown',function(e){if(T.exp&&!host.contains(e.target))setExp(false)},{capture:true,passive:true});
+/* any later user gesture re-unlocks audio when a restored timer is running */
+['pointerup','touchend','click'].forEach(function(n){D.addEventListener(n,function(){if(T.st==='run'&&(!ctx||ctx.state!=='running'))unlockAudio()},{capture:true,passive:true})});
+
+/* ---------- placement under the sticky top bar ---------- */
+function place(){try{var tb=D.querySelector('.topbar'),b=0;if(tb){var r=tb.getBoundingClientRect();if(r.height>0)b=Math.max(0,Math.round(r.bottom))}
+  host.style.setProperty('--mk-tm-top',b?b+'px':'env(safe-area-inset-top,0px)')}catch(e){}}
+place();addEventListener('resize',place);addEventListener('orientationchange',place);
+try{var tbEl=D.querySelector('.topbar');if(tbEl&&window.ResizeObserver)new ResizeObserver(place).observe(tbEl)}catch(e){}
+try{new MutationObserver(function(){place();paintTime(Date.now())}).observe(rs,{attributes:true,attributeFilter:['class']})}catch(e){}
+
+/* ---------- re-sync the instant the page is visible/alive again; throttling can never change the result ---------- */
+function resync(){tick();wlSync()}
+D.addEventListener('visibilitychange',function(){if(!D.hidden)resync()});
+addEventListener('pageshow',function(e){if(e.persisted){var s=read();if(s){T=s;render()}}resync()});
+addEventListener('focus',resync);D.addEventListener('resume',resync);
+addEventListener('pagehide',function(){if(T.st==='run'){T.seen=Date.now();persist()}});
+addEventListener('storage',function(e){if(e.key!==KEY&&e.key!==null)return;T=read()||dflt();render()});
+
+/* ---------- boot: restore from timestamps ---------- */
+(function(){var t=Date.now();if(T.st==='run'){backGuard(t);T.seen=t}
+  render();if(T.st==='run')tick()})();
+window.MKTimer={state:function(){return JSON.parse(JSON.stringify(T))},tick:tick,key:KEY};
+}catch(err){try{console.error('MK-TIMER',err)}catch(_){}}})();
+</script>
+<!-- MK-TIMER:END -->
 </body>
 </html>
