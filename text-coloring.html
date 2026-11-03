@@ -738,7 +738,7 @@ html.app-night .pe-sh{box-shadow:0 -10px 30px rgba(0,0,0,.5)}
           <span id="edCount" class="ed-count" aria-live="off">0 كلمة · 0 حرف</span>
         </div>
         <!-- MK-LASTMOD:START (AI agents: on EVERY edit of this file set LAST_MODIFIED_DATE = Egypt date YYYY-MM-DD, LAST_MODIFIED_TIME = Egypt time 12-hour hh:mm (Africa/Cairo), LAST_MODIFIED_AMPM = صباحًا or مساءً with the matching (AM)/(PM). The Hijri date fills itself from the date. Do not touch the script.) -->
-        <div id="mkLastMod" class="mk-lastmod" dir="rtl"><div class="mk-lm-l1"><span class="mk-lm-flag" aria-hidden="true">🇪🇬</span> <span>آخر تعديل:</span> <b id="mkLastModDate" data-var="LAST_MODIFIED_DATE">2026-11-03</b> <span>الساعة</span> <b id="mkLastModTime" data-var="LAST_MODIFIED_TIME">08:18</b> <span id="mkLastModAP" data-var="LAST_MODIFIED_AMPM">صباحًا (AM)</span></div><div id="mkLastModHijri" class="mk-lm-l2" hidden></div></div>
+        <div id="mkLastMod" class="mk-lastmod" dir="rtl"><div class="mk-lm-l1"><span class="mk-lm-flag" aria-hidden="true">🇪🇬</span> <span>آخر تعديل:</span> <b id="mkLastModDate" data-var="LAST_MODIFIED_DATE">2026-11-03</b> <span>الساعة</span> <b id="mkLastModTime" data-var="LAST_MODIFIED_TIME">08:02</b> <span id="mkLastModAP" data-var="LAST_MODIFIED_AMPM">صباحًا (AM)</span></div><div id="mkLastModHijri" class="mk-lm-l2" hidden></div></div>
         <style id="mk-lastmod-css">.mk-lastmod{margin:8px 0 0;padding:7px 12px;border:1px solid var(--line,#ccc);border-radius:10px;background:var(--surface-2,transparent);color:var(--muted,inherit);font:inherit;font-size:13px;text-align:center;line-height:1.8}.mk-lastmod b{color:var(--text,inherit);font-weight:700;unicode-bidi:isolate;direction:ltr;display:inline-block;white-space:nowrap}.mk-lm-l2{margin-top:1px;font-size:12.5px;color:var(--muted,inherit)}.mk-lm-l2[hidden]{display:none}.mk-lm-flag{font-size:15px}</style>
         <script id="mk-lastmod-script">
         /* Hijri date for the Egypt stamp date. Never blocks the page: shows instantly from local data, then upgrades from a free API (aladhan.com) if reachable. */
@@ -803,6 +803,10 @@ html.app-night .pe-sh{box-shadow:0 -10px 30px rgba(0,0,0,.5)}
           <span class="vc-dot" aria-hidden="true"></span>
           <span class="vc-tx"><small id="vcLb">عدد زوار المذكرة</small><b id="vcNum" dir="ltr">0</b></span>
           <span class="vc-ic" aria-hidden="true"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg></span>
+        </div><div id="acBox" class="vc-box ac-box" role="status" aria-live="off" title="عدد الأجهزة النشطة خلال آخر 5 دقائق تقريبًا" hidden>
+          <span class="vc-dot" aria-hidden="true"></span>
+          <span class="vc-tx"><small>نشطون الآن</small><b id="acNum" dir="ltr">0</b></span>
+          <span class="vc-ic" aria-hidden="true"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3.2"/><path d="M3 20c0-3.3 2.7-6 6-6s6 2.7 6 6"/><circle cx="17" cy="9" r="2.4"/><path d="M16.5 14.2c2.7.2 4.5 2.3 4.5 5.1"/></svg></span>
         </div></div>
       </section>
     </div>
@@ -5023,6 +5027,12 @@ body.theme-cvd .reader .md blockquote.callout>.co-t{letter-spacing:0;text-decora
 .vc-dot{width:10px;height:10px;border-radius:50%;background:#22c55e;box-shadow:0 0 0 0 rgba(34,197,94,.55);animation:vcPulse 2s ease-out infinite;flex:none}
 .vc-box.vc-stale .vc-dot{background:#f59e0b;animation:none}
 .vc-box.vc-bump .vc-tx b{animation:vcBump .6s ease}
+/* MK-ACTIVE-NOW: two counter boxes side by side */
+.vc-wrap{gap:10px;flex-wrap:wrap;align-items:stretch}
+.vc-wrap .vc-box{flex:1 1 150px;min-width:0;max-width:250px;gap:9px;padding:9px 12px}
+.vc-wrap .vc-tx small{white-space:nowrap}
+.vc-wrap .vc-tx b{font-size:22px}
+.vc-wrap .vc-ic{width:34px;height:34px;flex:none}
 @keyframes vcFlow{to{background-position:0 0,300% 0}}
 @keyframes vcPulse{70%{box-shadow:0 0 0 9px rgba(34,197,94,0)}100%{box-shadow:0 0 0 0 rgba(34,197,94,0)}}
 @keyframes vcIn{from{opacity:0;transform:translateY(10px) scale(.96)}}
@@ -5074,6 +5084,56 @@ body.theme-cvd .reader .md blockquote.callout>.co-t{letter-spacing:0;text-decora
     if(wantHit)return call('get');throw 0}).then(function(v){LS.set(ck,String(v));show(v,false)},function(){if(isFinite(cached)&&cached>0)show(cached,true)}).catch(function(){})}
   /* mk-fix-v1 (H): after load, idle, never blocks startup */
   (function(){var go=function(){setTimeout(function(){try{mkGo()}catch(_){}},1200)};if(document.readyState==='complete')go();else addEventListener('load',go,{once:true})})();
+})();
+</script>
+<script id="active-v1-script">
+(function(){
+  'use strict';
+  /* "Active now" counter. Same free public counter service as the visitors box (Abacus). Each device sends ONE tiny
+     "I am here" hit per 5-minute slot while the page is visible; the number shown is the hits of the current slot
+     (and the previous slot right after a slot starts). No personal data is sent. Fully fail-safe: if the service is
+     unreachable the box simply keeps its last number (dimmed) or stays hidden. Never blocks the page. */
+  var API='https://abacus.jasoncameron.dev',SLOT=300000,POLL=30000;
+  var box=document.getElementById('acBox'),num=document.getElementById('acNum');
+  if(!box||!num||!window.fetch)return;
+  var h=location.hostname,web=/^https?:$/.test(location.protocol)&&h&&!/^(localhost|127\.|0\.0\.0\.0|10\.|192\.168\.|\[)/.test(h)&&!/\.local$/.test(h);
+  function san(x){return String(x).replace(/[^A-Za-z0-9_.\-]/g,'-').replace(/-+/g,'-').replace(/^-|-$/g,'')}
+  var seg=san((location.pathname.split('/')[1]||'root').replace(/\.html?$/i,'')).slice(0,24)||'root';
+  var ns=san(h||'local').slice(0,60)||'local';
+  var LS={get:function(k){try{return localStorage.getItem(k)}catch(_){return null}},set:function(k,v){try{localStorage.setItem(k,v)}catch(_){}}};
+  function keyOf(b){return 'a'+seg+'-'+b}
+  function call(kind,key){
+    if(navigator.onLine===false)return Promise.reject(0);
+    var c=window.AbortController?new AbortController():null,tm=c&&setTimeout(function(){c.abort()},4000);
+    return fetch(API+'/'+kind+'/'+encodeURIComponent(ns)+'/'+encodeURIComponent(key),{cache:'no-store',signal:c?c.signal:undefined})
+      .then(function(r){if(tm)clearTimeout(tm);if(r.status===404&&kind==='get')return{value:0};if(!r.ok)throw 0;return r.json()})
+      .then(function(j){var v=Number(j&&j.value);if(!isFinite(v)||v<0)throw 0;return Math.floor(v)});
+  }
+  function fmt(n){try{return n.toLocaleString('en-US')}catch(_){return String(n)}}
+  var shown=-1,busy=false;
+  function show(v,stale){
+    if(!(v>0)&&shown<0)return;                      /* nothing known yet: stay hidden */
+    box.hidden=false;box.classList.toggle('vc-stale',!!stale);
+    if(v!==shown){shown=v;num.textContent=fmt(v);box.classList.remove('vc-bump');void box.offsetWidth;box.classList.add('vc-bump');setTimeout(function(){box.classList.remove('vc-bump')},700)}
+  }
+  function beat(b){                                  /* once per device per slot (all tabs share localStorage) */
+    if(!web||LS.get('mk-ac-slot')===ns+'/'+seg+':'+b)return Promise.resolve();
+    LS.set('mk-ac-slot',ns+'/'+seg+':'+b);
+    return call('hit',keyOf(b)).catch(function(){LS.set('mk-ac-slot','')});
+  }
+  function read(b,young){
+    return call('get',keyOf(b)).then(function(cur){
+      if(!young)return cur;
+      return call('get',keyOf(b-1)).then(function(p){return Math.max(cur,p)},function(){return cur})});
+  }
+  function tick(){
+    if(busy||document.hidden)return;busy=true;
+    var now=Date.now(),b=Math.floor(now/SLOT),young=(now%SLOT)<50000;
+    beat(b).then(function(){return read(b,young)}).then(function(v){show(web?Math.max(1,v):v,false)},function(){if(shown>0)show(shown,true)}).then(function(){busy=false},function(){busy=false});
+  }
+  document.addEventListener('visibilitychange',function(){if(!document.hidden)setTimeout(tick,300)});
+  var started=false;function start(){if(started)return;started=true;setTimeout(tick,1800);setInterval(tick,POLL)}
+  if(document.readyState==='complete')start();else addEventListener('load',start,{once:true});
 })();
 </script>
 <style id="study-v3-css">
@@ -9934,9 +9994,14 @@ html #mkTm .mk-tm-tg{font-size:15px}
 .mk-done-t{font-family:var(--font-head);font-size:24px;line-height:1.6;font-weight:900;overflow-wrap:anywhere}
 .mk-done-s{margin:4px 0 16px;color:var(--muted);font-size:14px}
 .mk-done-b{min-width:140px;min-height:44px;padding:0 24px;border:0;border-radius:14px;background:var(--accent);color:var(--on-c);font:inherit;font-size:16px;font-weight:900}
-.mk-dk{position:fixed;z-index:9400;left:50%;bottom:calc(96px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);width:min(92vw,520px);max-height:40vh;overflow:auto;box-sizing:border-box;padding:14px 16px;border-radius:20px;text-align:center;color:var(--text);border:1px solid var(--line);background:color-mix(in srgb,var(--surface) 96%,transparent);-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);box-shadow:0 12px 40px rgba(0,0,0,.28);animation:mkpop .3s ease}
+.mk-dk{position:fixed;z-index:9400;left:50%;top:var(--mk-dk-top,64px);bottom:auto;transform:translateX(-50%);width:min(94vw,520px);max-height:var(--mk-dk-mh,28vh);display:flex;flex-direction:column;overflow:hidden;box-sizing:border-box;padding:10px 14px 12px;border-radius:20px;text-align:center;color:var(--text);border:1px solid var(--line);background:color-mix(in srgb,var(--surface) 96%,transparent);-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);box-shadow:0 12px 40px rgba(0,0,0,.28);animation:mkpop .3s ease}
 .mk-dk-n{margin-bottom:4px;font-size:12px;font-weight:900;color:var(--accent)}
-.mk-dk-t{font-size:19px;line-height:2;font-weight:700}
+.mk-dk-t{flex:1 1 auto;min-height:0;overflow:auto;font-size:18px;line-height:1.9;font-weight:700;overscroll-behavior:contain}
+.mk-dk-b{flex:0 0 auto;display:flex;gap:8px;margin-top:8px}
+.mk-dk-b button{flex:1 1 0;min-height:44px;padding:0 10px;border-radius:12px;font:inherit;font-size:15px;font-weight:900;touch-action:manipulation;-webkit-tap-highlight-color:transparent}
+.mk-dk-rp{border:1px solid var(--accent);background:var(--surface-2);color:var(--text)}
+.mk-dk-rp b{display:inline-block;min-width:1.6em;margin-inline-start:6px;padding:0 6px;border-radius:999px;background:var(--accent);color:var(--on-c);font-weight:900}
+.mk-dk-ok{border:0;background:var(--accent);color:var(--on-c)}
 @keyframes mkpop{from{opacity:0;transform:scale(.9)}to{opacity:1;transform:none}}
 .mk-dk{animation-name:mkfade}
 @keyframes mkfade{from{opacity:0}to{opacity:1}}
@@ -10153,7 +10218,7 @@ host.addEventListener('click',function(e){var b=e.target.closest?e.target.closes
     case 'hm':setTotal(Math.round(T.dur/MIN)+(+b.getAttribute('data-tmv')));break;
     case 'snd':unlockAudio();chime();break;
     case 'prev':showDone(true);break;
-    case 'dkon':T.dk.on=!T.dk.on;persist();render();if(T.dk.on&&dkPool().length)dkFire(true);break;
+    case 'dkon':T.dk.on=!T.dk.on;persist();render();break;
     case 'dkint':T.dk.every=+b.getAttribute('data-tmv');persist();render();break;
     case 'dkc':var id=b.getAttribute('data-tmv'),ix=T.dk.sel.indexOf(id);if(ix>-1)T.dk.sel.splice(ix,1);else T.dk.sel.push(id);persist();render();break;
     case 'wl':T.wl=!T.wl;persist();render();break}});
@@ -10180,17 +10245,26 @@ msgIn.addEventListener('input',function(){T.msg=clean(msgIn.value,80);persist()}
 /* ---------- adhkar reminders (a card every N minutes while enabled) ---------- */
 var dkT=0,dkNext=0,dkI=0,dkSig='',dkHT=0;
 var dkEl=D.createElement('div');dkEl.className='mk-dk';dkEl.hidden=true;dkEl.setAttribute('dir','rtl');dkEl.setAttribute('role','status');dkEl.setAttribute('aria-live','polite');
-dkEl.innerHTML='<div class="mk-dk-n"></div><div class="mk-dk-t"></div>';D.body.appendChild(dkEl);
-var dkN=dkEl.firstChild,dkTx=dkEl.lastChild;
+dkEl.innerHTML='<div class="mk-dk-n"></div><div class="mk-dk-t"></div><div class="mk-dk-b"><button type="button" class="mk-dk-rp" aria-label="تكرار الذكر">تكرار<b dir="ltr">٠</b></button><button type="button" class="mk-dk-ok">تم، والحمد لله</button></div>';D.body.appendChild(dkEl);
+var dkN=dkEl.children[0],dkTx=dkEl.children[1],dkRp=dkEl.querySelector('.mk-dk-rp'),dkOk=dkEl.querySelector('.mk-dk-ok'),dkRpN=dkRp.querySelector('b'),dkCnt=0;
+function ar(n){return String(n).replace(/\d/g,function(c){return '٠١٢٣٤٥٦٧٨٩'.charAt(+c)})}
 function dkPool(){var a=DK.filter(function(x){return T.dk.sel.indexOf(x.id)>-1}),c=(T.dk.custom||'').trim();if(c)a.push({id:'c',n:'ذكر',t:c});return a}
 function dkHide(){clearTimeout(dkHT);dkEl.hidden=true}
-function dkShow(x){dkN.textContent=x.n;dkTx.textContent=x.t;dkEl.hidden=false;clearTimeout(dkHT);dkHT=setTimeout(dkHide,clamp(5000+x.t.length*80,8000,24000))}
-dkEl.addEventListener('click',dkHide);
-function dkArm(){clearTimeout(dkT);dkT=0;if(!T.dk.on||!dkPool().length)return;dkT=setTimeout(function(){dkFire()},clamp(dkNext-Date.now(),1000,T.dk.every*MIN))}
+function dkShow(x){dkN.textContent=x.n;dkTx.textContent=x.t;dkTx.scrollTop=0;dkCnt=0;dkRpN.textContent=ar(0);dkPlace();dkEl.hidden=false}
+/* the card stays until the user presses "تم" — tapping the screen or the text never dismisses it */
+dkRp.addEventListener('click',function(e){e.stopPropagation();dkCnt++;dkRpN.textContent=ar(dkCnt)});
+dkOk.addEventListener('click',function(e){e.stopPropagation();dkHide()});
+function dkPlace(){try{var tb=D.querySelector('.topbar'),b=0;if(tb){var r=tb.getBoundingClientRect();if(r.height>0)b=Math.max(0,Math.round(r.bottom))}
+  var top=(b||0)+8,vh=window.innerHeight||800;
+  dkEl.style.setProperty('--mk-dk-top',top+'px');
+  dkEl.style.setProperty('--mk-dk-mh',Math.max(150,Math.round(vh/3-top+8))+'px')}catch(e){}}
+addEventListener('resize',function(){if(!dkEl.hidden)dkPlace()});
+function dkArm(){clearTimeout(dkT);dkT=0;if(!T.dk.on||!dkPool().length)return;dkT=setTimeout(function(){var left=dkNext-Date.now();if(left>40){dkArm();return}dkFire()},clamp(dkNext-Date.now(),0,T.dk.every*MIN))}
 function dkFire(force){try{dkFire2(force)}catch(e){dkNext=Date.now()+T.dk.every*MIN;try{dkArm()}catch(_){}}}
+function dkAdv(){var e=T.dk.every*MIN,n=Date.now();dkNext+=e;if(dkNext<=n+200)dkNext+=Math.ceil((n+200-dkNext)/e)*e}
 function dkFire2(force){clearTimeout(dkT);dkT=0;var pool=dkPool();if(!T.dk.on||!pool.length)return;
-  if(force===true||(!D.hidden&&rs.classList.contains('active'))){dkShow(pool[dkI%pool.length]);dkI++}
-  dkNext=Date.now()+T.dk.every*MIN;dkArm()}
+  if(force===true||(!D.hidden&&rs.classList.contains('active'))){if(dkEl.hidden){dkShow(pool[dkI%pool.length]);dkI++}}
+  dkAdv();dkArm()}
 function dkSync(){var g=(T.dk.on?1:0)+'|'+T.dk.every+'|'+(dkPool().length>0?1:0);if(g===dkSig)return;dkSig=g;
   if(!T.dk.on)dkHide();dkNext=Date.now()+T.dk.every*MIN;dkArm()}
 function dkResync(){if(T.dk.on&&dkNext&&Date.now()>=dkNext+500)dkFire()}
