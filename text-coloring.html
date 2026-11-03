@@ -9871,18 +9871,68 @@ html #mkTm .mk-tm-tg{font-size:15px}
   html #mkTm .mk-tm-pp{width:30px;height:30px}
   html #mkTm .mk-tm-tg{height:30px;font-size:13px;padding:0 2px}
 }
+/* MK-TIMER-TOPBAR-MOBILE-2: compact one-row bar + new timer parts */
+@media(max-width:560px){
+  html .topbar{gap:4px!important;padding:6px 6px 7px!important;flex-wrap:nowrap!important}
+  html .topbar .top-actions{gap:4px!important;flex:1 1 0;min-width:0}
+  html .topbar .top-actions>.nav-btn,html .topbar .top-actions>.theme-wrap{flex:1 1 auto;min-width:0}
+  html .topbar .top-actions>.zoom-box,html .topbar .top-actions>.night-btn{flex:none}
+  html .topbar .top-actions .nav-btn,html .topbar .top-actions .theme-btn{min-height:34px!important;padding:3px 5px!important;font-size:11.5px!important;gap:2px!important}
+  html .topbar .night-btn{width:32px;padding:0!important}
+  html .topbar .night-btn svg{width:17px;height:17px}
+  html .topbar .theme-wrap .theme-btn{width:100%}
+  html .topbar .zoom-box button{width:24px}
+  html #mkTm{width:78px;height:38px}
+  html #mkTm .mk-tm-box{width:78px}
+  html #mkTm.exp .mk-tm-box{width:min(300px,calc(100vw - 14px))}
+}
+.mk-tm-sec{margin-top:10px;padding-top:4px;border-top:1px solid var(--line)}
+.mk-tm-sec>summary{display:flex;align-items:center;justify-content:space-between;cursor:pointer;list-style:none;padding:8px 2px;font-size:13.5px;font-weight:850;color:var(--text)}
+.mk-tm-sec>summary::-webkit-details-marker{display:none}
+.mk-tm-sec>summary::after{content:"⌄";opacity:.6;transition:transform .2s}
+.mk-tm-sec[open]>summary::after{transform:rotate(180deg)}
+.mk-tm-sec input[type=text]{display:block;width:100%;box-sizing:border-box;margin:5px 0;padding:9px 11px;border:1px solid var(--line);border-radius:11px;background:var(--surface-2);color:var(--text);font:inherit;font-size:14px;text-align:start}
+.mk-tm-sec .mk-tm-fl{display:block;margin-top:8px}
+.mk-tm-sb{flex:1;min-height:36px;border:1px solid var(--line);border-radius:10px;background:var(--surface-2);color:var(--text);font:inherit;font-size:13px;font-weight:800}
+.mk-tm-chips{display:flex;flex-wrap:wrap;gap:5px;margin:6px 0}
+.mk-tm-chips button{padding:6px 10px;border:1px solid var(--line);border-radius:999px;background:var(--surface-2);color:var(--text);font:inherit;font-size:12.5px;font-weight:750}
+.mk-tm-chips button[aria-pressed=true]{background:var(--accent);border-color:var(--accent);color:var(--on-c)}
+.mk-done{position:fixed;inset:0;z-index:9600;display:grid;place-items:center;padding:20px;background:rgba(8,18,18,.55);-webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px)}
+.mk-done[hidden],.mk-dk[hidden]{display:none}
+.mk-done-card{width:min(360px,100%);box-sizing:border-box;text-align:center;padding:26px 22px 20px;border-radius:26px;background:var(--surface);color:var(--text);border:1px solid var(--line);box-shadow:0 20px 60px rgba(0,0,0,.35);animation:mkpop .35s cubic-bezier(.22,1.2,.3,1)}
+.mk-done-ic{width:64px;height:64px;margin:0 auto 12px;display:grid;place-items:center;border-radius:50%;background:var(--accent);color:var(--on-c);font-size:34px;font-weight:900}
+.mk-done-t{font-family:var(--font-head);font-size:24px;line-height:1.6;font-weight:900;overflow-wrap:anywhere}
+.mk-done-s{margin:4px 0 16px;color:var(--muted);font-size:14px}
+.mk-done-b{min-width:140px;min-height:44px;padding:0 24px;border:0;border-radius:14px;background:var(--accent);color:var(--on-c);font:inherit;font-size:16px;font-weight:900}
+.mk-dk{position:fixed;z-index:9400;left:50%;bottom:calc(96px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);width:min(92vw,520px);max-height:40vh;overflow:auto;box-sizing:border-box;padding:14px 16px;border-radius:20px;text-align:center;color:var(--text);border:1px solid var(--line);background:color-mix(in srgb,var(--surface) 96%,transparent);-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);box-shadow:0 12px 40px rgba(0,0,0,.28);animation:mkpop .3s ease}
+.mk-dk-n{margin-bottom:4px;font-size:12px;font-weight:900;color:var(--accent)}
+.mk-dk-t{font-size:19px;line-height:2;font-weight:700}
+@keyframes mkpop{from{opacity:0;transform:scale(.9)}to{opacity:1;transform:none}}
+.mk-dk{animation-name:mkfade}
+@keyframes mkfade{from{opacity:0}to{opacity:1}}
+@media(prefers-reduced-motion:reduce){.mk-done-card,.mk-dk{animation:none}}
+/* MK-TIMER-HARDEN */
+html.mk-rd:not(.mk-nf) #mkTm{display:block}
+html.mk-rd .topbar .brand{display:none}
+html #mkTm.mk-float{position:fixed;top:calc(8px + env(safe-area-inset-top,0px));inset-inline-end:8px;z-index:9000}
+#mkTm,#mkTm *{-webkit-tap-highlight-color:transparent}
+#mkTm button{touch-action:manipulation}
+.mk-done,.mk-dk{overscroll-behavior:contain}
+.mk-dk-t,.mk-done-t{overflow-wrap:anywhere;word-break:break-word}
 </style>
 <script id="mk-timer-script">
 /* MK-TIMER: accurate study timer. Truth = absolute wall-clock timestamps (Date.now); the ticker only repaints. */
 (function(){try{
 var D=document,KEY='refaie-minimal-study-v1-timer',MIN=60000,MAXMIN=23*60+59,MAXDUR=MAXMIN*MIN,MAXSW=359999000;/* stopwatch display caps at 99:59:59 */
-var rs=D.getElementById('readerScreen');if(!rs||!D.body)return;
+var rs=D.getElementById('readerScreen');if(!rs||!D.body||D.getElementById('mkTm'))return;
 function noop(){}
 function num(v,d){return(typeof v==='number'&&isFinite(v))?v:d}
 function clamp(v,a,b){return Math.min(b,Math.max(a,v))}
+function clean(v,n){return String(v==null?'':v).replace(/[\u0000-\u001F\u007F\u200E\u200F\u202A-\u202E\u2066-\u2069]/g,' ').replace(/\s+/g,' ').slice(0,n)}
+var DKIDS=['salawat','istighfar','sayyid','tasbih','hamd','takbir','tahlil','hawqala','ilm'];
 function p2(n){return(n<10?'0':'')+n}
 function fmt(s){var h=Math.floor(s/3600),m=Math.floor(s%3600/60),r=s%60;return(h?h+':'+p2(m):p2(m))+':'+p2(r)}
-function dflt(){return{v:1,mode:'cd',st:'idle',dur:25*MIN,endAt:0,startedAt:0,acc:0,remMs:25*MIN,exp:false,nt:false,seen:0,wl:false}}
+function dflt(){return{v:1,mode:'cd',st:'idle',dur:25*MIN,endAt:0,startedAt:0,acc:0,remMs:25*MIN,exp:false,nt:false,seen:0,wl:false,msg:'',dk:{on:false,every:5,sel:['salawat','istighfar'],custom:''}}}
 /* validate anything read from storage: corrupt/foreign JSON can never crash the app */
 function norm(o){var d=dflt();if(!o||typeof o!=='object')return d;
   d.mode=o.mode==='sw'?'sw':'cd';
@@ -9891,6 +9941,9 @@ function norm(o){var d=dflt();if(!o||typeof o!=='object')return d;
   d.endAt=Math.max(0,num(o.endAt,0));d.startedAt=Math.max(0,num(o.startedAt,0));
   d.acc=clamp(num(o.acc,0),0,MAXSW);d.remMs=clamp(num(o.remMs,d.dur),0,d.dur);
   d.exp=!!o.exp;d.nt=!!o.nt;d.seen=Math.max(0,num(o.seen,0));d.wl=!!o.wl;
+  d.msg=typeof o.msg==='string'?clean(o.msg,80).trim():'';
+  var k=(o.dk&&typeof o.dk==='object')?o.dk:{};
+  d.dk={on:!!k.on,every:[1,3,5,10,15,30].indexOf(k.every)>-1?k.every:5,sel:Array.isArray(k.sel)?k.sel.filter(function(x,i,a){return DKIDS.indexOf(x)>-1&&a.indexOf(x)===i}):['salawat','istighfar'],custom:typeof k.custom==='string'?clean(k.custom,200).trim():''};
   if(d.mode==='sw'&&d.st==='done')d.st='idle';
   var n=Date.now();/* a running timestamp must be plausible: a countdown ends within 24 h from now, a stopwatch cannot start in the future */
   if(d.st==='run'&&((d.mode==='cd'&&!(d.endAt>0&&d.endAt<=n+MAXDUR+36e5))||(d.mode==='sw'&&!(d.startedAt>0&&d.startedAt<=n+36e5))))d.st='idle';
@@ -9908,6 +9961,16 @@ function el(t){return T.st==='run'?T.acc+Math.max(0,t-T.startedAt):T.st==='pause
 function backGuard(t){if(T.st==='run'&&T.seen&&t<T.seen-1500){var d=T.seen-t;T.endAt-=d;T.startedAt-=d;persist()}}
 
 /* ---------- DOM ---------- */
+var DK=[
+{id:'salawat',n:'الصلاة الإبراهيمية',t:'اللَّهُمَّ صَلِّ عَلَى مُحَمَّدٍ وَعَلَى آلِ مُحَمَّدٍ، كَمَا صَلَّيْتَ عَلَى إِبْرَاهِيمَ وَعَلَى آلِ إِبْرَاهِيمَ، إِنَّكَ حَمِيدٌ مَجِيدٌ، اللَّهُمَّ بَارِكْ عَلَى مُحَمَّدٍ وَعَلَى آلِ مُحَمَّدٍ، كَمَا بَارَكْتَ عَلَى إِبْرَاهِيمَ وَعَلَى آلِ إِبْرَاهِيمَ، إِنَّكَ حَمِيدٌ مَجِيدٌ'},
+{id:'istighfar',n:'الاستغفار',t:'أَسْتَغْفِرُ اللَّهَ الْعَظِيمَ الَّذِي لَا إِلَهَ إِلَّا هُوَ الْحَيَّ الْقَيُّومَ وَأَتُوبُ إِلَيْهِ'},
+{id:'sayyid',n:'سيد الاستغفار',t:'اللَّهُمَّ أَنْتَ رَبِّي لَا إِلَهَ إِلَّا أَنْتَ، خَلَقْتَنِي وَأَنَا عَبْدُكَ، وَأَنَا عَلَى عَهْدِكَ وَوَعْدِكَ مَا اسْتَطَعْتُ، أَعُوذُ بِكَ مِنْ شَرِّ مَا صَنَعْتُ، أَبُوءُ لَكَ بِنِعْمَتِكَ عَلَيَّ، وَأَبُوءُ لَكَ بِذَنْبِي فَاغْفِرْ لِي، فَإِنَّهُ لَا يَغْفِرُ الذُّنُوبَ إِلَّا أَنْتَ'},
+{id:'tasbih',n:'التسبيح',t:'سُبْحَانَ اللَّهِ وَبِحَمْدِهِ، سُبْحَانَ اللَّهِ الْعَظِيمِ'},
+{id:'hamd',n:'التحميد',t:'الْحَمْدُ لِلَّهِ حَمْدًا كَثِيرًا طَيِّبًا مُبَارَكًا فِيهِ'},
+{id:'takbir',n:'التكبير',t:'اللَّهُ أَكْبَرُ كَبِيرًا'},
+{id:'tahlil',n:'التهليل',t:'لَا إِلَهَ إِلَّا اللَّهُ وَحْدَهُ لَا شَرِيكَ لَهُ، لَهُ الْمُلْكُ وَلَهُ الْحَمْدُ وَهُوَ عَلَى كُلِّ شَيْءٍ قَدِيرٌ'},
+{id:'hawqala',n:'الحوقلة',t:'لَا حَوْلَ وَلَا قُوَّةَ إِلَّا بِاللَّهِ'},
+{id:'ilm',n:'زدني علمًا',t:'رَبِّ زِدْنِي عِلْمًا'}];
 var host=D.createElement('div');host.id='mkTm';host.className='mk-tm';host.setAttribute('dir','rtl');host.setAttribute('role','group');host.setAttribute('aria-label','مؤقّت المذاكرة');
 var wlOK=!!(navigator&&navigator.wakeLock&&navigator.wakeLock.request);
 host.innerHTML=
@@ -9937,18 +10000,30 @@ host.innerHTML=
 +'<button type="button" data-tma="pre" data-tmv="15" aria-pressed="false">15 د</button><button type="button" data-tma="pre" data-tmv="25" aria-pressed="true">25 د</button><button type="button" data-tma="pre" data-tmv="45" aria-pressed="false">45 د</button><button type="button" data-tma="pre" data-tmv="60" aria-pressed="false">60 د</button>'
 +'</div></div>'
 +'<div class="mk-tm-act"><button type="button" class="mk-tm-go" data-tma="go">ابدأ</button><button type="button" class="mk-tm-rs" data-tma="rs">إعادة ضبط</button></div>'
++'<details class="mk-tm-sec"><summary>رسالة وصوت الانتهاء</summary>'
++'<label class="mk-tm-fl" for="mkTmMsg">رسالتك عند انتهاء الوقت</label>'
++'<input id="mkTmMsg" type="text" maxlength="80" dir="auto" autocomplete="off" placeholder="بارك الله فيك! انتهى الوقت">'
++'<div class="mk-tm-row"><button type="button" class="mk-tm-sb" data-tma="snd">🔔 تجربة الصوت</button><button type="button" class="mk-tm-sb" data-tma="prev">👁 معاينة</button></div>'
++'</details>'
++'<details class="mk-tm-sec"><summary>تذكير الأذكار</summary>'
++'<button type="button" class="mk-tm-wl mk-tm-dkw" data-tma="dkon" role="switch" aria-checked="false"><span>إظهار ذكر كل فترة</span><span class="sw" aria-hidden="true"></span></button>'
++'<span class="mk-tm-fl">كل</span><div class="mk-tm-pre" role="group" aria-label="الفترة">'+[1,3,5,10,15,30].map(function(n){return '<button type="button" data-tma="dkint" data-tmv="'+n+'" aria-pressed="false">'+n+' د</button>'}).join('')+'</div>'
++'<span class="mk-tm-fl">اختر الأذكار</span><div class="mk-tm-chips" role="group" aria-label="الأذكار">'+DK.map(function(x){return '<button type="button" data-tma="dkc" data-tmv="'+x.id+'" aria-pressed="false">'+x.n+'</button>'}).join('')+'</div>'
++'<input id="mkTmDk" type="text" maxlength="200" dir="auto" autocomplete="off" placeholder="ذكر خاص بك (اختياري)">'
++'</details>'
 +(wlOK?'<button type="button" class="mk-tm-wl" data-tma="wl" role="switch" aria-checked="false"><span>إبقاء الشاشة مضاءة أثناء العدّ</span><span class="sw" aria-hidden="true"></span></button>':'')
 +'</div></div></div>'
 +'<div class="mk-tm-sr" role="status" aria-live="polite"></div>'
 +'</div>';
 (function(){var tb=D.querySelector('.topbar'),ta=tb&&tb.querySelector('.top-actions');
-  if(tb&&ta)tb.insertBefore(host,ta);else D.body.appendChild(host)})();
+  if(tb&&ta)tb.insertBefore(host,ta);else{host.classList.add('mk-float');D.body.appendChild(host)}})();
 function $(s){return host.querySelector(s)}
 var box=$('.mk-tm-box'),tg=$('.mk-tm-tg'),pp=$('.mk-tm-pp'),bd=$('#mkTmBd'),tEl=$('#mkTmT'),big=$('#mkTmBig'),lbl=$('#mkTmLbl'),
-    hIn=$('#mkTmH'),mIn=$('#mkTmM'),go=$('.mk-tm-go'),rsB=$('.mk-tm-rs'),wlB=$('.mk-tm-wl'),sr=$('.mk-tm-sr'),
+    hIn=$('#mkTmH'),mIn=$('#mkTmM'),go=$('.mk-tm-go'),rsB=$('.mk-tm-rs'),wlB=$('[data-tma=wl]'),sr=$('.mk-tm-sr'),
     modeB=[].slice.call(host.querySelectorAll('[data-tma=mode]')),preB=[].slice.call(host.querySelectorAll('[data-tma=pre]')),
     hmB=[].slice.call(host.querySelectorAll('[data-tma=hm]'));
 function say2(m){try{sr.textContent='';sr.textContent=m}catch(e){}}
+var msgIn=$('#mkTmMsg'),dkIn=$('#mkTmDk'),dkSw=$('[data-tma=dkon]'),dkB=[].slice.call(host.querySelectorAll('[data-tma=dkc]')),dkIntB=[].slice.call(host.querySelectorAll('[data-tma=dkint]'));
 
 /* ---------- paint (cheap, only touches DOM when a visible value changed) ---------- */
 function paintTime(t){
@@ -9959,11 +10034,12 @@ function paintTime(t){
 }
 function goLabel(){return T.st==='run'?'إيقاف مؤقت':T.st==='pause'?'متابعة':T.st==='done'?'ابدأ من جديد':'ابدأ'}
 function stLabel(){return T.st==='run'?(T.mode==='cd'?'جارٍ العدّ التنازلي':'جارٍ القياس'):T.st==='pause'?'متوقف مؤقتًا':T.st==='done'?'انتهى الوقت':'جاهز'}
-function render(){
+function render(){try{renderCore()}catch(e){try{console.error('MK-TIMER render',e)}catch(_){}}}
+function renderCore(){
   var st=T.st,cd=T.mode==='cd',busy=(st==='run'||st==='pause'),total=Math.round(T.dur/MIN),noDur=cd&&T.dur<=0&&(st==='idle'||st==='done');
   box.setAttribute('data-st',st);box.setAttribute('data-mode',T.mode);
   host.classList.toggle('exp',!!T.exp);tg.setAttribute('aria-expanded',String(!!T.exp));bd.setAttribute('aria-hidden',String(!T.exp));
-  modeB.forEach(function(b){b.setAttribute('aria-pressed',String(b.getAttribute('data-tmv')===T.mode));b.disabled=busy});
+  modeB.forEach(function(b){b.setAttribute('aria-pressed',String(b.getAttribute('data-tmv')===T.mode))});
   if(D.activeElement!==hIn)hIn.value=String(Math.floor(total/60));
   if(D.activeElement!==mIn)mIn.value=String(total%60);
   hIn.disabled=mIn.disabled=busy;hmB.forEach(function(b){b.disabled=busy});
@@ -9971,6 +10047,11 @@ function render(){
   var gl=goLabel();go.textContent=gl;go.disabled=noDur;pp.disabled=noDur;pp.setAttribute('aria-label',gl+' المؤقّت');pp.title=gl;
   rsB.disabled=(st==='idle');lbl.textContent=stLabel();
   if(wlB)wlB.setAttribute('aria-checked',String(!!T.wl));
+  try{dkSw.setAttribute('aria-checked',String(!!T.dk.on));
+  dkIntB.forEach(function(b){b.setAttribute('aria-pressed',String(+b.getAttribute('data-tmv')===T.dk.every))});
+  dkB.forEach(function(b){b.setAttribute('aria-pressed',String(T.dk.sel.indexOf(b.getAttribute('data-tmv'))>-1))});
+  if(D.activeElement!==msgIn)msgIn.value=T.msg;if(D.activeElement!==dkIn)dkIn.value=T.dk.custom;
+  dkSync()}catch(e){}
   P.st='';paintTime(Date.now());
   if(st==='run'){if(!timer)schedule(Date.now())}else{clearTimeout(timer);timer=0}
   wlSync();firstRender=false;
@@ -9990,17 +10071,23 @@ function tick(){clearTimeout(timer);timer=0;var t=Date.now();
 function finish(t){
   var over=t-T.endAt,s=read(),dup=!!(s&&s.mode==='cd'&&s.st==='done'&&s.nt&&s.endAt===T.endAt);
   T.st='done';T.remMs=0;T.seen=t;T.nt=true;persist();
-  if(!dup&&over<15000)notify();
+  if(!dup){if(over<15000)notify();try{showDone()}catch(e){}}
   render();say2('انتهى الوقت');
 }
 function unlockAudio(){try{var AC=window.AudioContext||window.webkitAudioContext;if(!AC)return;if(!ctx)ctx=new AC();
   if(ctx.state==='suspended'){var p=ctx.resume();if(p&&p.catch)p.catch(noop)}
   var b=ctx.createBuffer(1,1,22050),s=ctx.createBufferSource();s.buffer=b;s.connect(ctx.destination);s.start(0)}catch(e){}}
+var mg=null;
+function stopSnd(){try{if(mg&&ctx){mg.gain.cancelScheduledValues(ctx.currentTime);mg.gain.setTargetAtTime(0,ctx.currentTime,.06)}}catch(e){}mg=null}
+function bell(f,at){/* soft bell: fundamental + two decaying partials */
+  [[1,.2,1.7],[2.01,.07,1.1],[3.02,.035,.7]].forEach(function(p){var o=ctx.createOscillator(),g=ctx.createGain();
+    o.type='sine';o.frequency.value=f*p[0];g.gain.setValueAtTime(.0001,at);g.gain.exponentialRampToValueAtTime(p[1],at+.02);g.gain.exponentialRampToValueAtTime(.0001,at+p[2]);
+    o.connect(g);g.connect(mg);o.start(at);o.stop(at+p[2]+.05)})}
 function chime(){try{if(!ctx)return;
-  var play=function(){try{var t0=ctx.currentTime;[[784,0],[988,.2],[1175,.4]].forEach(function(n){var o=ctx.createOscillator(),g=ctx.createGain(),a=t0+n[1];
-    o.type='sine';o.frequency.value=n[0];g.gain.setValueAtTime(.0001,a);g.gain.exponentialRampToValueAtTime(.15,a+.03);g.gain.exponentialRampToValueAtTime(.0001,a+.8);
-    o.connect(g);g.connect(ctx.destination);o.start(a);o.stop(a+.85)})}catch(e){}};
-  if(ctx.state==='running')play();else{var p=ctx.resume();if(p&&p.then)p.then(play,noop)}}catch(e){}}
+  var play=function(){try{stopSnd();mg=ctx.createGain();mg.gain.value=1;mg.connect(ctx.destination);var t0=ctx.currentTime+.05;
+    var seq=[[523.25,0],[659.25,.3],[783.99,.6],[1046.5,.95],[783.99,1.7],[1046.5,2.0],[1318.51,2.35]];
+    [0,3.4].forEach(function(r){seq.forEach(function(n){bell(n[0],t0+r+n[1])})})}catch(e){}};
+  if(ctx.state==='running')play();else{var q=ctx.resume();if(q&&q.then)q.then(play,noop)}}catch(e){}}
 function notify(){chime();try{if(navigator.vibrate)navigator.vibrate([220,120,220,120,380])}catch(e){}}
 
 /* ---------- optional screen wake lock (feature-detected, never required) ---------- */
@@ -10010,16 +10097,16 @@ function wlSync(){if(!wlOK)return;try{
   else if(WL){var l=WL;WL=null;l.release().catch(noop)}}catch(e){wlBusy=false}}
 
 /* ---------- actions ---------- */
-function start(){unlockAudio();var t=Date.now();
+function start(){try{hideDone()}catch(e){}unlockAudio();var t=Date.now();
   if(T.mode==='cd'){if(T.dur<=0)return;var base=T.st==='pause'?T.remMs:T.dur;T.remMs=base;T.endAt=t+base}
   else{if(T.st!=='pause')T.acc=0;T.startedAt=t}
   var resumed=T.st==='pause';T.st='run';T.nt=false;T.seen=t;persist();render();say2(resumed?'تمت المتابعة':'بدأ المؤقّت')}
 function pause(){var t=Date.now();
   if(T.mode==='cd'){T.remMs=Math.max(0,T.endAt-t);if(T.remMs<=0){finish(t);return}}else T.acc+=Math.max(0,t-T.startedAt);
   T.st='pause';T.seen=t;persist();render();say2('تم الإيقاف مؤقتًا')}
-function reset(){T.st='idle';T.remMs=T.dur;T.acc=0;T.endAt=0;T.startedAt=0;T.nt=false;T.seen=0;persist();render();say2('أُعيد الضبط')}
+function reset(){try{hideDone()}catch(e){}T.st='idle';T.remMs=T.dur;T.acc=0;T.endAt=0;T.startedAt=0;T.nt=false;T.seen=0;persist();render();say2('أُعيد الضبط')}
 function primary(){if(T.st==='run')pause();else start()}
-function setMode(m){if(T.st==='run'||T.st==='pause'||(m!=='cd'&&m!=='sw')||m===T.mode)return;T.mode=m;reset();say2(m==='cd'?'عدّ تنازلي':'ساعة إيقاف')}
+function setMode(m){if((m!=='cd'&&m!=='sw')||m===T.mode)return;T.mode=m;reset();say2(m==='cd'?'عدّ تنازلي':'ساعة إيقاف')}
 function setTotal(min){if(T.st==='run'||T.st==='pause')return;T.dur=clamp(Math.round(min),0,MAXMIN)*MIN;if(T.st==='done'){reset();return}T.remMs=T.dur;persist();render()}
 function setExp(b){T.exp=!!b;persist();render()}
 function digits(s){return String(s).replace(/[\u0660-\u0669]/g,function(c){return c.charCodeAt(0)-1632}).replace(/[\u06F0-\u06F9]/g,function(c){return c.charCodeAt(0)-1776}).replace(/\D/g,'')}
@@ -10034,6 +10121,11 @@ host.addEventListener('click',function(e){var b=e.target.closest?e.target.closes
     case 'mode':setMode(b.getAttribute('data-tmv'));break;
     case 'pre':setTotal(+b.getAttribute('data-tmv'));break;
     case 'hm':setTotal(Math.round(T.dur/MIN)+(+b.getAttribute('data-tmv')));break;
+    case 'snd':unlockAudio();chime();break;
+    case 'prev':showDone(true);break;
+    case 'dkon':T.dk.on=!T.dk.on;persist();render();if(T.dk.on&&dkPool().length)dkFire(true);break;
+    case 'dkint':T.dk.every=+b.getAttribute('data-tmv');persist();render();break;
+    case 'dkc':var id=b.getAttribute('data-tmv'),ix=T.dk.sel.indexOf(id);if(ix>-1)T.dk.sel.splice(ix,1);else T.dk.sel.push(id);persist();render();break;
     case 'wl':T.wl=!T.wl;persist();render();break}});
 [hIn,mIn].forEach(function(i){i.addEventListener('input',fromInputs);i.addEventListener('focus',function(){try{i.select()}catch(e){}});
   i.addEventListener('blur',render);i.addEventListener('keydown',function(e){if(e.key==='Enter'){e.preventDefault();i.blur()}})});
@@ -10043,19 +10135,53 @@ D.addEventListener('pointerdown',function(e){if(T.exp&&!host.contains(e.target))
 /* any later user gesture re-unlocks audio when a restored timer is running */
 ['pointerup','touchend','click'].forEach(function(n){D.addEventListener(n,function(){if(T.st==='run'&&(!ctx||ctx.state!=='running'))unlockAudio()},{capture:true,passive:true})});
 
+/* ---------- end-of-time message (custom text) ---------- */
+var doneEl=D.createElement('div');doneEl.className='mk-done';doneEl.hidden=true;doneEl.setAttribute('dir','rtl');doneEl.setAttribute('role','alertdialog');doneEl.setAttribute('aria-modal','true');doneEl.setAttribute('aria-labelledby','mkDoneT');
+doneEl.innerHTML='<div class="mk-done-card"><div class="mk-done-ic" aria-hidden="true">✓</div><div class="mk-done-t" id="mkDoneT" dir="auto"></div><div class="mk-done-s">انتهى الوقت المحدد</div><button type="button" class="mk-done-b">حسنًا</button></div>';
+D.body.appendChild(doneEl);
+var doneT=doneEl.querySelector('#mkDoneT'),doneB=doneEl.querySelector('.mk-done-b');
+function showDone(){doneT.textContent=(T.msg||'').trim()||'بارك الله فيك! انتهى الوقت';doneEl.hidden=false;try{doneB.focus()}catch(e){}}
+function hideDone(){doneEl.hidden=true;stopSnd()}
+doneB.addEventListener('click',hideDone);
+doneEl.addEventListener('click',function(e){if(e.target===doneEl)hideDone()});
+D.addEventListener('keydown',function(e){if(e.key==='Escape'&&!doneEl.hidden)hideDone()});
+msgIn.addEventListener('input',function(){T.msg=clean(msgIn.value,80);persist()});
+
+/* ---------- adhkar reminders (a card every N minutes while enabled) ---------- */
+var dkT=0,dkNext=0,dkI=0,dkSig='',dkHT=0;
+var dkEl=D.createElement('div');dkEl.className='mk-dk';dkEl.hidden=true;dkEl.setAttribute('dir','rtl');dkEl.setAttribute('role','status');dkEl.setAttribute('aria-live','polite');
+dkEl.innerHTML='<div class="mk-dk-n"></div><div class="mk-dk-t"></div>';D.body.appendChild(dkEl);
+var dkN=dkEl.firstChild,dkTx=dkEl.lastChild;
+function dkPool(){var a=DK.filter(function(x){return T.dk.sel.indexOf(x.id)>-1}),c=(T.dk.custom||'').trim();if(c)a.push({id:'c',n:'ذكر',t:c});return a}
+function dkHide(){clearTimeout(dkHT);dkEl.hidden=true}
+function dkShow(x){dkN.textContent=x.n;dkTx.textContent=x.t;dkEl.hidden=false;clearTimeout(dkHT);dkHT=setTimeout(dkHide,clamp(5000+x.t.length*80,8000,24000))}
+dkEl.addEventListener('click',dkHide);
+function dkArm(){clearTimeout(dkT);dkT=0;if(!T.dk.on||!dkPool().length)return;dkT=setTimeout(function(){dkFire()},clamp(dkNext-Date.now(),1000,T.dk.every*MIN))}
+function dkFire(force){try{dkFire2(force)}catch(e){dkNext=Date.now()+T.dk.every*MIN;try{dkArm()}catch(_){}}}
+function dkFire2(force){clearTimeout(dkT);dkT=0;var pool=dkPool();if(!T.dk.on||!pool.length)return;
+  if(force===true||(!D.hidden&&rs.classList.contains('active'))){dkShow(pool[dkI%pool.length]);dkI++}
+  dkNext=Date.now()+T.dk.every*MIN;dkArm()}
+function dkSync(){var g=(T.dk.on?1:0)+'|'+T.dk.every+'|'+(dkPool().length>0?1:0);if(g===dkSig)return;dkSig=g;
+  if(!T.dk.on)dkHide();dkNext=Date.now()+T.dk.every*MIN;dkArm()}
+function dkResync(){if(T.dk.on&&dkNext&&Date.now()>=dkNext+500)dkFire()}
+dkIn.addEventListener('input',function(){T.dk.custom=clean(dkIn.value,200);persist();dkSync()});
+
 /* ---------- placement under the sticky top bar ---------- */
 function place(){try{var tb=D.querySelector('.topbar'),b=0;if(tb){var r=tb.getBoundingClientRect();if(r.height>0)b=Math.max(0,Math.round(r.bottom))}
   host.style.setProperty('--mk-tm-top',b?b+'px':'env(safe-area-inset-top,0px)')}catch(e){}}
 place();addEventListener('resize',place);addEventListener('orientationchange',place);
 try{var tbEl=D.querySelector('.topbar');if(tbEl&&window.ResizeObserver)new ResizeObserver(place).observe(tbEl)}catch(e){}
-try{new MutationObserver(function(){place();paintTime(Date.now())}).observe(rs,{attributes:true,attributeFilter:['class']})}catch(e){}
+function rdSync(){try{D.documentElement.classList.toggle('mk-rd',rs.classList.contains('active'));D.documentElement.classList.toggle('mk-nf',!!(D.body&&D.body.classList.contains('nt-focus')))}catch(e){}}
+rdSync();
+try{new MutationObserver(function(){rdSync();place();paintTime(Date.now())}).observe(rs,{attributes:true,attributeFilter:['class']})}catch(e){}
+try{new MutationObserver(rdSync).observe(D.body,{attributes:true,attributeFilter:['class']})}catch(e){}
 
 /* ---------- re-sync the instant the page is visible/alive again; throttling can never change the result ---------- */
-function resync(){tick();wlSync()}
+function resync(){tick();wlSync();dkResync()}
 D.addEventListener('visibilitychange',function(){if(!D.hidden)resync()});
 addEventListener('pageshow',function(e){if(e.persisted){var s=read();if(s){T=s;render()}}resync()});
 addEventListener('focus',resync);D.addEventListener('resume',resync);
-addEventListener('pagehide',function(){if(T.st==='run'){T.seen=Date.now();persist()}});
+addEventListener('pagehide',function(){try{stopSnd()}catch(e){}if(T.st==='run'){T.seen=Date.now();persist()}});
 addEventListener('storage',function(e){if(e.key!==KEY&&e.key!==null)return;T=read()||dflt();render()});
 
 /* ---------- boot: restore from timestamps ---------- */
