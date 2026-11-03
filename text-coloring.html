@@ -9848,6 +9848,29 @@ html.app-night #mkTm{--surface:#212836;--surface-2:#2a3243;--text:#e3e8f1;--mute
 /* PDF / cover / page-setup isolation (the PDF is built from renderMarkdown(), never from the live DOM; this is belt and braces) */
 body:has(#pageModal:not(.hidden)) #mkTm,body:has(#coverModal:not(.hidden)) #mkTm,body.pdf-busy #mkTm,.pdf-page #mkTm{visibility:hidden!important}
 @media print{#mkTm{display:none!important}}
+
+/* MK-TIMER-TOPBAR: timer lives in the top bar where the brand logo was (study page only) */
+html #mkTm{position:relative;inset:auto;top:auto;z-index:25;flex:none;display:none;width:124px;height:44px;padding:0;margin:0;pointer-events:auto}
+body:has(#readerScreen.active):not(.nt-focus) #mkTm{display:block}
+body:has(#readerScreen.active) .topbar .brand{display:none}
+html #mkTm .mk-tm-box{position:absolute;top:0;inset-inline-start:0;width:124px;max-width:none}
+html #mkTm.exp .mk-tm-box{width:min(296px,calc(100vw - 20px))}
+html #mkTm .mk-tm-tg{font-size:15px}
+/* MK-TIMER-TOPBAR-MOBILE: keep everything on ONE row on phones */
+@media(max-width:560px){
+  html .topbar{flex-wrap:nowrap;row-gap:0;gap:5px;padding:8px 8px 9px;align-items:center}
+  html .topbar .top-actions{flex:1 1 0;min-width:0;width:auto;margin-inline-start:0;gap:4px}
+  html .topbar .top-actions>.nav-btn,html .topbar .top-actions>.theme-wrap{flex:1 1 0;min-width:0}
+  html .topbar .top-actions>.zoom-box{flex:none}
+  html .topbar .nav-btn,html .topbar .theme-btn{min-height:34px;padding:4px 3px;font-size:11.5px;gap:3px;overflow:hidden;text-overflow:clip}
+  html .topbar .zoom-box button{width:24px}
+  html #mkTm{width:84px;height:38px}
+  html #mkTm .mk-tm-box{width:84px}
+  html #mkTm.exp .mk-tm-box{width:min(296px,calc(100vw - 16px))}
+  html #mkTm .mk-tm-hd{padding:2px 3px;padding-inline-start:4px;gap:2px}
+  html #mkTm .mk-tm-pp{width:30px;height:30px}
+  html #mkTm .mk-tm-tg{height:30px;font-size:13px;padding:0 2px}
+}
 </style>
 <script id="mk-timer-script">
 /* MK-TIMER: accurate study timer. Truth = absolute wall-clock timestamps (Date.now); the ticker only repaints. */
@@ -9918,7 +9941,8 @@ host.innerHTML=
 +'</div></div></div>'
 +'<div class="mk-tm-sr" role="status" aria-live="polite"></div>'
 +'</div>';
-D.body.appendChild(host);
+(function(){var tb=D.querySelector('.topbar'),ta=tb&&tb.querySelector('.top-actions');
+  if(tb&&ta)tb.insertBefore(host,ta);else D.body.appendChild(host)})();
 function $(s){return host.querySelector(s)}
 var box=$('.mk-tm-box'),tg=$('.mk-tm-tg'),pp=$('.mk-tm-pp'),bd=$('#mkTmBd'),tEl=$('#mkTmT'),big=$('#mkTmBig'),lbl=$('#mkTmLbl'),
     hIn=$('#mkTmH'),mIn=$('#mkTmM'),go=$('.mk-tm-go'),rsB=$('.mk-tm-rs'),wlB=$('.mk-tm-wl'),sr=$('.mk-tm-sr'),
