@@ -737,9 +737,39 @@ html.app-night .pe-sh{box-shadow:0 -10px 30px rgba(0,0,0,.5)}
           <button id="clearBtn" class="clear-btn" type="button" aria-label="مسح محتوى الصفحة"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6h18M8 6V4h8v2M6 6l1 14h10l1-14"/></svg><span>مسح</span></button>
           <span id="edCount" class="ed-count" aria-live="off">0 كلمة · 0 حرف</span>
         </div>
-        <!-- MK-LASTMOD:START (AI agents: update LAST_MODIFIED_DATE and LAST_MODIFIED_TIME below on EVERY edit of this file) -->
-        <div id="mkLastMod" class="mk-lastmod" dir="rtl"><span>آخر تعديل:</span> <b id="mkLastModDate" data-var="LAST_MODIFIED_DATE">2026-11-02</b> <span>الساعة</span> <b id="mkLastModTime" data-var="LAST_MODIFIED_TIME">20:50</b></div>
-        <style id="mk-lastmod-css">.mk-lastmod{margin:8px 0 0;padding:7px 12px;border:1px solid var(--line,#ccc);border-radius:10px;background:var(--surface-2,transparent);color:var(--muted,inherit);font:inherit;font-size:13px;text-align:center}.mk-lastmod b{color:var(--text,inherit);font-weight:700;unicode-bidi:isolate;direction:ltr;display:inline-block;white-space:nowrap}</style>
+        <!-- MK-LASTMOD:START (AI agents: on EVERY edit of this file set LAST_MODIFIED_DATE = Egypt date YYYY-MM-DD, LAST_MODIFIED_TIME = Egypt time 12-hour hh:mm (Africa/Cairo), LAST_MODIFIED_AMPM = صباحًا or مساءً with the matching (AM)/(PM). The Hijri date fills itself from the date. Do not touch the script.) -->
+        <div id="mkLastMod" class="mk-lastmod" dir="rtl"><div class="mk-lm-l1"><span class="mk-lm-flag" aria-hidden="true">🇪🇬</span> <span>آخر تعديل:</span> <b id="mkLastModDate" data-var="LAST_MODIFIED_DATE">2026-11-03</b> <span>الساعة</span> <b id="mkLastModTime" data-var="LAST_MODIFIED_TIME">08:18</b> <span id="mkLastModAP" data-var="LAST_MODIFIED_AMPM">صباحًا (AM)</span></div><div id="mkLastModHijri" class="mk-lm-l2" hidden></div></div>
+        <style id="mk-lastmod-css">.mk-lastmod{margin:8px 0 0;padding:7px 12px;border:1px solid var(--line,#ccc);border-radius:10px;background:var(--surface-2,transparent);color:var(--muted,inherit);font:inherit;font-size:13px;text-align:center;line-height:1.8}.mk-lastmod b{color:var(--text,inherit);font-weight:700;unicode-bidi:isolate;direction:ltr;display:inline-block;white-space:nowrap}.mk-lm-l2{margin-top:1px;font-size:12.5px;color:var(--muted,inherit)}.mk-lm-l2[hidden]{display:none}.mk-lm-flag{font-size:15px}</style>
+        <script id="mk-lastmod-script">
+        /* Hijri date for the Egypt stamp date. Never blocks the page: shows instantly from local data, then upgrades from a free API (aladhan.com) if reachable. */
+        (function(){try{
+          var D=document,el=D.getElementById('mkLastModHijri'),de=D.getElementById('mkLastModDate');if(!el||!de)return;
+          var m=/^(\d{4})-(\d{2})-(\d{2})$/.exec((de.textContent||'').trim());if(!m)return;
+          var Y=+m[1],M=+m[2],Dd=+m[3],key='mk-hijri-v1-'+m[0];
+          var MN=['محرم','صفر','ربيع الأول','ربيع الآخر','جمادى الأولى','جمادى الآخرة','رجب','شعبان','رمضان','شوال','ذو القعدة','ذو الحجة'];
+          /* Dar al-Ifta (Egypt) confirmed first days of months: extend when a new month is announced */
+          var ANCH=[{g:Date.UTC(2026,9,12),y:1448,m:5}];
+          function ok(h){return h&&h.d>=1&&h.d<=30&&h.m>=1&&h.m<=12&&h.y>=1300&&h.y<=1600}
+          function show(h,src){if(!ok(h))return false;el.textContent='🌙 الموافق '+h.d+' '+MN[h.m-1]+' '+h.y+' هـ';el.title='المصدر: '+src;el.hidden=false;return true}
+          function anchor(){var t=Date.UTC(Y,M-1,Dd);for(var i=0;i<ANCH.length;i++){var k=Math.round((t-ANCH[i].g)/864e5);if(k>=0&&k<=28)return{y:ANCH[i].y,m:ANCH[i].m,d:1+k}}return null}
+          function intl(){try{var p=new Intl.DateTimeFormat('en-u-ca-islamic-umalqura-nu-latn',{day:'numeric',month:'numeric',year:'numeric',timeZone:'UTC'}).formatToParts(new Date(Date.UTC(Y,M-1,Dd,12))),o={};
+            p.forEach(function(x){if(x.type==='day'||x.type==='month'||x.type==='year'||x.type==='relatedYear')o[x.type]=parseInt(x.value,10)});
+            return{d:o.day,m:o.month,y:o.year||o.relatedYear}}catch(e){return null}}
+          var A=anchor(),cached=null;
+          try{var c=JSON.parse(localStorage.getItem(key)||'null');if(c&&ok(c))cached=c}catch(e){}
+          /* 1) instant, offline */
+          if(A)show(A,'دار الإفتاء المصرية');else if(cached)show(cached,'aladhan.com (محفوظ)');else show(intl(),'تقويم أم القرى (تقريبي، دون اتصال)');
+          if(A)return;/* Egypt's official date is known: nothing more to fetch */
+          if(cached||!window.fetch)return;
+          /* 2) upgrade from the free API; failure/timeout is silent */
+          var ac=window.AbortController?new AbortController():null,to=setTimeout(function(){try{ac&&ac.abort()}catch(e){}},7000);
+          fetch('https://api.aladhan.com/v1/gToH/'+m[3]+'-'+m[2]+'-'+m[1],ac?{signal:ac.signal}:{}).then(function(r){return r.ok?r.json():null}).then(function(j){
+            clearTimeout(to);var h=j&&j.data&&j.data.hijri;if(!h)return;
+            var o={d:parseInt(h.day,10),m:parseInt(h.month&&h.month.number,10),y:parseInt(h.year,10)};
+            if(ok(o)&&show(o,'aladhan.com')){try{localStorage.setItem(key,JSON.stringify(o))}catch(e){}}
+          }).catch(function(){clearTimeout(to)});
+        }catch(e){}})();
+        </script>
         <!-- MK-LASTMOD:END -->
         <div id="confirmBox" class="confirm-box hidden" role="alertdialog" aria-modal="true" aria-labelledby="confirmTxt">
           <div class="confirm-card">
