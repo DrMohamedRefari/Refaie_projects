@@ -738,7 +738,7 @@ html.app-night .pe-sh{box-shadow:0 -10px 30px rgba(0,0,0,.5)}
           <span id="edCount" class="ed-count" aria-live="off">0 كلمة · 0 حرف</span>
         </div>
         <!-- MK-LASTMOD:START (AI agents: on EVERY edit of this file set LAST_MODIFIED_DATE = Egypt date YYYY-MM-DD, LAST_MODIFIED_TIME = Egypt time 12-hour hh:mm (Africa/Cairo), LAST_MODIFIED_AMPM = صباحًا or مساءً with the matching (AM)/(PM). The Hijri date fills itself from the date. Do not touch the script.) -->
-        <div id="mkLastMod" class="mk-lastmod" dir="rtl"><div class="mk-lm-l1"><span class="mk-lm-flag" aria-hidden="true">🇪🇬</span> <span>آخر تعديل:</span> <b id="mkLastModDate" data-var="LAST_MODIFIED_DATE">2026-11-03</b> <span>الساعة</span> <b id="mkLastModTime" data-var="LAST_MODIFIED_TIME">08:02</b> <span id="mkLastModAP" data-var="LAST_MODIFIED_AMPM">صباحًا (AM)</span></div><div id="mkLastModHijri" class="mk-lm-l2" hidden></div></div>
+        <div id="mkLastMod" class="mk-lastmod" dir="rtl"><div class="mk-lm-l1"><span class="mk-lm-flag" aria-hidden="true">🇪🇬</span> <span>آخر تعديل:</span> <b id="mkLastModDate" data-var="LAST_MODIFIED_DATE">2026-11-03</b> <span>الساعة</span> <b id="mkLastModTime" data-var="LAST_MODIFIED_TIME">10:19</b> <span id="mkLastModAP" data-var="LAST_MODIFIED_AMPM">صباحًا (AM)</span></div><div id="mkLastModHijri" class="mk-lm-l2" hidden></div></div>
         <style id="mk-lastmod-css">.mk-lastmod{margin:8px 0 0;padding:7px 12px;border:1px solid var(--line,#ccc);border-radius:10px;background:var(--surface-2,transparent);color:var(--muted,inherit);font:inherit;font-size:13px;text-align:center;line-height:1.8}.mk-lastmod b{color:var(--text,inherit);font-weight:700;unicode-bidi:isolate;direction:ltr;display:inline-block;white-space:nowrap}.mk-lm-l2{margin-top:1px;font-size:12.5px;color:var(--muted,inherit)}.mk-lm-l2[hidden]{display:none}.mk-lm-flag{font-size:15px}</style>
         <script id="mk-lastmod-script">
         /* Hijri date for the Egypt stamp date. Never blocks the page: shows instantly from local data, then upgrades from a free API (aladhan.com) if reachable. */
@@ -840,13 +840,13 @@ html.app-night .pe-sh{box-shadow:0 -10px 30px rgba(0,0,0,.5)}
       </ol>
       <!-- AIP:HTML:START (AI prompt helper) -->
       <section id="aip-section" class="aip-section" aria-labelledby="aip-heading">
-        <h3 id="aip-heading" class="aip-h">برومبت جاهز للذكاء الاصطناعي</h3>
-        <p class="aip-p">انسخه والصقه <b>في نهاية طلبك</b> (أسفله مباشرة)، ثم أرسل الطلب والبرومبت معاً.</p>
+        <h3 id="aip-heading" class="aip-h">ملحق جاهز لأي برومبت (دقة المخرجات)</h3>
+        <p class="aip-p">ليس برومبتًا مستقلًا: هو <b>جزء يُلحق بنهاية أي طلب</b> تكتبه للذكاء الاصطناعي، ليضبط شكل المخرجات حسب ما تدعمه الأداة (جداول، تنبيهات، بطاقات مرئية، أسئلة MCQ…) ويشدد على الدقة وعدم اختلاق المعلومات. ألصقه أسفل طلبك مباشرة ثم أرسل الكل معًا.</p>
         <details id="aip-details" class="aip-details">
-          <summary>عرض نص البرومبت</summary>
-          <textarea id="aip-prompt-text" class="aip-pre" readonly dir="ltr" spellcheck="false" aria-label="نص البرومبت"></textarea>
+          <summary>عرض نص الملحق</summary>
+          <textarea id="aip-prompt-text" class="aip-pre" readonly dir="ltr" spellcheck="false" aria-label="نص ملحق البرومبت"></textarea>
         </details>
-        <button id="aip-copy" class="cv-btn pri aip-copy" type="button">نسخ البرومبت</button>
+        <button id="aip-copy" class="cv-btn pri aip-copy" type="button">نسخ الملحق</button>
         <p id="aip-msg" class="aip-msg" role="status" aria-live="polite"></p>
       </section>
       <!-- AIP:HTML:END -->
@@ -1520,6 +1520,13 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
     s=s.replace(/\\([\\`*_{}\[\]()#+\-.!|~=^])/g,(m,c)=>hold(c)); // backslash escapes
     // Protect code spans before other inline formatting.
     s=s.replace(/`([^`]+)`/g,(m,c)=>hold(`<code>${c}</code>`));
+    s=s.replace(/&amp;(amp|lt|gt|quot|nbsp|copy|reg|trade|deg|plusmn|times|divide|hellip|mdash|ndash|larr|rarr|harr|uarr|darr|ge|le|ne|asymp|micro|middot|bull|#\d{1,6}|#[xX][0-9a-fA-F]{1,5});/g,(m,e)=>{/* MK-MDX: decode a safe entity set (output stays escaped) */
+      const N={amp:'&amp;',lt:'&lt;',gt:'&gt;',quot:'&quot;',nbsp:'\u00A0',copy:'\u00A9',reg:'\u00AE',trade:'\u2122',deg:'\u00B0',plusmn:'\u00B1',times:'\u00D7',divide:'\u00F7',hellip:'\u2026',mdash:'\u2014',ndash:'\u2013',larr:'\u2190',rarr:'\u2192',harr:'\u2194',uarr:'\u2191',darr:'\u2193',ge:'\u2265',le:'\u2264',ne:'\u2260',asymp:'\u2248',micro:'\u00B5',middot:'\u00B7',bull:'\u2022'};
+      if(N[e]) return hold(N[e]);
+      const cp=e[1]==='x'||e[1]==='X'?parseInt(e.slice(2),16):parseInt(e.slice(1),10);
+      if(!(cp>=32&&cp<=0x10FFFF)||(cp>=0xD800&&cp<=0xDFFF)||(cp>=0x7F&&cp<=0x9F)) return m;
+      return hold(escapeHTML(String.fromCodePoint(cp)))});
+    s=s.replace(/&lt;(kbd|sub|sup|mark|u)&gt;([^<>\n]{1,300}?)&lt;\/\1&gt;/gi,(m,t,x)=>hold('<'+t.toLowerCase()+'>')+x+hold('</'+t.toLowerCase()+'>'));
     s=s.replace(/&lt;br\s*\/?&gt;/gi,()=>hold('<br>'));
     s=s.replace(/\[\^([^\]\s]+)\]/g,(m,id)=>{if(!(id in FN))return m;let k=FNO.indexOf(id);if(k<0){FNO.push(id);k=FNO.length-1}return hold(`<sup class="fnr">${k+1}</sup>`)});
     s=s.replace(/!\[([^\]]*)\]\(((?:[^()\s]|\([^()\s]*\))+)(?:\s+["']([^"']*)["'])?\)/g,(m,alt,url,title)=>{
@@ -1584,11 +1591,13 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
   function tableAt(lines,i){
     return lines[i].includes('|')&&i+1<lines.length&&isTableDivider(lines[i+1])&&getCells(lines[i]).length===getCells(lines[i+1]).length;
   }
-  function headingMatch(line){return line.match(/^(#{1,6})\s+(.*?)(?:\s+#+)?$/)}
-  function listMatch(line){return line.match(/^(\s*)([-+*]|\d+[.)])\s+(.*)$/)}
+  function headingMatch(line){return line.match(/^(#{1,6})\s+(.*?)(?:\s+#+)?$/)||line.match(/^(#{2,6})(?=[^\s#])(.*?)(?:\s+#+)?$/)/* MK-MDX: '##Title' without space */}
+  const MKD='\\d\\u0660-\\u0669\\u06F0-\\u06F9',MKD2=s=>String(s).replace(/[\u0660-\u0669]/g,c=>c.charCodeAt(0)-0x660).replace(/[\u06F0-\u06F9]/g,c=>c.charCodeAt(0)-0x6F0),MK_ORD=new RegExp('['+MKD+']');
+  const MK_LM=new RegExp('^(\\s*)([-+*\\u2022\\u25AA\\u25E6\\u25CF\\u2013]|['+MKD+']+[.)])\\s+(.*)$');/* MK-MDX: also • ▪ ◦ ● – bullets and Arabic-Indic numbering */
+  function listMatch(line){return line.match(MK_LM)}
   const indentOf=s=>s.replace(/\t/g,'    ').length;
   function isBlockStart(line){
-    return /^(#{1,6})\s+/.test(line)||/^\s*>/.test(line)||/^\s*(```|~~~)/.test(line)||/^\s*([-+*])\s+/.test(line)||/^\s*\d+[.)]\s+/.test(line)||HR.test(line);
+    return !!headingMatch(line)||/^\s*>/.test(line)||/^\s*(```|~~~)/.test(line)||!!listMatch(line)||HR.test(line);
   }
   // v6: lines under a list item that are indented deeper than its marker belong to that item.
   function listCont(lines,s,indent,depth){
@@ -1608,8 +1617,8 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
     return {html,next:j};
   }
   function renderList(lines,start,depth){
-    const first=listMatch(lines[start]); const ordered=/\d/.test(first[2]); const tag=ordered?'ol':'ul';
-    const firstIndent=indentOf(first[1]), canNest=depth<MAX_DEPTH, sn=ordered?parseInt(first[2],10):1;
+    const first=listMatch(lines[start]); const ordered=MK_ORD.test(first[2]); const tag=ordered?'ol':'ul';
+    const firstIndent=indentOf(first[1]), canNest=depth<MAX_DEPTH, sn=ordered?parseInt(MKD2(first[2]),10):1;
     let out=`<${tag}${ordered&&sn!==1?` start="${sn}" style="counter-reset:uxli ${sn-1}"`:''}>`; let i=start;
     while(i<lines.length){
       const m=listMatch(lines[i]); if(!m) break;
@@ -1619,7 +1628,7 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
         // Nested list belongs to previous <li>.
         const nested=renderList(lines,i,depth+1); out+=nested.html; i=nested.next; continue;
       }
-      if(indent===firstIndent&&/\d/.test(m[2])!==ordered) break;
+      if(indent===firstIndent&&MK_ORD.test(m[2])!==ordered) break;
       const tm=m[3].match(/^\[([ xX])\]\s+(.*)$/);
       out+=tm?`<li class="task${tm[1]===' '?'':' done'}"><span class="cb" data-d="${tm[1]===' '?0:1}"></span>${inlineMarkdown(tm[2])}`:`<li>${inlineMarkdown(m[3])}`;
       {const ct=listCont(lines,i+1,indent,depth); out+=ct.html; i=ct.next-1;}
@@ -4206,133 +4215,13 @@ html.app-night .cv-scroll{background:#212836}
 <script id="aip-script">
 /* AIP: AI-prompt helper. Isolated + fail-safe: nothing here can break the main app. */
 (function(){try{
-var AIP_PROMPT=[
-  "=== READ THIS FIRST ===",
-  "The text ABOVE this block is my real request (my topic, lecture or question bank). Fulfil it completely and accurately first. Then deliver the answer ONLY in the format defined below. The rules below describe how to format the answer; they are not the task itself.",
-  "",
-  "You are writing high-yield study notes for Mudhakirati (\u0645\u0630\u0627\u0643\u0631\u062a\u064a), an offline Markdown-to-study-page renderer used by Arabic-speaking medical and nursing students.",
-  "",
-  "OUTPUT CONTRACT",
-  "Return exactly ONE outer four-backtick Markdown fence that begins with ````markdown and ends with ````. Put the complete note inside it. Do not add an introduction or comments outside the fence. Inside the note use ordinary Markdown only; never raw HTML, SVG, emoji, Unicode arrows or box-drawing characters.",
-  "",
-  "CONTENT RULES",
-  "- Use the supplied source/lecture/question bank as the authority. Preserve its terminology, distinctions, options and level of certainty. Do not silently correct or invent facts. If information is absent, say \u201cNot specified in the source\u201d only when needed.",
-  "- Explain mechanisms as cause -> effect using words, not arrow characters. Distinguish source facts from a useful clinical inference. Include a high-yield distinction only when it helps answer the stated learning goals.",
-  "- Keep the document self-contained. Use one # title, ## major sections and ### subsections. Avoid ##### headings.",
-  "- Prefer concise connected explanation over a pile of cards. Use bullets for parallel items, numbered lists for ordered steps, and tables only for genuine comparisons or structured data.",
-  "- Aim per ## section: 0\u20132 callouts, 0\u20132 visual blocks, and at most 1 table unless comparison genuinely needs a second. A 20-question bank can use one mcq block per question. Do not turn every paragraph into a callout.",
-  "",
-  "SUPPORTED MARKDOWN",
-  "Headings: # Title, ## Section, ### Subsection, #### Minor heading.",
-  "Bold: **key phrase**. Emphasis: *term* (rendered as colored underline, not italic). Highlight: ==must-remember==. Strike: ~~incorrect claim~~ only when discussing a misconception. Inline code: `short literal token`; use it sparingly. Superscript ^value^ and subscript ~value~ are fragile: avoid unless essential; if essential, no spaces inside the token. Do not use tildes for ranges or decorative separators.",
-  "Lists: - bullet; 1. ordered; - [ ] checklist; - [x] completed. Do not insert blank lines between items in one list. Use one blank line before the next paragraph or block.",
-  "Tables: use a header, a separator with exactly one --- per column, and rows with the same number of columns, e.g.:",
-  "| Feature | Above | Below |",
-  "|:---|:---|:---|",
-  "| Sensation | Visceral | Somatic |",
-  "Do not put blank lines inside tables. Use <br> only inside a table cell when a line break is genuinely necessary. Escape a literal pipe as \\|.",
-  "Callouts: use one blank line between separate callouts. Examples:",
-  "> [!IMPORTANT] Dentate line rule",
-  "> Above the line is typically visceral and relatively painless; below is somatic and pain-sensitive.",
-  "",
-  "> [!WARNING] Do not infer a diagnosis from one finding alone",
-  "> Interpret findings in clinical context.",
-  "Available types: NOTE, INFO, ABSTRACT, SUMMARY, TIP, HINT, IMPORTANT, WARNING, CAUTION, DANGER, SUCCESS, QUESTION, EXAMPLE, HIGHYIELD, TRAP, REDFLAG, EVIDENCE. Use explicit titles and short bodies. Do not merge two callouts into one block.",
-  "",
-  "VISUAL BLOCKS",
-  "Use this form. Every line in the body must begin with > followed by one plain list item. Keep items at one level except classification. Do not place a table, nested callout or nested blockquote inside a visual block. If a visual is malformed or too long, the renderer shows a plain quote/list instead.",
-  "",
-  "Steps (2\u201312 items):",
-  "> [!VISUAL] steps: Initial assessment",
-  "> 1. Inspect the external opening and discharge",
-  "> 2. Assess complexity and recurrence",
-  "> 3. Select imaging when clinically indicated",
-  "",
-  "Compare (2\u20134 rows; label: meaning):",
-  "> [!VISUAL] compare: Above versus below the dentate line",
-  "> - **Above**: Visceral sensation; portal drainage",
-  "> - **Below**: Somatic sensation; systemic drainage",
-  "",
-  "Algorithm (2\u20138 rows):",
-  "> [!VISUAL] algorithm: Approach to a fistula",
-  "> - Examine: Look for an opening and induration",
-  "> - Assess: Identify complex or recurrent disease",
-  "> - Image: Consider MRI or endoanal ultrasound when indicated",
-  "",
-  "Definition (1\u20134 rows; first row is the term):",
-  "> [!VISUAL] definition: Key term",
-  "> - Dentate line: A landmark separating regions with different anatomy and innervation",
-  "> - Clinical relevance: It helps interpret pain and drainage patterns",
-  "",
-  "Key numbers (2\u20138 rows; include units in the label):",
-  "> [!VISUAL] numbers: Recall values",
-  "> - 4 cm: Surgical canal, approximate",
-  "> - 2 cm: Anatomical canal, approximate",
-  "> - 90 degrees: Anorectal angle, approximate",
-  "Only include values supported by the source or standard required by the request; preserve qualifiers such as \u201capproximately\u201d.",
-  "",
-  "MCQ (question + 2\u20136 options + valid answer + why; wrong-option notes and takeaway optional):",
-  "> [!VISUAL] mcq: Q1 review",
-  "> - Q: Which option is least appropriate as routine treatment?",
-  "> - A: Fiber and lifestyle measures",
-  "> - B: Rubber-band ligation",
-  "> - C: Hemorrhoidectomy for every second-degree case",
-  "> - D: Sclerotherapy in selected patients",
-  "> - Answer: C",
-  "> - Why: The treatment should match the grade and clinical context.",
-  "> - Wrong A: Conservative measures are appropriate in many cases.",
-  "> - Wrong B: An office procedure may be appropriate.",
-  "> - Takeaway: Match treatment intensity to disease grade.",
-  "Answer must be exactly one option letter A\u2013F first. Do not use this visual syntax for a question that has no supported answer key; say that it is unverified in normal prose instead.",
-  "",
-  "Red flags (1\u20138):",
-  "> [!VISUAL] redflags: Urgent features",
-  "> - Systemic toxicity: Urgent clinical assessment",
-  "> - Rapidly progressive pain: Assess for serious disease",
-  "",
-  "Classification (1\u201312; indent children by two spaces):",
-  "> [!VISUAL] classification: Disease groups",
-  "> - Anorectal disease",
-  ">   - Hemorrhoidal disease",
-  ">     - Internal hemorrhoids",
-  ">   - Anorectal sepsis",
-  ">     - Abscess or fistula",
-  "",
-  "Anatomy/layers (2\u20138):",
-  "> [!VISUAL] anatomy: Wall layers (schematic)",
-  "> - Mucosa: Epithelial lining",
-  "> - Submucosa: Connective tissue and vessels",
-  "> - Muscle: Sphincter and wall muscle relationships",
-  "Add \u201cschematic, not to scale\u201d if the diagram could be confused with an exact anatomical drawing.",
-  "",
-  "Legend (2\u20138 rows):",
-  "> [!VISUAL] legend: Meaning of labels",
-  "> - HIGH-YIELD: Prioritize for recall",
-  "> - EXAM TRAP: Common misconception",
-  "> - RED FLAG: Urgent escalation cue",
-  "",
-  "Existing types still supported: timeline, metrics/stats/kpi and mnemonic/mnemo. Use them only where the structure matches: timeline items are \u201c**label**: text\u201d; metrics are \u201clabel: value\u201d; mnemonic items start with a short letter/number cue, followed by a hyphen and meaning. Each legacy visual should have 2\u201312 items.",
-  "",
-  "MEDICAL QUESTION ANALYSIS",
-  "For every MCQ, preserve the exact options and the intended correct answer from the source. State the principle first; then give a short explanation; then explain each important distractor, especially the tempting error; finish with a one-sentence Takeaway. Do not repeat the stem and full answer several times. If source and answer key disagree, flag the discrepancy rather than silently resolving it.",
-  "",
-  "DIRECTION AND FONT SAFETY",
-  "Arabic, English and mixed lines are allowed. Keep English medical terms spelled conventionally. Avoid emoji, unusual Unicode symbols, arrow glyphs, decorative characters and unsupported Greek symbols. Prefer \u201cincreases\u201d, \u201cdecreases\u201d, \u201cleads to\u201d, \u201cgreater than\u201d, \u201cless than\u201d, \u201capproximately\u201d, and ordinary hyphens. Avoid false Markdown: never use underscores in ordinary words for italics, never surround ranges in tildes, and only use ^sup^ / ~sub~ when truly necessary with no spaces inside.",
-  "",
-  "FINAL QUALITY CHECK BEFORE OUTPUT",
-  "1. One outer four-backtick `markdown` fence only, no text outside it.",
-  "2. Every table has a valid divider and consistent column counts.",
-  "3. Each blockquote line in a callout/visual starts with >; separate consecutive callouts with one blank line.",
-  "4. No blank lines inside a list; no nested lists inside visual blocks except classification.",
-  "5. No unsupported facts, raw HTML, emoji, arrow glyphs, malformed ^ or ~ markup, or color-dependent instructions.",
-  "6. Use only the components that improve understanding. End with a concise summary or revision checklist if useful."
-].join("\n");/* UP9 */
+var AIP_PROMPT="=== OUTPUT-FORMAT MODULE (append-only; not a separate task) ===\nThis block is part of my request above, not a new request. Do exactly what my request asks (topic, language, depth, structure, length). Use this block only to control HOW the answer is written so that it renders correctly in my Markdown study app and stays factually accurate. If anything here conflicts with an explicit instruction in my request, my request wins, except for the accuracy rules.\n\nACCURACY\n- Treat any source I supplied (lecture, notes, question bank, answer key) as the authority. Keep its terminology, options, numbers and level of certainty. Never invent facts, values, doses, guideline names or references. If something is missing or uncertain, say so in one short phrase instead of guessing.\n- Keep source facts separate from your own clinical inference, and label the inference. Keep qualifiers such as \"approximately\", \"usually\", \"in selected patients\". Always give units with numbers.\n- If a source and its answer key disagree, flag the discrepancy; do not silently resolve it.\n- Explain mechanisms as cause then effect in words, not with arrow symbols.\n\nOUTPUT CONTRACT\n- Deliver the whole answer as ordinary Markdown inside ONE outer four-backtick fence: open with ````markdown and close with ````. Put nothing outside the fence unless my request asks for it.\n- Inside: no raw HTML (except <br> inside a table cell when a line break is truly needed), no SVG, no emoji, no arrows or box-drawing characters, no decorative symbols.\n- Arabic, English and mixed lines are fine. Write English medical terms in their usual spelling inside Arabic sentences; the app handles direction automatically.\n\nSTRUCTURE\n- One # title, then ## sections and ### subsections (#### only if essential). Always put a space after the #.\n- Prefer short connected explanation. Use bullets for parallel items, numbered lists for ordered steps, tables only for real comparisons. Nested lists: indent children by 2 spaces, at most 3 levels. No blank lines between items of one list.\n- Per ## section aim for 0-2 callouts, 0-2 visual blocks and at most 1 table. Do not turn every paragraph into a callout.\n- Footnotes are supported: text[^1] and a line \"[^1]: note\". Links must be full https:// URLs.\n\nINLINE SYNTAX\n**bold** key phrase; *term* (shown as a coloured underline, not italic); ==must-remember== highlight; ~~wrong claim~~ only for misconceptions; `literal` sparingly; <kbd>Ctrl<\/kbd> for keys. Tasks: - [ ] / - [x]. Avoid ^sup^ and ~sub~ unless essential (no spaces inside). Never use tildes for ranges, never use underscores inside ordinary words, escape a literal pipe in a table as \\|.\n\nTABLES\nHeader row, a divider with one --- per column (colons set alignment), every row with the same number of columns, no blank lines inside:\n| Feature | Above | Below |\n|:---|:---|:---|\n| Sensation | Visceral | Somatic |\n\nCALLOUTS (one blank line between callouts; every line starts with >)\n> [!IMPORTANT] Short explicit title\n> One or two short sentences.\nTypes: NOTE, INFO, ABSTRACT, SUMMARY, TIP, HINT, IMPORTANT, WARNING, CAUTION, DANGER, SUCCESS, QUESTION, EXAMPLE, HIGHYIELD, TRAP, REDFLAG, EVIDENCE. Use HIGHYIELD for must-know points, TRAP for common exam mistakes, REDFLAG for urgent warning signs.\n\nVISUAL BLOCKS (optional; use only where the content has that shape)\nForm: \"> [!VISUAL] type: Title\", then body lines that each start with > and are plain list items (no tables, nested callouts or nested quotes inside). If malformed the app shows a plain quote, so keep them exact.\n> [!VISUAL] steps: Title            (2-12 items: \"> 1. ...\")\n> [!VISUAL] compare: Title          (2-4 items: \"> - **Label**: meaning\")\n> [!VISUAL] algorithm: Title        (2-8 items: \"> - Step: detail\")\n> [!VISUAL] definition: Title       (1-4 items; first item \"> - Term: meaning\")\n> [!VISUAL] numbers: Title          (2-8 items: \"> - 4 cm: what it is\"; value first, with unit)\n> [!VISUAL] redflags: Title         (1-8 items: \"> - Sign: action\")\n> [!VISUAL] classification: Title   (1-12 items; children indented 2 spaces)\n> [!VISUAL] anatomy: Title          (2-8 items: \"> - Layer: description\"; add \"schematic, not to scale\" if needed)\n> [!VISUAL] legend: Title           (2-8 items: \"> - LABEL: meaning\")\n> [!VISUAL] timeline: Title         (2-12 items: \"> - **Label**: text\")\n> [!VISUAL] metrics: Title          (2-12 items: \"> - label: value\")\n> [!VISUAL] mnemonic: Title         (2-12 items: \"> - X - meaning\")\nMCQ block (exactly this shape; use only when the answer key is supported by the source):\n> [!VISUAL] mcq: Q1 review\n> - Q: Question text?\n> - A: Option\n> - B: Option\n> - C: Option\n> - Answer: C\n> - Why: One-sentence principle.\n> - Wrong A: Why A is tempting but wrong.\n> - Takeaway: One-sentence rule.\n2-6 options, Answer is a single letter, \"Wrong X\" and \"Takeaway\" are optional. For a question without a verified key, discuss it in normal prose and mark it unverified.\n\nMCQ ANALYSIS (when I give questions)\nKeep the exact options and the intended answer. State the principle first, explain briefly, explain each important distractor, end with a one-sentence takeaway. Do not repeat the stem and the full answer several times.\n\nFINAL CHECK BEFORE SENDING\n1. One outer four-backtick markdown fence, nothing outside it.\n2. Headings have a space after #; lists have no blank lines between items.\n3. Tables: valid divider, equal column counts. Callout and visual lines all start with >.\n4. No invented facts, no raw HTML, emoji, arrows or malformed ^ ~ markup.\n5. Only components that help understanding; end with a short summary or revision checklist only if useful.";/* UP9 */
 var ta=document.getElementById('aip-prompt-text'),btn=document.getElementById('aip-copy'),
     det=document.getElementById('aip-details'),sec=document.getElementById('aip-section'),
     msg=document.getElementById('aip-msg'),scr=document.querySelector('#helpModal .cv-scroll');
 if(!ta||!btn||!sec)return;
 ta.textContent=AIP_PROMPT;
-var LABEL='نسخ البرومبت',timer=0;
+var LABEL='نسخ الملحق',timer=0;
 function say(t){try{msg.textContent=t||''}catch(e){}}
 function ok(){
   try{clearTimeout(timer);btn.textContent='\u2713 تم النسخ';say('');
@@ -4371,7 +4260,7 @@ btn.addEventListener('click',function(){
 if(scr){
   var row=document.createElement('div');row.className='aip-top';
   var tb=document.createElement('button');tb.type='button';tb.className='cv-btn aip-top-btn';
-  tb.textContent='نسخ برومبت الذكاء الاصطناعي';
+  tb.textContent='نسخ ملحق البرومبت';
   tb.addEventListener('click',function(){
     try{
       sec.scrollIntoView({block:'start',behavior:'smooth'});
@@ -10295,5 +10184,332 @@ window.MKTimer={state:function(){return JSON.parse(JSON.stringify(T))},tick:tick
 }catch(err){try{console.error('MK-TIMER',err)}catch(_){}}})();
 </script>
 <!-- MK-TIMER:END -->
+<!-- MK-MDX:START -->
+<style id="mk-mdx-css">
+/* toolbar + health sheet: theme-agnostic, variables only */
+.mkx-tb{display:flex;gap:6px;overflow-x:auto;padding:6px 2px;margin:2px 0 6px;scrollbar-width:none;-webkit-overflow-scrolling:touch;touch-action:pan-x}
+.mkx-tb::-webkit-scrollbar{display:none}
+.mkx-b{flex:0 0 auto;min-width:40px;min-height:40px;padding:0 10px;border:1px solid var(--line);border-radius:12px;background:var(--surface-2,var(--surface));color:var(--text);font:inherit;font-weight:700;font-size:.9rem;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.mkx-b:active{background:var(--accent);color:var(--on-c,#fff)}
+.mkx-b:focus-visible,.mkx-sheet button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.mkx-sel{appearance:none;-webkit-appearance:none;text-align:center}
+.mkx-health{position:relative}
+.mkx-n{display:inline-flex;align-items:center;justify-content:center;min-width:20px;height:20px;margin-inline-start:6px;padding:0 5px;border-radius:10px;background:var(--danger,#c0392b);color:#fff;font-size:.72rem;font-weight:800}
+.mkx-sheet{position:fixed;inset:0;z-index:2147483000;display:flex;align-items:flex-end;justify-content:center;background:rgba(0,0,0,.45)}
+.mkx-sheet[hidden]{display:none}
+.mkx-card{width:min(560px,100%);max-height:82vh;display:flex;flex-direction:column;background:var(--surface);color:var(--text);border:1px solid var(--line);border-radius:18px 18px 0 0;padding:12px 14px calc(12px + env(safe-area-inset-bottom,0px))}
+.mkx-h{display:flex;align-items:center;justify-content:space-between;font-size:1.05rem}
+.mkx-x{min-width:44px;min-height:44px;border:0;background:none;color:var(--text);font-size:1.6rem;cursor:pointer}
+.mkx-sub{color:var(--muted);font-size:.9rem;margin-bottom:6px}
+.mkx-list{overflow:auto;touch-action:pan-y;-webkit-overflow-scrolling:touch;flex:1;min-height:0}
+.mkx-it{display:flex;gap:8px;justify-content:space-between;align-items:flex-start;padding:8px 0;border-top:1px solid var(--line);font-size:.92rem}
+.mkx-df{margin-top:4px;font-size:.82rem;color:var(--muted);word-break:break-word}
+.mkx-df s{opacity:.8}.mkx-df span{color:var(--text);font-weight:700}
+.mkx-ac{display:flex;flex-direction:column;gap:4px;flex:0 0 auto}
+.mkx-ac button,.mkx-f button{min-height:36px;padding:0 12px;border:1px solid var(--line);border-radius:10px;background:var(--surface-2,var(--surface));color:var(--text);font:inherit;cursor:pointer}
+.mkx-f{display:flex;gap:8px;margin-top:8px}
+.mkx-f .mkx-go{flex:1;min-height:44px;background:var(--accent);color:var(--on-c,#fff);border-color:var(--accent);font-weight:800}
+.mkx-f button:disabled{opacity:.5}
+.mkx-pt{display:flex;align-items:center;gap:8px;margin-top:10px;min-height:34px;font-size:.9rem}
+.mkx-toast{position:fixed;inset-inline:0;bottom:calc(20px + env(safe-area-inset-bottom,0px));margin:auto;width:max-content;max-width:90vw;padding:10px 16px;border-radius:12px;background:var(--text);color:var(--surface);z-index:2147483001;opacity:0;transform:translateY(8px);pointer-events:none;transition:opacity .2s,transform .2s;font-size:.92rem}
+.mkx-toast.on{opacity:1;transform:none}
+@media (prefers-reduced-motion:reduce){.mkx-toast{transition:none}}
+body:has(#pageModal:not(.hidden)) :is(.mkx-sheet,.mkx-toast,.mkx-cp),body:has(#coverModal:not(.hidden)) :is(.mkx-sheet,.mkx-toast,.mkx-cp),body.pdf-busy :is(.mkx-sheet,.mkx-toast,.mkx-cp){visibility:hidden}
+.pdf-page .mkx-tb,.pdf-page .mkx-sheet{display:none}
+/* reader + PDF typography (one structural pass, no theme selectors) */
+.md kbd{display:inline-block;padding:0 .4em;border:1px solid var(--line);border-bottom-width:2px;border-radius:.3em;background:var(--surface-2,var(--surface));font-size:.85em;line-height:1.5;font-family:var(--font)}
+.md sub,.md sup{line-height:0}
+.md mark{text-decoration:underline;text-decoration-thickness:.12em;text-underline-offset:.18em;text-decoration-color:currentColor}
+.md :is(h1,h2,h3,h4,h5,h6){text-wrap:balance;overflow-wrap:anywhere}
+.md p,.md li{orphans:2;widows:2}
+.md td,.md th{overflow-wrap:anywhere;font-variant-numeric:tabular-nums}
+.reader .md del{text-decoration-thickness:.1em}
+.mkx-w{font-size:.82rem;white-space:nowrap}
+.mkx-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px}
+.mkx-grid button{min-height:44px;border:1px solid var(--line);border-radius:12px;background:var(--surface-2,var(--surface));color:var(--text);font:inherit;cursor:pointer}
+.mkx-grid button:active{background:var(--accent);color:var(--on-c,#fff)}
+.mkx-fr{display:flex;flex-direction:column;gap:8px;overflow:auto;touch-action:pan-y}
+.mkx-fr input[type=text]{min-height:44px;padding:0 12px;border:1px solid var(--line);border-radius:12px;background:var(--bg,var(--surface));color:var(--text);font:inherit}
+.mkx-oi{display:block;width:100%;min-height:40px;padding-block:6px;text-align:start;border:0;border-top:1px solid var(--line);background:none;color:var(--text);font:inherit;cursor:pointer}
+.mkx-oi:active{background:var(--surface-2,var(--surface))}
+.md pre{position:relative}
+.mkx-cp{position:absolute;top:6px;inset-inline-end:6px;width:34px;height:34px;border:1px solid var(--line);border-radius:10px;background:var(--surface);color:var(--text);cursor:pointer;opacity:.85;padding:0}
+.mkx-cp::before{content:"\29C9";font-size:16px;line-height:1}
+.mkx-cp.ok::before{content:"\2713"}
+.pdf-page .mkx-cp{display:none}
+/* scroll hint when a table cannot shrink further */
+.reader .md .table-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;overscroll-behavior-x:contain}
+.reader .md img{box-shadow:0 1px 6px rgba(0,0,0,.12)}
+@media (prefers-reduced-motion:no-preference){.reader .md a{transition:background-color .15s}}
+</style>
+<script id="mk-mdx-script">
+(function(){try{
+'use strict';
+var D=document,KEY='refaie-minimal-study-v1';
+/* ---------- pure normaliser (idempotent, never touches fenced code) ---------- */
+function normalizeMarkdown(src){
+  var ch=[];function note(l,m,from,to){ch.push({line:l,msg:m,from:from,to:to})}
+  var raw=String(src==null?'':src);
+  var t=raw.replace(/\r\n?|\u2028|\u2029/g,'\n');
+  if(t!==raw) note(0,'نهايات أسطر ويندوز تم توحيدها');
+  var lines=t.split('\n'),out=[],fence=null,i,L,m,prevBlank=true,hdrOut=false;
+  var cells=function(x){x=x.trim();if(x[0]==='|')x=x.slice(1);if(x.slice(-1)==='|'&&x.slice(-2)!=='\\|')x=x.slice(0,-1);return x.split(/(?<!\\)\|/).length};
+  var isDiv=function(x){return /^\s*\|?\s*:?-{1,}:?\s*(\|\s*:?-{1,}:?\s*)*\|?\s*$/.test(x)&&x.indexOf('-')>-1&&(x.indexOf('|')>-1||/^\s*:?-+:?\s*$/.test(x)===false)};
+  var tableLike=function(x){return x.indexOf('|')>-1&&cells(x)>=2&&!/^\s*>/.test(x)};
+  for(i=0;i<lines.length;i++){
+    L=lines[i];var ln=i+1,f=L.match(/^\s*(```|~~~)/);
+    if(fence){out.push({t:L,o:ln});if(f&&f[1]===fence)fence=null;continue}
+    if(f){fence=f[1];out.push({t:L,o:ln});continue}
+    var o=L;
+    L=L.replace(/[\u200B\u2060\uFEFF]/g,'');
+    L=L.replace(/\u00A0/g,' ');
+    if(L!==o) note(ln,'مسافات/رموز غير مرئية',o,L);
+    o=L;L=L.replace(/^(\s*)\t+/,function(a,b){return b+a.slice(b.length).replace(/\t/g,'    ')});
+    if(L!==o) note(ln,'مسافة Tab في بداية السطر',o,L);
+    o=L;L=L.replace(/[ \t]+$/,'');
+    if(L!==o&&!/^\s*$/.test(o)) note(ln,'مسافات زائدة في نهاية السطر',o,L);
+    o=L;
+    if((m=L.match(/^(#{2,6})(?=[^\s#])(.*)$/))) L=m[1]+' '+m[2];
+    else if((m=L.match(/^#(?=[\u0600-\u06FF])(.*)$/))) L='# '+m[1];
+    if(L!==o) note(ln,'عنوان بدون مسافة بعد #',o,L);
+    o=L;
+    if((m=L.match(/^(\s*)([\u2022\u25AA\u25E6\u25CF\u2013*+])\s+(?=\S)(.*)$/))&&!/^\*\*|^\*[^*]*\*$/.test(m[3])) L=m[1]+'- '+m[3];
+    if(L!==o) note(ln,'رمز نقطة غير قياسي تم توحيده إلى -',o,L);
+    o=L;
+    L=L.replace(/^(\s*)([\u0660-\u0669\u06F0-\u06F9]+)([.)])(\s+)/,function(a,b,c,d,e){return b+c.replace(/[\u0660-\u0669]/g,function(x){return x.charCodeAt(0)-0x660}).replace(/[\u06F0-\u06F9]/g,function(x){return x.charCodeAt(0)-0x6F0})+'.'+e});
+    if(L!==o) note(ln,'ترقيم بأرقام هندية تم توحيده',o,L);
+    o=L;
+    if((m=L.match(/^(\s*)(\d+)\)(\s+)/))) L=m[1]+m[2]+'.'+L.slice(m[0].length-m[3].length);
+    if(L!==o) note(ln,'ترقيم 1) تم توحيده إلى 1.',o,L);
+    o=L;
+    var sb=(L.match(/\*\*/g)||[]).length;
+    if(sb===1&&!/`/.test(L)&&(m=L.match(/\*\*(?=\S)/))&&L.trim().slice(-2)!=='**'){L=L.replace(/\s*$/,'')+'**'}
+    if(L!==o) note(ln,'علامة ** مفتوحة بلا إغلاق',o,L);
+    out.push({t:L,o:ln});
+  }
+  if(fence){while(out.length&&out[out.length-1].t.trim()==='')out.pop();out.push({t:fence,o:lines.length});note(lines.length,'كتلة كود مفتوحة تم إغلاقها')}
+  /* headings: blank line around; tables: repair; collapse blank runs */
+  var res=[],k,inF=null,tbl=0;
+  for(k=0;k<out.length;k++){
+    var e=out[k],T=e.t,mf=T.match(/^\s*(```|~~~)/);
+    if(inF){res.push(e);if(mf&&mf[1]===inF)inF=null;continue}
+    if(mf){inF=mf[1];res.push(e);continue}
+    if(/^#{1,6}\s/.test(T)&&res.length&&res[res.length-1].t.trim()!==''){res.push({t:'',o:e.o});note(e.o,'سطر فارغ قبل العنوان')}
+    /* table repair */
+    if(tableLike(T)&&!isDiv(T)&&(!res.length||!tableLike(res[res.length-1].t))){
+      var nx=out[k+1],n=cells(T);
+      if(nx&&tableLike(nx.t)&&!isDiv(nx.t)&&!/^\s*[-*+]\s/.test(T)&&!/^\s*\d+\.\s/.test(T)&&cells(nx.t)===n){
+        res.push(e);res.push({t:'|'+new Array(n+1).join(' --- |'),o:e.o});note(e.o,'جدول بلا سطر فاصل — تمت إضافته');continue}
+    }
+    if(tbl&&tableLike(T)&&!isDiv(T)){
+      var hn=tbl,cn=cells(T);
+      if(cn<hn&&/^\s*\|/.test(T)){var core=T.replace(/\s*\|\s*$/,'');var fixed=core+new Array(hn-cn+1).join(' |')+' |';note(e.o,'صف جدول ناقص الخلايا — تمت تتمته',T,fixed);T=fixed;e={t:T,o:e.o}}
+    }
+    if(isDiv(T)&&res.length&&tableLike(res[res.length-1].t)&&!isDiv(res[res.length-1].t)) tbl=cells(res[res.length-1].t);
+    else if(!tableLike(T)) tbl=0;
+    res.push(e);
+    if(/^#{1,6}\s/.test(T)){var nn=out[k+1];if(nn&&nn.t.trim()!==''&&!/^\s*(```|~~~)/.test(nn.t)){res.push({t:'',o:e.o});note(e.o,'سطر فارغ بعد العنوان')}}
+  }
+  var fin=[],blank=0,inG=null;
+  res.forEach(function(e){var mf=e.t.match(/^\s*(```|~~~)/);
+    if(inG){fin.push(e.t);if(mf&&mf[1]===inG)inG=null;return}
+    if(mf){inG=mf[1];blank=0;fin.push(e.t);return}
+    if(e.t.trim()===''){blank++;if(blank>1){note(e.o,'أسطر فارغة متكررة');return}}else blank=0;
+    fin.push(e.t)});
+  while(fin.length&&fin[0].trim()==='')fin.shift();
+  var text=fin.join('\n').replace(/\n+$/,'')+(raw.trim()?'\n':'');
+  return {text:text,changes:ch};
+}
+window.MKMDX={normalize:normalizeMarkdown};
+/* ---------- UI ---------- */
+var ta=D.getElementById('markdownInput'),bar=D.querySelector('#editorScreen .ed-bar');
+if(!ta||!bar) return;
+var composing=false;ta.addEventListener('compositionstart',function(){composing=true});ta.addEventListener('compositionend',function(){composing=false});
+function lsg(k,d){try{var v=localStorage.getItem(KEY+k);return v===null?d:v}catch(_){return d}}
+function lss(k,v){try{localStorage.setItem(KEY+k,v)}catch(_){}}
+var tt=0,toast=D.createElement('div');toast.className='mkx-toast';toast.setAttribute('role','status');D.body.appendChild(toast);
+function say(m){toast.textContent=m;toast.classList.add('on');clearTimeout(tt);tt=setTimeout(function(){toast.classList.remove('on')},2400)}
+function setText(txt,s,e){ /* native undo when possible */
+  ta.focus();ta.setSelectionRange(s==null?0:s,e==null?ta.value.length:e);
+  var ok=false;try{ok=D.execCommand('insertText',false,txt)}catch(_){}
+  if(!ok||ta.value.indexOf(txt)<0&&txt){ta.setRangeText(txt,s==null?0:s,e==null?ta.value.length:e,'end');ta.dispatchEvent(new Event('input',{bubbles:true}))}
+}
+function replaceAll(txt){var old=ta.value;lastUndo=old;setText(txt,0,ta.value.length);showUndo()}
+var lastUndo=null,undoBtn=null;
+function showUndo(){if(!undoBtn)return;undoBtn.hidden=lastUndo===null}
+/* toolbar */
+var tb=D.createElement('div');tb.className='mkx-tb';tb.setAttribute('role','toolbar');tb.setAttribute('aria-label','أدوات التنسيق');
+var CAL=[['note','ملاحظة'],['tip','نصيحة'],['important','مهم'],['warning','تنبيه'],['caution','احذر']];
+function wrap(a,b,ph){return function(){var s=ta.selectionStart,e=ta.selectionEnd,v=ta.value,sel=v.slice(s,e)||ph;setText(a+sel+b,s,e);ta.setSelectionRange(s+a.length,s+a.length+sel.length)}}
+function linePre(p,ph){return function(){var v=ta.value,s=ta.selectionStart,e=ta.selectionEnd,ls=v.lastIndexOf('\n',s-1)+1,le=v.indexOf('\n',e);if(le<0)le=v.length;
+  var seg=v.slice(ls,le)||ph,n=0;var r=seg.split('\n').map(function(x){n++;return (typeof p==='function'?p(n):p)+x.replace(/^(#{1,6}\s+|[-*+]\s+(\[[ xX]\]\s+)?|\d+\.\s+|>\s?)/,'')}).join('\n');
+  setText(r,ls,le);ta.setSelectionRange(ls,ls+r.length)}}
+function block(txt,off){return function(){var v=ta.value,s=ta.selectionStart,e=ta.selectionEnd,sel=v.slice(s,e),pre=(s>0&&v[s-1]!=='\n'?'\n\n':(s>1&&v[s-2]!=='\n'?'\n':'')),t=txt.replace('$',sel||'نص');setText(pre+t+'\n',s,e);var c=s+pre.length+(off==null?t.length:off);ta.setSelectionRange(c,c)}}
+var BTN=[
+ ['عريض','B',wrap('**','**','نص')],['مائل','I',wrap('*','*','نص')],['تمييز','==',wrap('==','==','نص')],
+ ['عنوان 2','H2',linePre('## ','عنوان')],['عنوان 3','H3',linePre('### ','عنوان')],
+ ['قائمة','•',linePre('- ','بند')],['قائمة مرقمة','1.',linePre(function(n){return n+'. '},'بند')],['مهمة','☑',linePre('- [ ] ','مهمة')],['اقتباس','❝',linePre('> ','اقتباس')],
+ ['جدول','▦',block('| العمود 1 | العمود 2 |\n| --- | --- |\n| $ |  |',null)],['كود','</>',block('```\n$\n```',null)],['فاصل','—',block('---',null)],
+ ['رابط','🔗',function(){var s=ta.selectionStart,e=ta.selectionEnd,sel=ta.value.slice(s,e)||'نص الرابط';setText('['+sel+'](https://)',s,e);var p=s+sel.length+3;ta.setSelectionRange(p,p+8)}]
+];
+BTN.forEach(function(b){var x=D.createElement('button');x.type='button';x.className='mkx-b';x.textContent=b[1];x.setAttribute('aria-label',b[0]);x.title=b[0];
+  x.addEventListener('mousedown',function(e){e.preventDefault()});x.addEventListener('click',function(){if(composing)return;try{b[2]()}catch(err){}});tb.appendChild(x)});
+var cb=D.createElement('select');cb.className='mkx-b mkx-sel';cb.setAttribute('aria-label','إدراج تنبيه ملوّن');
+cb.innerHTML='<option value="">تنبيه…</option>'+CAL.map(function(c){return '<option value="'+c[0]+'">'+c[1]+'</option>'}).join('');
+cb.addEventListener('change',function(){var k=cb.value;cb.value='';if(!k||composing)return;block('> [!'+k.toUpperCase()+']\n> $',null)();});
+tb.appendChild(cb);
+bar.parentNode.insertBefore(tb,bar.nextSibling);
+/* health check button */
+var hb=D.createElement('button');hb.type='button';hb.className='ed-chip mkx-health';hb.innerHTML='<span>فحص وإصلاح Markdown</span><b class="mkx-n" hidden></b>';
+bar.insertBefore(hb,bar.querySelector('#clearBtn'));
+var sheet=D.createElement('div');sheet.className='mkx-sheet';sheet.hidden=true;sheet.setAttribute('role','dialog');sheet.setAttribute('aria-label','فحص Markdown');
+sheet.innerHTML='<div class="mkx-card"><div class="mkx-h"><b>فحص Markdown</b><button type="button" class="mkx-x" aria-label="إغلاق">×</button></div><div class="mkx-sub"></div><div class="mkx-list"></div><div class="mkx-f"><button type="button" class="mkx-go">إصلاح الكل</button><button type="button" class="mkx-un" hidden>تراجع</button></div><label class="mkx-pt"><input type="checkbox"> تنظيف تلقائي عند اللصق</label></div>';
+D.body.appendChild(sheet);undoBtn=sheet.querySelector('.mkx-un');
+var list=sheet.querySelector('.mkx-list'),sub=sheet.querySelector('.mkx-sub'),pt=sheet.querySelector('.mkx-pt input'),cur=null;
+function scan(){cur=normalizeMarkdown(ta.value);return cur}
+function esc(x){return String(x).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})}
+function paint(){var r=scan(),c=r.changes;sub.textContent=c.length?('وُجدت '+c.length+' ملاحظة'):'النص سليم، لا توجد مشاكل.';
+  list.innerHTML=c.slice(0,200).map(function(x,i){return '<div class="mkx-it"><div><b>'+(x.line?('سطر '+x.line+': '):'')+'</b>'+esc(x.msg)+(x.from!=null?'<div class="mkx-df" dir="auto"><s>'+esc(x.from.slice(0,80))+'</s><br><span>'+esc((x.to||'').slice(0,80))+'</span></div>':'')+'</div><div class="mkx-ac">'+(x.line?'<button type="button" data-j="'+i+'">اذهب</button>':'')+(x.from!=null?'<button type="button" data-f="'+i+'">أصلح</button>':'')+'</div></div>'}).join('');
+  sheet.querySelector('.mkx-go').disabled=!c.length;var n=hb.querySelector('.mkx-n');n.hidden=!c.length;n.textContent=c.length>99?'99+':c.length;showUndo()}
+function gotoLine(n){var v=ta.value.split('\n'),p=0,i;for(i=0;i<n-1&&i<v.length;i++)p+=v[i].length+1;ta.focus();ta.setSelectionRange(p,p+(v[n-1]||'').length);var lh=parseFloat(getComputedStyle(ta).lineHeight)||24;ta.scrollTop=Math.max(0,(n-3)*lh)}
+function open(){paint();sheet.hidden=false;pt.checked=lsg('-mdx-paste','0')==='1'}
+function close(){sheet.hidden=true}
+hb.addEventListener('click',open);
+sheet.addEventListener('click',function(e){
+  if(e.target===sheet||e.target.classList.contains('mkx-x')){close();return}
+  var b=e.target.closest('button');if(!b)return;
+  if(b.classList.contains('mkx-go')){var r=scan();if(r.changes.length){replaceAll(r.text);say('تم إصلاح '+r.changes.length+' ملاحظة')}paint();return}
+  if(b.classList.contains('mkx-un')){if(lastUndo!==null){setText(lastUndo,0,ta.value.length);lastUndo=null;say('تم التراجع')}paint();return}
+  if(b.dataset.j!=null){var c=cur.changes[+b.dataset.j];close();gotoLine(c.line);return}
+  if(b.dataset.f!=null){var c2=cur.changes[+b.dataset.f],v=ta.value.split('\n');
+    if(c2.from!=null&&v[c2.line-1]!==undefined){var cand=v[c2.line-1].replace(/[\u200B\u2060\uFEFF]/g,'').replace(/\u00A0/g,' ');
+      if(v[c2.line-1]===c2.from||cand===c2.from){lastUndo=ta.value;v[c2.line-1]=c2.to;replaceAll2(v.join('\n'))}}paint()}});
+function replaceAll2(t){var old=ta.value;lastUndo=old;setText(t,0,ta.value.length);showUndo()}
+pt.addEventListener('change',function(){lss('-mdx-paste',pt.checked?'1':'0')});
+D.addEventListener('keydown',function(e){if(e.key==='Escape'&&!sheet.hidden)close()});
+/* smart paste (opt-in, never blocks plain paste) */
+ta.addEventListener('paste',function(e){try{
+  if(lsg('-mdx-paste','0')!=='1')return;
+  var t=e.clipboardData&&e.clipboardData.getData('text/plain');if(!t)return;
+  var r=normalizeMarkdown(t);if(!r.changes.length)return;
+  e.preventDefault();var s=ta.selectionStart,en=ta.selectionEnd;setText(r.text.replace(/\n$/,''),s,en);say('تم تنظيف النص الملصوق ('+r.changes.length+')');
+}catch(_){}});
+ta.addEventListener('input',function(){clearTimeout(ta.__mkx);ta.__mkx=setTimeout(function(){try{var n=normalizeMarkdown(ta.value).changes.length,b=hb.querySelector('.mkx-n');b.hidden=!n;b.textContent=n>99?'99+':n}catch(_){}},700)});
+}catch(err){try{console.error('MK-MDX',err)}catch(_){}}})();
+</script>
+<script id="mk-mdx2-script">
+(function(){try{
+'use strict';
+var D=document,ta=D.getElementById('markdownInput'),tb=D.querySelector('.mkx-tb'),shared=window.MKMDX;
+if(!ta||!tb||!shared) return;
+var KEY='refaie-minimal-study-v1';
+var tt=0,toast=D.querySelector('.mkx-toast');
+function say(m){if(!toast)return;toast.textContent=m;toast.classList.add('on');clearTimeout(tt);tt=setTimeout(function(){toast.classList.remove('on')},2400)}
+function setText(txt,s,e){ta.focus();ta.setSelectionRange(s,e);var ok=false;try{ok=D.execCommand('insertText',false,txt)}catch(_){}
+  if(!ok){ta.setRangeText(txt,s,e,'end');ta.dispatchEvent(new Event('input',{bubbles:true}))}}
+function esc(x){return String(x).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})}
+function mkSheet(title,body){var s=D.createElement('div');s.className='mkx-sheet';s.hidden=true;s.setAttribute('role','dialog');s.setAttribute('aria-label',title);
+  s.innerHTML='<div class="mkx-card"><div class="mkx-h"><b>'+title+'</b><button type="button" class="mkx-x" aria-label="إغلاق">×</button></div>'+body+'</div>';D.body.appendChild(s);
+  s.addEventListener('click',function(e){if(e.target===s||e.target.classList.contains('mkx-x'))s.hidden=true});return s}
+D.addEventListener('keydown',function(e){if(e.key==='Escape')D.querySelectorAll('.mkx-sheet').forEach(function(s){s.hidden=true})});
+function addBtn(label,txt,fn){var x=D.createElement('button');x.type='button';x.className='mkx-b mkx-w';x.textContent=txt;x.title=label;x.setAttribute('aria-label',label);
+  x.addEventListener('mousedown',function(e){e.preventDefault()});x.addEventListener('click',function(){try{fn()}catch(err){say('تعذّر تنفيذ الأمر')}});tb.appendChild(x);return x}
+function lineAt(pos){var v=ta.value,s=v.lastIndexOf('\n',pos-1)+1,e=v.indexOf('\n',pos);if(e<0)e=v.length;return [s,e]}
+function gotoLine(n){var v=ta.value.split('\n'),p=0,i;for(i=0;i<n&&i<v.length;i++)p+=v[i].length+1;ta.focus();ta.setSelectionRange(p,p+(v[n]||'').length);var lh=parseFloat(getComputedStyle(ta).lineHeight)||24;ta.scrollTop=Math.max(0,(n-3)*lh)}
+
+/* ===== table helper ===== */
+function splitRow(x){x=x.trim();if(x[0]==='|')x=x.slice(1);if(x.slice(-1)==='|'&&x.slice(-2)!=='\\|')x=x.slice(0,-1);var o=[],c='',i;for(i=0;i<x.length;i++){if(x[i]==='\\'&&x[i+1]==='|'){c+='\\|';i++}else if(x[i]==='|'){o.push(c.trim());c=''}else c+=x[i]}o.push(c.trim());return o}
+function isDivRow(c){return c.length>0&&c.every(function(k){return /^:?-+:?$/.test(k)})}
+function toRow(c){return '| '+c.join(' | ')+' |'}
+function findTable(){var v=ta.value.split('\n'),p=ta.selectionStart,ln=v.slice(0,0).length,acc=0,i,cur=0;
+  for(i=0;i<v.length;i++){if(p<=acc+v[i].length){cur=i;break}acc+=v[i].length+1;cur=i}
+  if(v[cur].indexOf('|')<0)return null;var a=cur,b=cur;while(a>0&&v[a-1].indexOf('|')>-1)a--;while(b<v.length-1&&v[b+1].indexOf('|')>-1)b++;
+  var rows=v.slice(a,b+1).map(splitRow);if(rows.length<2||!isDivRow(rows[1]))return null;
+  var before=v[cur].slice(0,p-acc),col=Math.max(0,(before.replace(/\\\|/g,'').match(/\|/g)||[]).length-(/^\s*\|/.test(v[cur])?1:0));
+  return {a:a,b:b,cur:cur,rows:rows,col:Math.min(col,rows[0].length-1),lines:v}}
+function writeTable(t){var n=t.rows[0].length;t.rows=t.rows.map(function(r,i){r=r.slice(0,n);while(r.length<n)r.push(i===1?'---':'');return r});
+  var txt=t.rows.map(toRow).join('\n'),v=t.lines,s=0,i;for(i=0;i<t.a;i++)s+=v[i].length+1;var e=s;for(i=t.a;i<=t.b;i++)e+=v[i].length+(i<t.b?1:0);setText(txt,s,e)}
+function convertSel(){var s=ta.selectionStart,e=ta.selectionEnd;if(s===e){say('حدّد النص المراد تحويله أولًا');return}
+  var raw=ta.value.slice(s,e).replace(/\r/g,''),L=raw.split('\n').filter(function(x){return x.trim()});if(L.length<1)return;
+  var d=raw.indexOf('\t')>-1?'\t':(L.every(function(x){return x.indexOf(',')>-1})?',':(L.every(function(x){return x.indexOf(';')>-1})?';':null));
+  var rows=L.map(function(x){return d?x.split(d).map(function(c){return c.trim().replace(/\|/g,'\\|')}):x.trim().split(/\s{2,}/)});
+  var n=Math.max.apply(null,rows.map(function(r){return r.length}));if(n<2){say('لم أجد أعمدة (استخدم Tab أو فاصلة)');return}
+  rows=rows.map(function(r){while(r.length<n)r.push('');return r});
+  var div=[];for(var i=0;i<n;i++)div.push('---');var out=[rows[0],div].concat(rows.slice(1)).map(toRow).join('\n');setText(out,s,e)}
+var tsheet=mkSheet('أدوات الجدول','<div class="mkx-sub">ضع المؤشر داخل جدول ثم اختر الأمر.</div><div class="mkx-grid"></div>');
+var grid=tsheet.querySelector('.mkx-grid');
+function tbtn(label,fn){var b=D.createElement('button');b.type='button';b.textContent=label;b.addEventListener('click',function(){var t=findTable();
+  if(label!=='تحويل المحدد إلى جدول'&&!t){say('المؤشر ليس داخل جدول');return}tsheet.hidden=true;try{fn(t)}catch(_){say('تعذّر التنفيذ')}});grid.appendChild(b)}
+tbtn('تحويل المحدد إلى جدول',function(){convertSel()});
+tbtn('+ صف',function(t){var r=[];for(var i=0;i<t.rows[0].length;i++)r.push('');t.rows.splice(Math.max(2,t.cur-t.a+1),0,r);writeTable(t)});
+tbtn('+ عمود',function(t){t.rows.forEach(function(r,i){r.splice(t.col+1,0,i===1?'---':'')});writeTable(t)});
+tbtn('− صف',function(t){var k=t.cur-t.a;if(k<2){say('لا يمكن حذف الترويسة');return}t.rows.splice(k,1);writeTable(t)});
+tbtn('− عمود',function(t){if(t.rows[0].length<2){say('عمود واحد فقط');return}t.rows.forEach(function(r){r.splice(t.col,1)});t.col=Math.max(0,t.col-1);writeTable(t)});
+[['محاذاة لليمين',function(x){return x.replace(/:/g,'')+':'}],['محاذاة للوسط',function(x){return ':'+x.replace(/:/g,'')+':'}],['محاذاة لليسار',function(x){return ':'+x.replace(/:/g,'')}]].forEach(function(a){
+  tbtn(a[0],function(t){t.rows[1][t.col]=a[1](t.rows[1][t.col]||'---');writeTable(t)})});
+addBtn('أدوات الجدول','⊞ جدول',function(){tsheet.hidden=false});
+
+/* ===== outline ===== */
+var osheet=mkSheet('فهرس العناوين','<div class="mkx-list mkx-ol"></div>'),ol=osheet.querySelector('.mkx-ol');
+function outline(){var v=ta.value.split('\n'),f=null,o=[],m,i;for(i=0;i<v.length;i++){var l=v[i],fm=l.match(/^\s*(```|~~~)/);if(f){if(fm&&fm[1]===f)f=null;continue}if(fm){f=fm[1];continue}
+  if((m=l.match(/^(#{1,6})\s+(.*?)(?:\s+#+)?\s*$/)))o.push({l:i,n:m[1].length,t:m[2].replace(/[*_`=~]/g,'')})}return o}
+addBtn('فهرس العناوين','☰ فهرس',function(){var o=outline();ol.innerHTML=o.length?o.map(function(h){return '<button type="button" class="mkx-oi" data-l="'+h.l+'" style="padding-inline-start:'+(8+(h.n-1)*14)+'px" dir="auto">'+esc(h.t||'(بدون عنوان)')+'</button>'}).join(''):'<div class="mkx-sub">لا توجد عناوين بعد.</div>';osheet.hidden=false});
+ol.addEventListener('click',function(e){var b=e.target.closest('.mkx-oi');if(!b)return;osheet.hidden=true;gotoLine(+b.dataset.l)});
+
+/* ===== find / replace (plain text by default) ===== */
+var fsheet=mkSheet('بحث واستبدال','<div class="mkx-fr"><input type="text" class="mkx-fi" placeholder="ابحث عن…" dir="auto" aria-label="نص البحث"><input type="text" class="mkx-ri" placeholder="استبدل بـ…" dir="auto" aria-label="نص الاستبدال"><div class="mkx-sub mkx-cnt" role="status"></div><label class="mkx-pt"><input type="checkbox" class="mkx-cs"> مطابقة حالة الأحرف</label><label class="mkx-pt"><input type="checkbox" class="mkx-rx"> تعبير نمطي (متقدّم)</label><div class="mkx-grid"><button type="button" data-a="prev">السابق</button><button type="button" data-a="next">التالي</button><button type="button" data-a="rep">استبدال</button><button type="button" data-a="all">استبدال الكل</button></div></div>');
+var fi=fsheet.querySelector('.mkx-fi'),ri=fsheet.querySelector('.mkx-ri'),cnt=fsheet.querySelector('.mkx-cnt'),cs=fsheet.querySelector('.mkx-cs'),rx=fsheet.querySelector('.mkx-rx');
+function re(){var q=fi.value;if(!q)return null;try{var src=rx.checked?q:q.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');if(src.length>500)return null;return new RegExp(src,'g'+(cs.checked?'':'i')+'u')}catch(_){return null}}
+function matches(){var r=re(),v=ta.value,o=[],m;if(!r)return o;r.lastIndex=0;while((m=r.exec(v))&&o.length<5000){if(m[0]==='')r.lastIndex++;else o.push([m.index,m.index+m[0].length])}return o}
+function upd(){var q=fi.value,r=re();if(!q){cnt.textContent='';return}if(!r){cnt.textContent='تعبير غير صالح';return}var n=matches().length;cnt.textContent=n?('عدد النتائج: '+n):'لا نتائج'}
+['input','change'].forEach(function(ev){fsheet.addEventListener(ev,upd)});
+function go(dir){var m=matches();if(!m.length){upd();return}var p=dir>0?ta.selectionEnd:ta.selectionStart-1,i;
+  var pick=null;if(dir>0){for(i=0;i<m.length;i++)if(m[i][0]>=ta.selectionEnd&&!(m[i][0]===ta.selectionStart&&m[i][1]===ta.selectionEnd)){pick=m[i];break}pick=pick||m[0]}
+  else{for(i=m.length-1;i>=0;i--)if(m[i][1]<=ta.selectionStart){pick=m[i];break}pick=pick||m[m.length-1]}
+  ta.focus();ta.setSelectionRange(pick[0],pick[1]);var ln=ta.value.slice(0,pick[0]).split('\n').length,lh=parseFloat(getComputedStyle(ta).lineHeight)||24;ta.scrollTop=Math.max(0,(ln-4)*lh)}
+fsheet.addEventListener('click',function(e){var b=e.target.closest('[data-a]');if(!b)return;var a=b.dataset.a,r=re();if(!r){upd();return}
+  if(a==='next'||a==='prev'){fsheet.hidden=true;go(a==='next'?1:-1);setTimeout(function(){fsheet.hidden=false;ta.blur()},0);return}
+  if(a==='rep'){var s=ta.selectionStart,en=ta.selectionEnd,sel=ta.value.slice(s,en);r.lastIndex=0;var whole=new RegExp('^(?:'+r.source+')$',r.flags.replace('g',''));
+    if(sel&&whole.test(sel)){setText(sel.replace(new RegExp(r.source,r.flags.replace('g','')),ri.value),s,en)}go(1);upd();return}
+  if(a==='all'){var n=matches().length;if(!n)return;var old=ta.value;setText(old.replace(r,function(){return ri.value}),0,old.length);say('تم استبدال '+n+' (يمكنك التراجع)');upd()}});
+addBtn('بحث واستبدال','🔍 بحث',function(){var s=ta.value.slice(ta.selectionStart,ta.selectionEnd);if(s&&s.length<80&&s.indexOf('\n')<0)fi.value=s;fsheet.hidden=false;upd();setTimeout(function(){fi.focus()},50)});
+
+/* ===== import / export .md ===== */
+var fin=D.createElement('input');fin.type='file';fin.accept='.md,.markdown,.txt,text/markdown,text/plain';fin.hidden=true;D.body.appendChild(fin);
+fin.addEventListener('change',function(){var f=fin.files&&fin.files[0];fin.value='';if(!f)return;if(f.size>5*1024*1024){say('الملف كبير جدًا');return}
+  var rd=new FileReader();rd.onload=function(){var t=String(rd.result||'');if(ta.value.trim()&&!confirm('سيُستبدل النص الحالي بمحتوى الملف (يمكنك التراجع). متابعة؟'))return;setText(t,0,ta.value.length);say('تم فتح الملف')};rd.onerror=function(){say('تعذّرت قراءة الملف')};rd.readAsText(f,'utf-8')});
+addBtn('فتح ملف Markdown','📂 فتح',function(){fin.click()});
+addBtn('حفظ كملف Markdown','💾 حفظ',function(){var t=ta.value;if(!t.trim()){say('لا يوجد نص للحفظ');return}
+  var m=t.match(/^#{1,6}\s+(.+)$/m),name=((m&&m[1]||'مذاكرتي').replace(/[\\\/:*?"<>|#=`~]/g,'').trim().slice(0,60)||'مذاكرتي')+'.md';
+  var u=URL.createObjectURL(new Blob(['\ufeff'+t],{type:'text/markdown;charset=utf-8'})),a=D.createElement('a');a.href=u;a.download=name;a.style.display='none';D.body.appendChild(a);a.click();setTimeout(function(){a.remove();URL.revokeObjectURL(u)},1500);say('تم الحفظ: '+name)});
+
+/* ===== copy rendered content as rich text ===== */
+addBtn('نسخ المحتوى منسّقًا','📋 نسخ منسق',function(){
+  var sb=D.getElementById('studyBtn'),eb=D.getElementById('editorBtn'),c=D.getElementById('content');if(!sb||!c||!ta.value.trim()){say('لا يوجد محتوى');return}
+  var y=window.scrollY;sb.click();
+  setTimeout(function(){try{
+    var cl=c.cloneNode(true);cl.removeAttribute('id');
+    cl.querySelectorAll('.mcq-toolbar,[data-mk-sheet],button,.cb').forEach(function(n){n.remove()});
+    cl.querySelectorAll('[style]').forEach(function(n){var st=n.getAttribute('style')||'',al=st.match(/text-align:\s*[a-z]+/);if(al)n.setAttribute('style',al[0]);else n.removeAttribute('style')});
+    cl.querySelectorAll('table').forEach(function(t){t.setAttribute('border','1');t.setAttribute('cellpadding','6');t.style.borderCollapse='collapse'});
+    cl.querySelectorAll('a').forEach(function(a){a.removeAttribute('target')});
+    var h=D.createElement('div');h.setAttribute('dir','rtl');h.style.cssText='position:fixed;top:0;left:0;opacity:0;pointer-events:none;width:600px;z-index:-1';h.appendChild(cl);D.body.appendChild(h);
+    var r=D.createRange();r.selectNodeContents(h);var sel=getSelection();sel.removeAllRanges();sel.addRange(r);
+    var ok=false;try{ok=D.execCommand('copy')}catch(_){}sel.removeAllRanges();h.remove();
+    if(eb)eb.click();setTimeout(function(){window.scrollTo(0,y)},60);
+    say(ok?'تم نسخ المحتوى منسّقًا':'تعذّر النسخ، جرّب من وضع المذاكرة');
+  }catch(err){if(eb)eb.click();say('تعذّر النسخ')}},350)});
+
+/* ===== reader: copy button on code blocks (no text node => ink fingerprints unchanged) ===== */
+var cont=D.getElementById('content');
+function decorate(){try{cont.querySelectorAll('pre:not([data-mkx])').forEach(function(p){p.setAttribute('data-mkx','1');var b=D.createElement('button');b.type='button';b.className='mkx-cp';b.setAttribute('aria-label','نسخ الكود');
+  b.addEventListener('click',function(e){e.stopPropagation();var code=p.querySelector('code'),t=code?code.textContent:p.textContent;
+    var done=function(){b.classList.add('ok');setTimeout(function(){b.classList.remove('ok')},1200)};
+    if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(t).then(done,function(){});else{var x=D.createElement('textarea');x.value=t;x.style.cssText='position:fixed;top:0;left:0;opacity:0';D.body.appendChild(x);x.select();try{D.execCommand('copy');done()}catch(_){}x.remove()}});
+  p.appendChild(b)})}catch(_){}}
+if(cont){var mq=0;new MutationObserver(function(){if(mq)return;mq=1;Promise.resolve().then(function(){mq=0;decorate()})}).observe(cont,{childList:true});decorate()}
+}catch(err){try{console.error('MK-MDX2',err)}catch(_){}}})();
+</script>
+<!-- MK-MDX:END -->
 </body>
 </html>
