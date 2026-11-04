@@ -1,5 +1,6 @@
 <!doctype html>
 <html lang="ar" dir="rtl">
+<!-- آخر تعديل: الأربعاء 4 نوفمبر 2026 - 08:33 صباحًا بتوقيت مصر (القاهرة) | تحسين أداء الممحاة -->
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
@@ -5509,15 +5510,50 @@ function paint(s,R,W){
   }
   cx.restore();
 }
+var CCv=null,CCk='',CCs=null,CCf=null,CCl=null,CCcur=null,CCe=0;
 function draw(){
   raf=0;KK=window.__czS?window.__czS():1;fit();cx.clearRect(0,0,innerWidth,innerHeight);
   if(!readerOn())return;
   var R=reader.getBoundingClientRect(),W=R.width;if(W<10)return;
   ymap(R);lay(R);
-  cx.save();cx.beginPath();cx.rect(R.left,R.top,R.width,R.height);cx.clip();
-  for(var i=0;i<S.strokes.length;i++)paint(S.strokes[i],R,W);
-  if(S.cur)paint(S.cur,R,W);
-  cx.restore();
+  if((S.cur||(drag&&!drag.sh&&S.tool==='e'))&&S.strokes.length>1){
+    /* PERF: while drawing/erasing, committed strokes are rendered once into a cache; each frame only blits it + paints the live stroke */
+    var dprC=Math.min(window.devicePixelRatio||1,2),sg=YM?(fy(0)+','+fy(777)+','+fy(9999)):'';
+    var kC=[cv.width,cv.height,R.left,R.top,W,KK,LV,sg,S.strokes.length].join('|');
+    var xc;if(!CCv)CCv=document.createElement('canvas');
+    if(CCk!==kC||CCs!==S.strokes||CCf!==S.strokes[0]||CCl!==S.strokes[S.strokes.length-1]){
+      if(CCv.width!==cv.width||CCv.height!==cv.height){CCv.width=cv.width;CCv.height=cv.height}
+      var rc=cx;xc=CCv.getContext('2d');xc.setTransform(1,0,0,1,0,0);xc.clearRect(0,0,CCv.width,CCv.height);xc.setTransform(dprC,0,0,dprC,0,0);CCe=0;CCcur=null;
+      cx=xc;
+      try{cx.save();cx.beginPath();cx.rect(R.left,R.top,R.width,R.height);cx.clip();
+        for(var j=0;j<S.strokes.length;j++)paint(S.strokes[j],R,W);
+        cx.restore()}finally{cx=rc}
+      CCk=kC;CCs=S.strokes;CCf=S.strokes[0];CCl=S.strokes[S.strokes.length-1];
+    }
+    xc=CCv.getContext('2d');
+    if(S.cur&&S.cur.t==='e'){   /* pixel eraser: apply only the NEW segments to the cache (O(new points) per frame) */
+      if(CCcur!==S.cur){CCcur=S.cur;CCe=0}
+      var pe=S.cur.p,ne=pe.length>>1;
+      if(ne>CCe){
+        var dz=S.cur._d||0;
+        xc.save();xc.setTransform(dprC,0,0,dprC,0,0);xc.beginPath();xc.rect(R.left,R.top,R.width,R.height);xc.clip();
+        xc.globalCompositeOperation='destination-out';xc.lineCap='round';xc.lineJoin='round';xc.lineWidth=S.cur.w*KK;xc.strokeStyle='#000';xc.fillStyle='#000';
+        if(CCe===0){xc.beginPath();xc.arc(R.left+pe[0]*W,R.top+fy((pe[1]+dz)*W),S.cur.w*KK/2,0,6.2832);xc.fill()}
+        if(ne>1){xc.beginPath();var i0=Math.max(CCe-1,0);xc.moveTo(R.left+pe[i0*2]*W,R.top+fy((pe[i0*2+1]+dz)*W));
+          for(var ie=i0+1;ie<ne;ie++)xc.lineTo(R.left+pe[ie*2]*W,R.top+fy((pe[ie*2+1]+dz)*W));xc.stroke()}
+        xc.restore();CCe=ne;
+      }
+      cx.save();cx.setTransform(1,0,0,1,0,0);cx.drawImage(CCv,0,0);cx.restore();
+    }else{
+      cx.save();cx.setTransform(1,0,0,1,0,0);cx.drawImage(CCv,0,0);cx.restore();
+      if(S.cur){cx.save();cx.beginPath();cx.rect(R.left,R.top,R.width,R.height);cx.clip();paint(S.cur,R,W);cx.restore()}
+    }
+  }else{
+    cx.save();cx.beginPath();cx.rect(R.left,R.top,R.width,R.height);cx.clip();
+    for(var i=0;i<S.strokes.length;i++)paint(S.strokes[i],R,W);
+    if(S.cur)paint(S.cur,R,W);
+    cx.restore();
+  }
   if(S.ring){cx.save();cx.beginPath();cx.arc(S.ring.x,S.ring.y,S.ring.r,0,6.2832);cx.lineWidth=1.5;cx.strokeStyle='rgba(120,130,150,.95)';cx.stroke();cx.restore()}
 }
 
@@ -5527,6 +5563,12 @@ function segDist(px,py,ax,ay,bx,by){var dx=bx-ax,dy=by-ay,l=dx*dx+dy*dy,t=l?((px
 function hit(s,x,y,R,rad){
   var W=R.width,p=s.p,n=p.length>>1,th=rad+s.w*KK/2;if(n<1)return false;
   function X(i){return R.left+p[i*2]*W}function Y(i){return R.top+fy((p[i*2+1]+(s._d||0))*W)}
+  if(!YM){  /* PERF: cheap bbox reject (skipped when sheets remap the y-axis) */
+    var bb=s._bb;
+    if(!bb||bb.n!==n){var a0=1e9,a1=-1e9,b0=1e9,b1=-1e9;for(var u=0;u<n;u++){var ux=p[u*2],uy=p[u*2+1];if(ux<a0)a0=ux;if(ux>a1)a1=ux;if(uy<b0)b0=uy;if(uy>b1)b1=uy}bb=s._bb={n:n,x0:a0,x1:a1,y0:b0,y1:b1}}
+    var mg=th+((s.t==='p'||s.t==='m')?2:80*KK+s.w*KK*5),dd=s._d||0;
+    if(x<R.left+bb.x0*W-mg||x>R.left+bb.x1*W+mg||y<R.top+(bb.y0+dd)*W-mg||y>R.top+(bb.y1+dd)*W+mg)return false;
+  }
   if(s.t==='p'||s.t==='m'){
     if(n===1)return Math.hypot(x-X(0),y-Y(0))<=th;
     for(var i=0;i<n-1;i++)if(segDist(x,y,X(i),Y(i),X(i+1),Y(i+1))<=th)return true;return false;
@@ -5701,7 +5743,7 @@ function eraseAt(e,R){
   var rad=width()/2,keep=[],gone=false;
   for(var i=0;i<S.strokes.length;i++){var s=S.strokes[i];
     if(s.t!=='e'&&hit(s,e.clientX,e.clientY,R,rad)){gone=true}else keep.push(s)}
-  if(gone){if(!drag.del){hpush(drag.pre);drag.del=true}S.strokes=keep;upd();save()}
+  if(gone){if(!drag.del){hpush(drag.pre);drag.del=true}S.strokes=keep;req()}
 }
 function panMoveEvt(e){
   if(e.pointerType==='touch'&&touches[e.pointerId]){
@@ -5727,7 +5769,7 @@ cv.addEventListener('pointermove',function(e){
     if(S.tool==='e'&&S.eras==='stroke'){eraseAt(ev,R);continue}
     var q=pt(ev,R),p=S.cur.p,n=p.length;
     if(S.tool==='p'||S.tool==='m'||S.tool==='e'){
-      if(Math.hypot((q[0]-p[n-2])*R.width,(q[1]-p[n-1])*R.width)>=1.2){p.push(q[0],q[1]);if(S.cur.q){var pv=window.MKSH2?MKSH2.pq(ev):-1;S.cur.q.push(pv>=0?pv:S.cur.q[S.cur.q.length-1])}}
+      if(Math.hypot((q[0]-p[n-2])*R.width,(q[1]-p[n-1])*R.width)>=(S.tool==='e'?Math.max(1.5,S.cur.w*KK*.18):1.2)){p.push(q[0],q[1]);if(S.cur.q){var pv=window.MKSH2?MKSH2.pq(ev):-1;S.cur.q.push(pv>=0?pv:S.cur.q[S.cur.q.length-1])}}
     }else{ if(n===2)p.push(q[0],q[1]);else{p[2]=q[0];p[3]=q[1]} }
   }
   req();
@@ -5737,6 +5779,7 @@ function finish(e){
   var d=drag;drag=null;S.ring=null;
   try{cv.releasePointerCapture(d.id)}catch(_){}
   if(d.sh){var Q2=window.MKSheets;if(Q2&&Q2.up)Q2.up(e,!!(e&&e.type==='pointercancel'));upd();req();return}
+  if(d.del)save();
   if(S.cur){
     var c=S.cur,n=c.p.length>>1,ok=true;S.cur=null;
     if(c.t==='l'||c.t==='a'||c.t==='c'){
@@ -7380,6 +7423,20 @@ function drawSheet(id){
   if(!sh.s.length&&!w.cur){releaseCanvas(w);return}
   if(!sizeCanvas(w))return;
   var Wd=w.paper.offsetWidth;w.ctx.clearRect(0,0,Wd,w.paper.offsetHeight);
+  if(w.cur&&sh.s.length>1){   /* PERF: committed strokes cached while a stroke is being drawn/erased */
+    var ck=w.cvs.width+'x'+w.cvs.height+'|'+Wd+'|'+sh.s.length;
+    if(!w.cc)w.cc=document.createElement('canvas');
+    if(w.ccK!==ck||w.ccS!==sh.s||w.ccF!==sh.s[0]||w.ccL!==sh.s[sh.s.length-1]){
+      if(w.cc.width!==w.cvs.width||w.cc.height!==w.cvs.height){w.cc.width=w.cvs.width;w.cc.height=w.cvs.height}
+      var c2=w.cc.getContext('2d');c2.setTransform(1,0,0,1,0,0);c2.clearRect(0,0,w.cc.width,w.cc.height);c2.setTransform(w.ctx.getTransform());
+      for(var j=0;j<sh.s.length;j++){if(window.MKMED&&MKMED.vis&&!MKMED.vis(sh,sh.s[j]))continue;paintStroke(c2,sh.s[j],Wd)}
+      w.ccK=ck;w.ccS=sh.s;w.ccF=sh.s[0];w.ccL=sh.s[sh.s.length-1];
+    }
+    w.ctx.save();w.ctx.setTransform(1,0,0,1,0,0);w.ctx.drawImage(w.cc,0,0);w.ctx.restore();
+    paintStroke(w.ctx,w.cur,Wd);
+    return;
+  }
+  if(w.cc){w.cc.width=w.cc.height=1;w.cc=null;w.ccK='';w.ccS=null}
   for(var i=0;i<sh.s.length;i++){if(window.MKMED&&MKMED.vis&&!MKMED.vis(sh,sh.s[i]))continue;paintStroke(w.ctx,sh.s[i],Wd)}
   if(w.cur)paintStroke(w.ctx,w.cur,Wd);
 }
@@ -7766,8 +7823,8 @@ function rdp(p,eps){
     if(md>eps&&mi>0){keep[mi]=1;st.push([s,mi],[mi,e])}}
   var o=[],ix=[];for(i=0;i<n;i++)if(keep[i]){o.push(p[i*2],p[i*2+1]);ix.push(i)}rdp.ix=ix;return o;
 }
-function eraseAtSheet(e){
-  var g=G,r=g.w.paper.getBoundingClientRect(),Wd=r.width,x=e.clientX-r.left,y=e.clientY-r.top,rad=K.width()/2,keep=[],gone=false;
+function eraseAtSheet(e,r0){
+  var g=G,r=r0||g.w.paper.getBoundingClientRect(),Wd=r.width,x=e.clientX-r.left,y=e.clientY-r.top,rad=K.width()/2,keep=[],gone=false;
   for(var i=0;i<g.sh.s.length;i++){var s=g.sh.s[i];if(s.t!=='e'&&(!window.MKMED||!MKMED.vis||MKMED.vis(g.sh,s))&&hitStroke(s,x,y,rad,Wd))gone=true;else keep.push(s)}
   if(gone){g.del=true;g.sh.s=keep;redraw(g.sh.id);save()}
 }
@@ -7787,10 +7844,10 @@ function moveStroke(evs){
   var r=g.w.paper.getBoundingClientRect(),Wd=r.width||1;
   for(var k=0;k<evs.length;k++){var ev=evs[k];
     if(S.ring){S.ring.x=ev.clientX;S.ring.y=ev.clientY}
-    if(S.tool==='e'&&S.eras==='stroke'){eraseAtSheet(ev);continue}
+    if(S.tool==='e'&&S.eras==='stroke'){eraseAtSheet(ev,r);continue}
     if(!g.cur)continue;
     var qx=(ev.clientX-r.left)/Wd,qy=(ev.clientY-r.top)/Wd,p=g.cur.p,n=p.length;
-    if(g.cur.t==='p'||g.cur.t==='m'||g.cur.t==='e'){if(Math.hypot((qx-p[n-2])*Wd,(qy-p[n-1])*Wd)>=1.2){p.push(qx,qy);if(g.cur.q){var pv=MKSH2.pq(ev);g.cur.q.push(pv>=0?pv:g.cur.q[g.cur.q.length-1])}}}
+    if(g.cur.t==='p'||g.cur.t==='m'||g.cur.t==='e'){if(Math.hypot((qx-p[n-2])*Wd,(qy-p[n-1])*Wd)>=(g.cur.t==='e'?Math.max(1.5,g.cur.w*.18):1.2)){p.push(qx,qy);if(g.cur.q){var pv=MKSH2.pq(ev);g.cur.q.push(pv>=0?pv:g.cur.q[g.cur.q.length-1])}}}
     else{if(n===2)p.push(qx,qy);else{p[2]=qx;p[3]=qy}}
   }
   redraw(g.sh.id);K.req();
