@@ -740,7 +740,7 @@ html.app-night .pe-sh{box-shadow:0 -10px 30px rgba(0,0,0,.5)}
           <span id="edCount" class="ed-count" aria-live="off">0 كلمة · 0 حرف</span>
         </div>
         <!-- MK-LASTMOD:START (AI agents: on EVERY edit of this file set LAST_MODIFIED_DATE = Egypt date YYYY-MM-DD, LAST_MODIFIED_TIME = Egypt time 12-hour hh:mm (Africa/Cairo), LAST_MODIFIED_AMPM = صباحًا or مساءً with the matching (AM)/(PM). The Hijri date fills itself from the date. Do not touch the script.) -->
-        <div id="mkLastMod" class="mk-lastmod" dir="rtl"><div class="mk-lm-l1"><span class="mk-lm-flag" aria-hidden="true">🇪🇬</span> <span>آخر تعديل:</span> <b id="mkLastModDate" data-var="LAST_MODIFIED_DATE">2026-11-12</b> <span>الساعة</span> <b id="mkLastModTime" data-var="LAST_MODIFIED_TIME">09:00</b> <span id="mkLastModAP" data-var="LAST_MODIFIED_AMPM">صباحًا (AM)</span></div><div id="mkLastModHijri" class="mk-lm-l2" hidden></div></div>
+        <div id="mkLastMod" class="mk-lastmod" dir="rtl"><div class="mk-lm-l1"><span class="mk-lm-flag" aria-hidden="true">🇪🇬</span> <span>آخر تعديل:</span> <b id="mkLastModDate" data-var="LAST_MODIFIED_DATE">2026-11-14</b> <span>الساعة</span> <b id="mkLastModTime" data-var="LAST_MODIFIED_TIME">06:58</b> <span id="mkLastModAP" data-var="LAST_MODIFIED_AMPM">مساءً (PM)</span></div><div id="mkLastModHijri" class="mk-lm-l2" hidden></div></div>
         <style id="mk-lastmod-css">.mk-lastmod{margin:8px 0 0;padding:7px 12px;border:1px solid var(--line,#ccc);border-radius:10px;background:var(--surface-2,transparent);color:var(--muted,inherit);font:inherit;font-size:13px;text-align:center;line-height:1.8}.mk-lastmod b{color:var(--text,inherit);font-weight:700;unicode-bidi:isolate;direction:ltr;display:inline-block;white-space:nowrap}.mk-lm-l2{margin-top:1px;font-size:12.5px;color:var(--muted,inherit)}.mk-lm-l2[hidden]{display:none}.mk-lm-flag{font-size:15px}</style>
         <script id="mk-lastmod-script">
         /* Hijri date for the Egypt stamp date. Never blocks the page: shows instantly from local data, then upgrades from a free API (aladhan.com) if reachable. */
@@ -11144,6 +11144,11 @@ body.nt-on #mkSelCv{display:block}
 .nt-bar .nt-seg button{padding-inline:4px;font-size:11.5px}
 body:has(#pageModal:not(.hidden)) :is(#mkSelBar,#mkSelHint,#mkSelCv,#mkSelToast),body:has(#coverModal:not(.hidden)) :is(#mkSelBar,#mkSelHint,#mkSelCv,#mkSelToast),body.pdf-busy :is(#mkSelBar,#mkSelHint,#mkSelCv,#mkSelToast),.pdf-page :is(#mkSelBar,#mkSelHint,#mkSelCv,#mkSelToast){visibility:hidden!important}
 @media print{#mkSelBar,#mkSelHint,#mkSelCv,#mkSelToast{display:none!important}.mk-note.mk-sel{outline:0}}
+#mkSelBar .mks-del:disabled{opacity:.45;cursor:default;filter:saturate(.5)}
+#mkSelBar .mks-rst[hidden],#mkSelHint .mks-rst[hidden]{display:none}
+#mkSelBar .mks-rst{border-color:var(--accent);font-weight:800}
+#mkSelHint.mks-lim{flex-wrap:wrap;justify-content:center;border-radius:18px;padding:6px 8px}
+#mkSelHint .mks-rst{background:var(--surface-2);color:var(--text);border:1px solid var(--accent)}
 @media(forced-colors:active){#mkSelBar,#mkSelHint,#mkSelToast{border:2px solid CanvasText;background:Canvas;color:CanvasText}#mkSelBar .mks-del{background:ButtonFace;color:ButtonText;border:2px solid CanvasText}#mkSelBar [aria-pressed=true]{outline:2px solid Highlight}}
 
 </style>
@@ -11170,12 +11175,21 @@ var sb=D.createElement('div');sb.id='mkSelBar';sb.setAttribute('role','toolbar')
 sb.innerHTML='<div class="mks-r1"><button type="button" class="mks-del" data-mk-a="del"></button><button type="button" class="mks-ghost" data-mk-a="cancel">إلغاء</button><button type="button" class="mks-ghost mks-mo" data-mk-a="more" aria-expanded="false" aria-label="خيارات التحديد" title="خيارات التحديد">⋯</button></div>'+
 '<div class="mks-r2" hidden><div class="mks-lbl">يشمل</div><div class="mks-chips" role="group" aria-label="ما يشمله التحديد"><button type="button" data-mk-k="pen">القلم</button><button type="button" data-mk-k="mk">الماركر</button><button type="button" data-mk-k="shp">الأشكال</button><button type="button" data-mk-k="txt">النصوص المكتوبة</button><button type="button" data-mk-k="scr">قصاصات</button></div>'+
 '<div class="mks-lbl">قاعدة الإصابة</div><div class="mks-seg" role="group" aria-label="قاعدة الإصابة"><button type="button" data-mk-k="touch">لمس</button><button type="button" data-mk-k="contain">احتواء</button></div>'+
-'<button type="button" class="mks-all" data-mk-a="all">تحديد الكل في الشاشة</button></div><div class="mks-msg" aria-hidden="true"></div>';
+'<button type="button" class="mks-all mks-rst" data-mk-a="reset" hidden>إعادة تفعيل كل الأنواع</button><button type="button" class="mks-all" data-mk-a="all">تحديد الكل في الشاشة</button></div><div class="mks-msg" aria-hidden="true"></div>';
 B.appendChild(sb);
 var hint=D.createElement('div');hint.id='mkSelHint';hint.hidden=true;hint.setAttribute('role','group');hint.setAttribute('aria-label','أداة التحديد');
-hint.innerHTML='<span>اسحب قطريًا لتحديد منطقة</span><button type="button" data-mk-a="all" aria-label="تحديد الكل في الشاشة الحالية (Shift+A)">تحديد الكل في الشاشة</button>';B.appendChild(hint);
+hint.innerHTML='<span>اسحب قطريًا لتحديد منطقة</span><button type="button" class="mks-rst" data-mk-a="reset" hidden>تفعيل كل الأنواع</button><button type="button" data-mk-a="all" aria-label="تحديد الكل في الشاشة الحالية (Shift+A)">تحديد الكل في الشاشة</button>';B.appendChild(hint);
 var tst=D.createElement('div');tst.id='mkSelToast';tst.setAttribute('role','status');tst.setAttribute('aria-live','polite');tst.hidden=true;B.appendChild(tst);
 var delB=sb.querySelector('.mks-del'),msgB=sb.querySelector('.mks-msg'),r2=sb.querySelector('.mks-r2');
+var moreB=sb.querySelector('[data-mk-a=more]'),hintSp=hint.querySelector('span'),HINT0=hintSp.textContent;
+/* MK-SELFIX: filters (chips) can be switched off until nothing is selectable; the bar must then stay reachable */
+function limited(){return !(M.pen&&M.mk&&M.shp&&M.txt&&M.scr)}
+function anyIgnoring(r0){ /* would this rectangle catch anything if every type were on? (locked sheets never count) */
+  build(false);var r=norm(r0),mode=M.mode;
+  for(var i=0;i<C.items.length;i++){var it=C.items[i];if(it.lk)continue;if(it.x1<r.x0||it.x0>r.x1||it.y1<r.y0||it.y0>r.y1)continue;if(itemHit(it,r,mode))return true}
+  return false}
+function rstSync(){var l=limited();sb.querySelector('.mks-rst').hidden=!l;hint.querySelector('.mks-rst').hidden=!l;hint.classList.toggle('mks-lim',l);hintSp.textContent=l?'بعض أنواع التحديد مُعطّلة':HINT0}
+function resetFilters(){M.pen=M.mk=M.shp=M.txt=M.scr=1;saveM();chipsSync();resetArm();refresh();uiSync();reqPaint();say('تم تفعيل كل الأنواع — '+(ST.sel.length?'تم تحديد '+cnt(ST.sel.length,1):'لا شيء محدد'))}
 var tT=0;
 function toast(t,undo){clearTimeout(tT);tst.textContent='';var s=D.createElement('span');s.textContent=t;tst.appendChild(s);
   if(undo){var b=D.createElement('button');b.type='button';b.textContent='تراجع';b.addEventListener('click',function(){tst.hidden=true;try{K.undo()}catch(e){}});tst.appendChild(b)}
@@ -11270,7 +11284,7 @@ function selectAllVisible(){
   if(!active())return;build(true);var R=RR(),v=vp();
   ST.rect={x0:v.x-R.left,y0:v.y-R.top,x1:v.x+v.w-R.left,y1:v.y+v.h-R.top};
   ST.pin=null;var n=compute(ST.rect);reqPaint();
-  if(!n){toast('لا يوجد شيء داخل التحديد');say('لا يوجد شيء داخل التحديد');ST.rect=null}else say('تم تحديد '+cnt(n,1));
+  if(!n){if(limited()&&anyIgnoring(ST.rect)){toast('لا شيء مطابق للأنواع المفعّلة — فعّل نوعًا من الخيارات');say('لا شيء مطابق للأنواع المفعّلة')}else{toast('لا يوجد شيء داخل التحديد');say('لا يوجد شيء داخل التحديد');ST.rect=null}}else say('تم تحديد '+cnt(n,1));
   uiSync()}
 /* ---------- deletion = ONE unified history step ---------- */
 function doDelete(){
@@ -11335,7 +11349,7 @@ function up(e,cancel){
     uiSync();reqPaint();return}
   if(e&&e.clientX!=null){g.cx=e.clientX;g.cy=e.clientY}
   ST.rect=rectFromPtr(g);var n=compute(ST.rect);
-  if(!n){clearSel();toast('لا يوجد شيء داخل التحديد'+(ST.lockN?' — تخطّي قصاصة مقفلة':''));say('لا يوجد شيء داخل التحديد')}
+  if(!n){if(limited()&&anyIgnoring(ST.rect)){toast('لا شيء مطابق للأنواع المفعّلة — فعّل نوعًا من الخيارات');say('لا شيء مطابق للأنواع المفعّلة')}else{clearSel();toast('لا يوجد شيء داخل التحديد'+(ST.lockN?' — تخطّي قصاصة مقفلة':''));say('لا يوجد شيء داخل التحديد')}}
   else say('تم تحديد '+cnt(n,1)+(ST.lockN?' — تخطّي قصاصة مقفلة':''));
   uiSync();reqPaint()}
 /* auto-scroll while dragging near the top/bottom edge (reader-relative anchoring keeps the rectangle glued to the document) */
@@ -11381,10 +11395,14 @@ function placeFloat(el,ar,avoid){
   el.style.top=Math.round(y)+'px'}
 function barRect(){var vis=B.classList.contains('nt-open');if(!vis)return null;var r=bar.getBoundingClientRect();return r.width?r:null}
 function uiSync(){
-  var on=active(),n=ST.sel.length;
-  hint.hidden=!(on&&!n&&!G);
-  sb.hidden=!(on&&n&&ST.rect&&!G);
-  if(!sb.hidden){setDelLabel();chipsSync();var rs0=ST.rect?norm(ST.rect):null;if(rs0){var R=RR();msgB.textContent=ST.lockN?'تخطّي قصاصة مقفلة':'';msgB.hidden=!ST.lockN;
+  var on=active(),n=ST.sel.length,emp=!n&&!!ST.rect&&!G&&limited();
+  hint.hidden=!(on&&!n&&!G&&!emp);
+  sb.hidden=!(on&&ST.rect&&!G&&(n||emp));
+  if(on)rstSync();
+  if(sb.hidden)ST.emp0=false;
+  if(!sb.hidden){setDelLabel();chipsSync();delB.disabled=!n;
+    if(!n&&!ST.emp0){r2.hidden=false;moreB.setAttribute('aria-expanded','true')}
+    ST.emp0=!n;var rs0=ST.rect?norm(ST.rect):null;if(rs0){var R=RR();msgB.textContent=!n?'لا شيء مطابق للأنواع المفعّلة — فعّل نوعًا من القائمة أو اضغط «إعادة تفعيل كل الأنواع»':(ST.lockN?'تخطّي قصاصة مقفلة':'');msgB.hidden=!(ST.lockN||!n);
     var ar0={left:R.left+rs0.x0,right:R.left+rs0.x1,top:R.top+rs0.y0,bottom:R.top+rs0.y1};
     /* clip the anchor to the visible viewport so a tall rectangle still gets a reachable bar */
     var v=vp();ar0.top=Math.max(ar0.top,v.y);ar0.bottom=Math.min(ar0.bottom,v.y+v.h);if(ar0.bottom<ar0.top){ar0.top=ar0.bottom=v.y+v.h/2}
@@ -11399,8 +11417,9 @@ sb.addEventListener('click',function(e){var b=e.target.closest('button');if(!b)r
   if(a==='cancel'){clearSel();uiSync();reqPaint();say('أُلغي التحديد');return}
   if(a==='more'){var o=r2.hidden;r2.hidden=!o;b.setAttribute('aria-expanded',String(o));uiSync();return}
   if(a==='all')return selectAllVisible();
+  if(a==='reset')return resetFilters();
   if(k){if(k==='touch'||k==='contain')M.mode=k;else M[k]=M[k]?0:1;saveM();chipsSync();resetArm();refresh();uiSync();reqPaint();say('تم تحديد '+cnt(ST.sel.length,1))}});
-hint.addEventListener('click',function(e){var b=e.target.closest('button');if(b&&b.dataset.mkA==='all')selectAllVisible()});
+hint.addEventListener('click',function(e){var b=e.target.closest('button');if(!b)return;if(b.dataset.mkA==='all')selectAllVisible();else if(b.dataset.mkA==='reset')resetFilters()});
 /* keep the pen bar's drag handler from seeing taps on our bar: ours is a body child, so nothing to do */
 /* ---------- painting (driven by the ink draw loop through MKSEL.tick) ---------- */
 function reqPaint(){try{K.req()}catch(e){}}
@@ -11712,5 +11731,48 @@ uiSync();if(isOn())startAll();stateSync();
 
 </script>
 <!-- MK-LIFE:END -->
+<!-- MK-EDTAB:START -->
+<style id="mk-edtab-css">
+/* Editor screen, tablet & up (>=701px). Phones (<=700px) are untouched. Colours come only from theme variables. */
+@media(min-width:701px){
+  #editorScreen{padding:26px clamp(16px,3vw,40px) 40px!important}
+  #editorScreen .editor-shell{width:min(1120px,100%);gap:16px}
+  #editorScreen .editor-head{display:block!important;padding:24px 30px 12px!important}
+  #editorScreen .editor-title{font-size:27px!important;line-height:1.4}
+  #editorScreen .editor-sub{display:block!important;margin:6px 0 0;max-width:68ch;font-size:14.5px;line-height:1.9}
+  #editorScreen .ed-feat-row{padding:6px 30px 0;margin:0}
+  #editorScreen .ed-bar{padding:10px 30px!important;gap:10px}
+  #editorScreen .ed-chip,#editorScreen .ed-bar .clear-btn{min-height:46px!important;padding:8px 20px!important;font-size:15px!important;font-weight:800!important;border-radius:13px!important}
+  #editorScreen .ed-chip svg,#editorScreen .ed-bar .clear-btn svg{width:19px!important;height:19px!important}
+  #editorScreen .ed-count{font-size:14px!important;opacity:1;padding:6px 14px;border-radius:999px;background:var(--surface-2);border:1px solid var(--line)}
+  #editorScreen .mkx-tb{flex-wrap:wrap;overflow:visible;padding:4px 30px 8px;margin:0;gap:8px;touch-action:auto}
+  #editorScreen .mkx-tb .mkx-b{min-width:46px;min-height:46px;padding:0 14px;font-size:15px;border-radius:13px}
+  #editorScreen .mkx-tb .mkx-w{font-size:14px}
+  #editorScreen .mk-lastmod{margin:4px 30px 6px;padding:9px 16px;font-size:14px;border-radius:12px}
+  #editorScreen #markdownInput{width:calc(100% - 60px)!important;margin:8px 30px 14px!important;padding:24px 26px!important;border-radius:18px!important;font-size:17.5px!important;line-height:1.95;min-height:clamp(340px,52vh,700px)!important}
+  /* main button: big, full width of the card */
+  #editorScreen .ed-go{display:block!important;padding:6px 30px 4px!important}
+  #editorScreen .ed-go-btn{width:100%!important;min-width:0!important;min-height:clamp(74px,9.5vh,96px)!important;padding:14px 30px!important;gap:16px!important;font-size:clamp(24px,3.4vw,31px)!important;font-weight:950!important;border-radius:22px!important;box-shadow:0 12px 28px color-mix(in srgb,var(--accent) 38%,transparent),inset 0 1px 0 rgba(255,255,255,.28)!important}
+  #editorScreen .ed-go-btn svg{width:clamp(26px,3.2vw,34px)!important;height:clamp(26px,3.2vw,34px)!important;transition:transform .18s}
+  #editorScreen .ed-go-btn:hover svg{transform:translateX(-6px)}
+  #editorScreen .ed-go-btn:focus-visible{outline:4px solid color-mix(in srgb,var(--accent) 45%,var(--text));outline-offset:3px}
+  #editorScreen .ed-go-hint{display:block!important;margin:12px 0 2px;font-size:14px}
+  /* contact buttons: two equal columns */
+  #editorScreen .editor-footer{display:grid!important;grid-template-columns:1fr 1fr;gap:14px!important;padding:16px 30px 6px!important}
+  #editorScreen .tg-btn{min-height:70px!important;padding:8px 16px!important;gap:13px!important;border-radius:18px!important}
+  #editorScreen .tg-ic{width:42px!important;height:42px!important;border-radius:13px!important}
+  #editorScreen .tg-ic svg{width:22px!important;height:22px!important}
+  #editorScreen .tg-tx b{font-size:15.5px!important}
+  #editorScreen .tg-tx small{display:block!important;font-size:12.5px}
+  #editorScreen .tg-ar{display:grid!important}
+  /* counters share the row evenly */
+  #editorScreen .vc-wrap{padding:14px 30px 24px;gap:14px}
+  #editorScreen .vc-wrap .vc-box{flex:1 1 0;max-width:none;padding:12px 18px;gap:12px}
+  #editorScreen .vc-wrap .vc-tx b{font-size:26px}
+  #editorScreen .vc-wrap .vc-ic{width:40px;height:40px}
+}
+@media(min-width:701px) and (prefers-reduced-motion:reduce){#editorScreen .ed-go-btn svg{transition:none}#editorScreen .ed-go-btn:hover svg{transform:none}}
+</style>
+<!-- MK-EDTAB:END -->
 </body>
 </html>
