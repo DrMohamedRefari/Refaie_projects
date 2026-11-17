@@ -740,7 +740,7 @@ html.app-night .pe-sh{box-shadow:0 -10px 30px rgba(0,0,0,.5)}
           <span id="edCount" class="ed-count" aria-live="off">0 كلمة · 0 حرف</span>
         </div>
         <!-- MK-LASTMOD:START (AI agents: on EVERY edit of this file set LAST_MODIFIED_DATE = Egypt date YYYY-MM-DD, LAST_MODIFIED_TIME = Egypt time 12-hour hh:mm (Africa/Cairo), LAST_MODIFIED_AMPM = صباحًا or مساءً with the matching (AM)/(PM). The Hijri date fills itself from the date. Do not touch the script.) -->
-        <div id="mkLastMod" class="mk-lastmod" dir="rtl"><div class="mk-lm-l1"><span class="mk-lm-flag" aria-hidden="true">🇪🇬</span> <span>آخر تعديل:</span> <b id="mkLastModDate" data-var="LAST_MODIFIED_DATE">2026-11-17</b> <span>الساعة</span> <b id="mkLastModTime" data-var="LAST_MODIFIED_TIME">10:18</b> <span id="mkLastModAP" data-var="LAST_MODIFIED_AMPM">صباحًا (AM)</span></div><div id="mkLastModHijri" class="mk-lm-l2" hidden></div></div>
+        <div id="mkLastMod" class="mk-lastmod" dir="rtl"><div class="mk-lm-l1"><span class="mk-lm-flag" aria-hidden="true">🇪🇬</span> <span>آخر تعديل:</span> <b id="mkLastModDate" data-var="LAST_MODIFIED_DATE">2026-11-17</b> <span>الساعة</span> <b id="mkLastModTime" data-var="LAST_MODIFIED_TIME">10:29</b> <span id="mkLastModAP" data-var="LAST_MODIFIED_AMPM">صباحًا (AM)</span></div><div id="mkLastModHijri" class="mk-lm-l2" hidden></div></div>
         <style id="mk-lastmod-css">.mk-lastmod{margin:8px 0 0;padding:7px 12px;border:1px solid var(--line,#ccc);border-radius:10px;background:var(--surface-2,transparent);color:var(--muted,inherit);font:inherit;font-size:13px;text-align:center;line-height:1.8}.mk-lastmod b{color:var(--text,inherit);font-weight:700;unicode-bidi:isolate;direction:ltr;display:inline-block;white-space:nowrap}.mk-lm-l2{margin-top:1px;font-size:12.5px;color:var(--muted,inherit)}.mk-lm-l2[hidden]{display:none}.mk-lm-flag{font-size:15px}</style>
         <script id="mk-lastmod-script">
         /* Hijri date for the Egypt stamp date. Never blocks the page: shows instantly from local data, then upgrades from a free API (aladhan.com) if reachable. */
@@ -11881,10 +11881,51 @@ bar.addEventListener('click',function(e){var b=e.target.closest('button');if(!b)
 var nT=0;input.addEventListener('input',function(){clearTimeout(nT);nT=setTimeout(function(){if(sig()!==lastSig){renderBar();subs.forEach(function(f){try{f('name')}catch(e){}})}},500)});
 /* safety net: programmatic edits (paste / clear / open .md …) keep the app's own key in sync; nothing else to save for the active text */
 renderBar();
-W.MKTEXTS={list:list,active:function(){return st.active},name:function(id){var i=idx(id);return i<0?'':nameOf(st.items[i],i)},setActive:setActive,add:add,remove:remove,rename:rename,onChange:function(f){if(typeof f==='function')subs.push(f)},count:function(){return st.items.length}};
+W.MKTEXTS={list:list,active:function(){return st.active},name:function(id){var i=idx(id);return i<0?'':nameOf(st.items[i],i)},setActive:setActive,add:add,remove:remove,rename:rename,onChange:function(f){if(typeof f==='function')subs.push(f)},count:function(){return st.items.length},toast:toast};
 }catch(err){try{console.warn('MK-TEXTS init failed',err)}catch(e){}}})();
 </script>
 <!-- MK-TEXTS:END -->
+<!-- MK-PAGEZOOM:START -->
+<style id="mk-pagezoom-css">
+/* MK-PAGEZOOM: scale the study page itself (width + text together) to fill the empty side space */
+.md{font-size:calc(18px*var(--zoom,1)*var(--mk-ps,1))}
+@media(max-width:700px){.reader .md{font-size:calc(17px*var(--zoom,1)*var(--mk-ps,1))}}
+.zoom-box .mk-pz{background:var(--accent-soft);color:var(--text);display:grid;place-items:center}
+.zoom-box .mk-pz svg{width:18px;height:18px;pointer-events:none}
+.zoom-box .mk-pz[aria-pressed="true"]{background:var(--accent);color:var(--on-c)}
+.zoom-box.mk-ps-off .mk-pz,body.mk-pdf-on .zoom-box .mk-pz{display:none}
+.zoom-box .mk-pz:focus-visible{outline:3px solid var(--accent);outline-offset:-3px}
+@media print{.mk-pz{display:none!important}}
+</style>
+<script id="mk-pagezoom-script">
+(function(){try{
+'use strict';
+var D=document,W=window,R=D.documentElement,KEY='refaie-minimal-study-v1-pagescale',BASE=880,MINP=.5,STEP=.1;
+var box=D.getElementById('zoomBox');if(!box)return;
+var ps=1;try{var v=parseFloat(localStorage.getItem(KEY));if(v>0)ps=v}catch(e){}
+function maxPs(){var avail=(R.clientWidth||W.innerWidth)-6;return Math.max(1,Math.min(3,avail/BASE))}
+function ic(p){return'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+p+'</svg>'}
+var defs=[['pgSmaller','تصغير الصفحة','<path d="M10 4v6H4M14 20v-6h6M10 10 3.5 3.5M14 14l6.5 6.5"/>'],
+          ['pgBigger','تكبير الصفحة (يملأ المساحة الفارغة)','<path d="M4 10V4h6M20 14v6h-6M4 4l6.5 6.5M20 20l-6.5-6.5"/>'],
+          ['pgFit','ملء عرض الشاشة / الرجوع للحجم الأصلي','<path d="M3 5v14M21 5v14M7 12h10M7 12l3-3M7 12l3 3M17 12l-3-3M17 12l-3 3"/>']];
+defs.forEach(function(d){var b=D.createElement('button');b.type='button';b.id=d[0];b.className='mk-pz';b.setAttribute('aria-label',d[1]);b.title=d[1];b.innerHTML=ic(d[2]);box.appendChild(b)});
+var bS=D.getElementById('pgSmaller'),bB=D.getElementById('pgBigger'),bF=D.getElementById('pgFit');
+function clamp(x){return Math.min(maxPs(),Math.max(MINP,x))}
+var tm=0;
+function apply(save,say){var mx=maxPs();ps=clamp(ps);box.classList.toggle('mk-ps-off',mx<=1.04);
+  R.style.setProperty('--reader-width',Math.round(BASE*ps)+'px');R.style.setProperty('--mk-ps',String(Math.round(ps*1000)/1000));
+  bS.disabled=ps<=MINP+.001;bB.disabled=ps>=mx-.001;bF.setAttribute('aria-pressed',String(ps>=mx-.01&&mx>1.04));
+  if(save){try{localStorage.setItem(KEY,String(ps))}catch(e){}}
+  if(say&&W.MKTEXTS&&MKTEXTS.toast)MKTEXTS.toast('حجم الصفحة '+Math.round(ps*100)+'%',900);
+  clearTimeout(tm);tm=setTimeout(function(){try{W.dispatchEvent(new Event('resize'))}catch(e){}},30)}
+bS.addEventListener('click',function(){ps=Math.max(MINP,Math.round((ps-STEP)*10)/10);apply(true,true)});
+bB.addEventListener('click',function(){ps=Math.round((ps+STEP)*10)/10;if(ps>maxPs()-.05)ps=maxPs();apply(true,true)});
+bF.addEventListener('click',function(){var mx=maxPs();ps=(ps>=mx-.01)?1:mx;apply(true,true)});
+var rt=0;W.addEventListener('resize',function(){clearTimeout(rt);rt=setTimeout(function(){var was=ps;apply(false,false)},120)});
+apply(false,false);
+}catch(err){try{console.warn('MK-PAGEZOOM failed',err)}catch(e){}}})();
+</script>
+<!-- MK-PAGEZOOM:END -->
 <!-- MK-PDFTAB:START -->
 <style id="mk-pdftab-css">
 /* MK-PDFTAB: tabs + PDF viewer. Colours only from theme variables (page paper & ink swatches are deliberate data). */
